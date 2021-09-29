@@ -32,45 +32,6 @@ export default function init() {
   envMap.load("../data/StudioG.zenv");
   scene.setEnvMap(envMap);
 
-  const asset = new CADAsset();
-  const zcad = urlParams.has("zcad")
-    ? urlParams.get("zcad")
-    : "../data/HC_SRO4.zcad";
-  if (zcad) {
-    asset.load(zcad).then(() => {
-      let count = 0;
-      asset.traverse((item) => {
-        if (item instanceof GeomItem) {
-          count++;
-        }
-      });
-      console.log("Done GeomItems:", count);
-      asset.getGeometryLibrary().on("loaded", () => {
-        let triangles = 0;
-        let lines = 0;
-        asset.traverse((item) => {
-          if (item instanceof GeomItem) {
-            const geom = item.getParameter("Geometry").getValue();
-            if (geom instanceof LinesProxy) {
-              lines += geom.__buffers.indices.length / 2;
-            }
-            if (geom instanceof MeshProxy) {
-              triangles += geom.__buffers.indices.length / 3;
-            }
-          }
-        });
-        console.log("lines: ", lines, " triangles: ", triangles);
-      });
-      renderer.frameAll();
-    });
-  }
-
-  scene.getRoot().addChild(asset);
-
-  const xfo = new Xfo();
-  xfo.ori.setFromEulerAngles(new EulerAngles(90 * (Math.PI / 180), 0, 0));
-  asset.getParameter("GlobalXfo").setValue(xfo);
-
   // Setup FPS Display
   const fpsElement = document.getElementById("fps");
   fpsElement.renderer = renderer;
@@ -86,18 +47,23 @@ export default function init() {
     while (item && !(item instanceof CADBody)) item = item.getOwner();
     return item;
   };
-  renderer.getViewport().on("pointerOverGeom", (event) => {
-    highlightedItem = filterItem(event.intersectionData.geomItem);
-    highlightedItem.addHighlight("pointerOverGeom", highlightColor, true);
-  });
-  renderer.getViewport().on("pointerLeaveGeom", (event) => {
-    highlightedItem.removeHighlight("pointerOverGeom", true);
-    highlightedItem = null;
-  });
+  // renderer.getViewport().on("pointerOverGeom", (event) => {
+  //   highlightedItem = filterItem(event.intersectionData.geomItem);
+  //   highlightedItem.addHighlight("pointerOverGeom", highlightColor, true);
+  // });
+  // renderer.getViewport().on("pointerLeaveGeom", (event) => {
+  //   highlightedItem.removeHighlight("pointerOverGeom", true);
+  //   highlightedItem = null;
+  // });
   renderer.getViewport().on("pointerDown", (event) => {
     if (event.intersectionData) {
       const geomItem = filterItem(event.intersectionData.geomItem);
       console.log(geomItem.getPath());
+
+      const material = event.intersectionData.geomItem
+        .getParameter("Material")
+        .getValue();
+      console.log(material.getName());
     }
   });
 
@@ -139,4 +105,31 @@ export default function init() {
   if (urlParams.has("profile")) {
     renderer.startContinuousDrawing();
   }
+
+  // //////////////////////////
+  // Load the Asset
+  const asset = new CADAsset();
+  const zcad = urlParams.has("zcad")
+    ? urlParams.get("zcad")
+    : "./data/Projet%20construcTAU-2020.skp.zcad";
+  if (zcad) {
+    asset.load(zcad).then(() => {
+      let numItems = 0;
+      let numGeomItem = 0;
+      asset.traverse((item) => {
+        numItems++;
+        if (item instanceof GeomItem) numGeomItem++;
+      });
+      console.log("numItems:", numItems);
+      const materials = asset.getMaterialLibrary().getMaterials();
+      materials.forEach((material) => {
+        const BaseColor = material.getParameter("BaseColor");
+        if (BaseColor) BaseColor.setValue(BaseColor.getValue().toGamma());
+        // console.log(material.getName(), material.getShaderName());
+      });
+      renderer.frameAll();
+    });
+  }
+
+  scene.getRoot().addChild(asset);
 }

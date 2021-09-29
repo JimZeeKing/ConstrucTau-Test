@@ -32,7 +32,7 @@ class LoginDialog extends HTMLElement {
 
     this.modalContent.innerHTML = `
         <div class="imgcontainer">
-          <img src="./data/logo-zea.svg" alt="Avatar" class="avatar">
+          <img src="./data/logo-inverse.png" alt="Avatar" class="avatar">
         </div>
 
         <div class="container">
