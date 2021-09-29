@@ -1,17 +1,7 @@
+import "./ConstrucTAOSurfaceShader.js";
 export default function init() {
-  const {
-    Color,
-    Vec3,
-    EulerAngles,
-    Xfo,
-    Scene,
-    GLRenderer,
-    EnvMap,
-    resourceLoader,
-    GeomItem,
-    MeshProxy,
-    LinesProxy,
-  } = zeaEngine;
+  const { Color, Vec3, Scene, GLRenderer, EnvMap, resourceLoader, GeomItem } =
+    zeaEngine;
   const { CADAsset, CADBody } = zeaCad;
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -123,9 +113,17 @@ export default function init() {
       console.log("numItems:", numItems);
       const materials = asset.getMaterialLibrary().getMaterials();
       materials.forEach((material) => {
+        material.setShaderName("ConstrucTAOSurfaceShader");
         const BaseColor = material.getParameter("BaseColor");
         if (BaseColor) BaseColor.setValue(BaseColor.getValue().toGamma());
         // console.log(material.getName(), material.getShaderName());
+
+        switch (material.getName()) {
+          case "Tyvek":
+          case "[Sheet Metal]":
+            material.getParameter("Overlay").setValue(0.0001);
+            break;
+        }
       });
       renderer.frameAll();
     });
