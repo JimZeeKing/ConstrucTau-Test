@@ -1,7 +1,16 @@
 import "./ConstrucTAOSurfaceShader.js";
 export default function init() {
-  const { Color, Vec3, Scene, GLRenderer, EnvMap, resourceLoader, GeomItem } =
-    zeaEngine;
+  const {
+    Color,
+    Vec3,
+    Scene,
+    GLRenderer,
+    EnvMap,
+    resourceLoader,
+    GeomItem,
+    TreeItem,
+    SelectionSet,
+  } = zeaEngine;
   const { CADAsset, CADBody } = zeaCad;
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -103,12 +112,45 @@ export default function init() {
     ? urlParams.get("zcad")
     : "./data/Projet%20construcTAU-2020.skp.zcad";
   if (zcad) {
+    const layers = {};
+
     asset.load(zcad).then(() => {
+      if (asset.hasParameter("LayerPaths")) {
+        const LayerPaths = asset.getParameter("LayerPaths").getValue();
+        LayerPaths.forEach((path) => {
+          const parts = path.split(">");
+          let item = scene.getRoot();
+          parts.forEach((name, index) => {
+            if (index == parts.length - 1) {
+              if (layers[name]) {
+                console.warn("Duplicte layer names found");
+              }
+              const layerItem = new SelectionSet(name);
+              item.addChild(layerItem);
+              layers[name] = layerItem;
+            } else {
+              let folderItem = item.getChildByName(name);
+              if (!folderItem) {
+                folderItem = new TreeItem(name);
+                item.addChild(folderItem);
+              }
+              item = folderItem;
+            }
+          });
+        });
+      }
+
       let numItems = 0;
       let numGeomItem = 0;
       asset.traverse((item) => {
         numItems++;
-        if (item instanceof GeomItem) numGeomItem++;
+        if (item instanceof GeomItem) {
+          if (item.hasParameter("LayerName")) {
+            const layerName = item.getParameter("LayerName").getValue();
+            if (layers[layerName]) layers[layerName].addItem(item);
+          }
+          numGeomItem++;
+        }
       });
       console.log("numItems:", numItems);
       const materials = asset.getMaterialLibrary().getMaterials();
@@ -121,7 +163,7 @@ export default function init() {
         switch (material.getName()) {
           case "Tyvek":
           case "[Sheet Metal]":
-            material.getParameter("Overlay").setValue(0.0001);
+            material.getParameter("Overlay").setValue(0.05);
             break;
         }
       });
