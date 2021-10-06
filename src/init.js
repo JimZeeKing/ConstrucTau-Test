@@ -1,17 +1,11 @@
 import "./ConstrucTAOSurfaceShader.js";
+import loadLabels from "./loadLabels.js";
+import loadAsset from "./loadAsset.js";
+import displayBillboardOnClick from "./displayBillboardOnClick.js";
 export default function init() {
-  const {
-    Color,
-    Vec3,
-    Scene,
-    GLRenderer,
-    EnvMap,
-    resourceLoader,
-    GeomItem,
-    TreeItem,
-    SelectionSet,
-  } = zeaEngine;
-  const { CADAsset, CADBody } = zeaCad;
+  const { Color, Vec3, Scene, GLRenderer, EnvMap, resourceLoader, TreeItem } =
+    zeaEngine;
+  const { CADBody } = zeaCad;
 
   const urlParams = new URLSearchParams(window.location.search);
   const scene = new Scene();
@@ -54,15 +48,28 @@ export default function init() {
   //   highlightedItem.removeHighlight("pointerOverGeom", true);
   //   highlightedItem = null;
   // });
-  renderer.getViewport().on("pointerDown", (event) => {
-    if (event.intersectionData) {
-      const geomItem = filterItem(event.intersectionData.geomItem);
-      console.log(geomItem.getPath());
 
-      const material = event.intersectionData.geomItem
-        .getParameter("Material")
-        .getValue();
-      console.log(material.getName());
+  let pointerDownPos;
+  renderer.getViewport().on("pointerDown", (event) => {
+    const { intersectionData } = event;
+    if (intersectionData) {
+      pointerDownPos = event.pointerPos;
+    }
+  });
+  renderer.getViewport().on("pointerUp", (event) => {
+    const { intersectionData } = event;
+    if (intersectionData && pointerDownPos) {
+      // const geomItem = filterItem(intersectionData.geomItem);
+      // console.log(geomItem.getPath());
+      const dist = event.pointerPos.distanceTo(pointerDownPos);
+      if (
+        dist < 2 &&
+        event.button == 0 &&
+        intersectionData &&
+        intersectionData.geomItem.hasParameter("LayerName")
+      ) {
+        displayBillboardOnClick(intersectionData, labelsData, billboards);
+      }
     }
   });
 
@@ -106,70 +113,21 @@ export default function init() {
   }
 
   // //////////////////////////
+  // Load the Labels
+  const promisses = [];
+  const billboards = new TreeItem("Billboards");
+  scene.getRoot().addChild(billboards);
+  let labelsData;
+  loadLabels("./data/labels.xlsx").then((json) => {
+    console.log(json);
+    labelsData = json;
+  });
+
+  // //////////////////////////
   // Load the Asset
-  const asset = new CADAsset();
-  const zcad = urlParams.has("zcad")
-    ? urlParams.get("zcad")
-    : "./data/Projet%20construcTAU-2020.skp.zcad";
-  if (zcad) {
-    const layers = {};
-
-    asset.load(zcad).then(() => {
-      if (asset.hasParameter("LayerPaths")) {
-        const LayerPaths = asset.getParameter("LayerPaths").getValue();
-        LayerPaths.forEach((path) => {
-          const parts = path.split(">");
-          let item = scene.getRoot();
-          parts.forEach((name, index) => {
-            if (index == parts.length - 1) {
-              if (layers[name]) {
-                console.warn("Duplicte layer names found");
-              }
-              const layerItem = new SelectionSet(name);
-              item.addChild(layerItem);
-              layers[name] = layerItem;
-            } else {
-              let folderItem = item.getChildByName(name);
-              if (!folderItem) {
-                folderItem = new TreeItem(name);
-                item.addChild(folderItem);
-              }
-              item = folderItem;
-            }
-          });
-        });
-      }
-
-      let numItems = 0;
-      let numGeomItem = 0;
-      asset.traverse((item) => {
-        numItems++;
-        if (item instanceof GeomItem) {
-          if (item.hasParameter("LayerName")) {
-            const layerName = item.getParameter("LayerName").getValue();
-            if (layers[layerName]) layers[layerName].addItem(item);
-          }
-          numGeomItem++;
-        }
-      });
-      console.log("numItems:", numItems);
-      const materials = asset.getMaterialLibrary().getMaterials();
-      materials.forEach((material) => {
-        material.setShaderName("ConstrucTAOSurfaceShader");
-        const BaseColor = material.getParameter("BaseColor");
-        if (BaseColor) BaseColor.setValue(BaseColor.getValue().toGamma());
-        // console.log(material.getName(), material.getShaderName());
-
-        switch (material.getName()) {
-          case "Tyvek":
-          case "[Sheet Metal]":
-            material.getParameter("Overlay").setValue(0.05);
-            break;
-        }
-      });
-      renderer.frameAll();
-    });
-  }
-
-  scene.getRoot().addChild(asset);
+  loadAsset("./data/Projet%20construcTAU-2020.skp.zcad").then((data) => {
+    scene.getRoot().addChild(data.asset);
+    scene.getRoot().addChild(data.layersRoot);
+    renderer.frameAll();
+  });
 }
