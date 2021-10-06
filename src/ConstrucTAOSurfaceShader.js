@@ -41,11 +41,20 @@ void main(void) {
   int drawItemId = getDrawItemId();
   v_drawItemId = float(drawItemId);
   v_geomItemData  = getInstanceData(drawItemId);
+  
+  #ifdef ENABLE_MULTI_DRAW
+  vec2 materialCoords = v_geomItemData.zw;
+  vec4 materialValue1 = getMaterialValue(materialCoords, 1);
+  float overlay = materialValue1.z;
+  #else
+  float overlay = Overlay;
+  #endif
 
   mat4 modelMatrix = getModelMatrix(drawItemId);
   mat4 modelViewMatrix = viewMatrix * modelMatrix;
 
-  vec4 pos = vec4(positions, 1.);
+  vec4 pos = vec4(positions + (normals * overlay), 1.);
+
   vec4 viewPos    = modelViewMatrix * pos;
   gl_Position     = projectionMatrix * viewPos;
 
@@ -61,14 +70,8 @@ void main(void) {
   //////////////////////////////////////////////
   // Overlay
 
-  #ifdef ENABLE_MULTI_DRAW
-  vec2 materialCoords = v_geomItemData.zw;
-  vec4 materialValue1 = getMaterialValue(materialCoords, 1);
-  float overlay = materialValue1.z;
-  #else
-  float overlay = Overlay;
-  #endif
-  gl_Position.z = mix(gl_Position.z, -gl_Position.w, overlay);
+  // gl_Position.z = mix(gl_Position.z, -gl_Position.w, overlay);
+  
   //////////////////////////////////////////////
 
   v_worldPos      = (modelMatrix * pos).xyz;
