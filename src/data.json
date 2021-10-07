@@ -1,43 +1,41 @@
 {
-    "data": {
-        "infos": [
-            {
-                "fullName": "Semelle filante (soutenant un mur porteur)",
-                "name": "Semelle filante",
-                "vocableFR": "Semelle filante",
-                "vocableEN": "Footing",
-                "materials": {
-                    "name": "Béton",
-                    "description": "Matériaux constituants: Ciment, agrégats, eau (les proportions sont régies par code)"
-                },
-                "standradSizes": {
-                    "width": "600mm",
-                    "height": "200mm"
-                },
-                "possibleSizes": {
-                    "width": "1 étage : 250 mm, 2 étages : 350 mm, 3 étages : 450 mm",
-                    "height": "Ne doit pas être inférieur à 100 mm ou la largeur de la saillie de la semelle"
-                },
-                "images": [
+    "infos": [
+        {
+            "fullName": "Semelle filante (soutenant un mur porteur)",
+            "name": "Semelle filante",
+            "vocableFR": "Semelle filante",
+            "vocableEN": "Footing",
+            "materials": {
+                "name": "Béton",
+                "description": "Matériaux constituants: Ciment, agrégats, eau (les proportions sont régies par code)"
+            },
+            "standradSizes": {
+                "width": "600mm",
+                "height": "200mm"
+            },
+            "possibleSizes": {
+                "width": "1 étage : 250 mm, 2 étages : 350 mm, 3 étages : 450 mm",
+                "height": "Ne doit pas être inférieur à 100 mm ou la largeur de la saillie de la semelle"
+            },
+            "images": [
+                {
+                    "url": ""
+                }
+            ],
+            "code": {
+                "article": "Section 9.15.3 Semelles",
+                "links": [
                     {
-                        "url": ""
+                        "name": "Lien vers le Pdf de Code de construction du Québec ",
+                        "url": "https://publications-cnrc.canada.ca/fra/voir/td/?id=7eae2721-7ff6-4e26-ac77-c9e90eb8cc0b&dp=2&dsl=fr"
+                    },
+                    {
+                        "name": "Lien vers Guide illustré de l'utilisateur – CNB 2015 : Maisons et petits bâtiments (Partie 9 de la division B)  ",
+                        "url": "https://nrc.canada.ca/fr/certifications-evaluations-normes/codes-canada/publications-codes-canada/guide-illustre-lutilisateur-cnb-2015-maisons-petits-batiments-partie-9-division-b"
                     }
-                ],
-                "code": {
-                    "article": "Section 9.15.3 Semelles",
-                    "links": [
-                        {
-                            "name": "Lien vers le Pdf de Code de construction du Québec ",
-                            "url": "https://publications-cnrc.canada.ca/fra/voir/td/?id=7eae2721-7ff6-4e26-ac77-c9e90eb8cc0b&dp=2&dsl=fr"
-                        },
-                        {
-                            "name": "Lien vers Guide illustré de l'utilisateur – CNB 2015 : Maisons et petits bâtiments (Partie 9 de la division B)  ",
-                            "url": "https://nrc.canada.ca/fr/certifications-evaluations-normes/codes-canada/publications-codes-canada/guide-illustre-lutilisateur-cnb-2015-maisons-petits-batiments-partie-9-division-b"
-                        }
-                    ]
-                },
-                "description": "Les semelles reçoivent les charges de la maison par l’intermédiaire des poteaux ou des murs de fondation et les transmettent au sol. Le type et les dimensions des semelles doivent se prêter à la composition du sol et être à une profondeur les mettant à l’abri de l’effet du gel. L’effet du gel sera évité par le drainage efficace autour des fondations dans le but d’éloigner l’eau du bâtiment. Les semelles doivent reposer sur un sol non remanié, sur le roc ou sur un matériau granulaire compacté"
-            }
-        ]
-    }
+                ]
+            },
+            "description": "Les semelles reçoivent les charges de la maison par l’intermédiaire des poteaux ou des murs de fondation et les transmettent au sol. Le type et les dimensions des semelles doivent se prêter à la composition du sol et être à une profondeur les mettant à l’abri de l’effet du gel. L’effet du gel sera évité par le drainage efficace autour des fondations dans le but d’éloigner l’eau du bâtiment. Les semelles doivent reposer sur un sol non remanié, sur le roc ou sur un matériau granulaire compacté"
+        }
+    ]
 }

@@ -11,8 +11,14 @@ DataPool.create = function name(JSONUrl) {
         return pool.data;
     }
 
+    pool.getObjectFromList = function (key, index) {
+        return pool.data[key] ? pool.data[key][index] : null;
+    };
+
     return pool;
 }
+
+export { DataPool };
 
 
 

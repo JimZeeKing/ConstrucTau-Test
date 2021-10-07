@@ -28,9 +28,9 @@ function createCanvas(width, height) {
     return canvas;
 
 }
-function createDataImage(data, name) {
+function createDataImage(imgData, name) {
     const di = new DataImage(name);
-    di.setData(100, 100, data);
+    di.setData(imgData.source.width, imgData.source.height, imgData.bytes);
     return di;
 }
 
@@ -38,24 +38,28 @@ function createBillboard(label, pos) {
     const billboard = new BillboardItem('billboard', label);
     const xfo = new Xfo(pos);
     billboard.getParameter('LocalXfo').setValue(xfo);
-    billboard.getParameter('PixelsPerMeter').setValue(300);
+    billboard.getParameter('PixelsPerMeter').setValue(600);
     billboard.getParameter('AlignedToCamera').setValue(true);
     billboard.getParameter('DrawOnTop').setValue(false);
     billboard.getParameter('Alpha').setValue(1);
     return billboard;
 }
-let data;
+let imgData = {};
 export function prepare(image) {
+
+    imgData.source = image;
+
     if (image) {
         const canvas = createCanvas(image.width, image.height);
         canvas.getContext("2d").drawImage(image, 0, 0);
-        data = canvas.getContext("2d").getImageData(0, 0, image.width, image.height);
+        imgData.bytes = canvas.getContext("2d").getImageData(0, 0, image.width, image.height);
         main();
     } else {
         loadImage("../data/images/dog.jpg", (image) => {
+            imgData.source = image;
             const canvas = createCanvas(image.width, image.height);
             canvas.getContext("2d").drawImage(image, 0, 0);
-            data = canvas.getContext("2d").getImageData(0, 0, image.width, image.height);
+            imgData.bytes = canvas.getContext("2d").getImageData(0, 0, image.width, image.height);
             main();
         });
     }
@@ -94,8 +98,9 @@ export function main() {
     const asset = new TreeItem('labels')
     scene.getRoot().addChild(asset)
 
-    const label0 = createDataImage(data, 'Hello')
+    const label0 = createDataImage(imgData, 'Hello')
     const billboard0 = createBillboard(label0, new Vec3(1, 1, 1))
+
     asset.addChild(billboard0)
 
     const label1 = createLabel(new Color(1, 1, 0), 'Long')
@@ -108,4 +113,3 @@ export function main() {
 
     renderer.resumeDrawing();
 }
-

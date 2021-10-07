@@ -4,9 +4,6 @@
 
 
 <head>
-
-
-
     <!-- download Zea Engine -- this downloads the latest build from version 3 of the engine -->
     <script src="./libs/zea-engine/index.umd.js"></script>
     <!-- download our stylesheet -->
@@ -15,20 +12,16 @@
     <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/src/dom-to-image-more.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/squirrelly@8.0.8/dist/browser/squirrelly.min.js"></script>
 
-    <script src="./src/DataPool.js"></script>
-
     <title>Zea Engine App</title>
     <style>
         table {
             background-color: #666;
             border: 2px solid #000;
             color: #fff;
-
         }
 
         thead {
             background-color: #000;
-
         }
 
         th {
@@ -41,8 +34,8 @@
             padding: 15px;
         }
 
-        .bold {
-            font-weight: bold;
+        a {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -56,81 +49,85 @@
         </main>
     </div>
 
-
-
-
     <!-- Run your code here -->
     <script type="module">
         import { prepare } from './src/data.js'
+        import { DataPool } from './src/DataPool.js'
+
         let json = DataPool.create("./src/data.json");
         json.loadData().then((data) => {
-            console.log(data);
-            document.querySelector("#test").innerHTML = Sqrl.render(document.querySelector("#test").innerHTML, data);
-
-            domtoimage.toPng(document.querySelector("#test")).then((data) => {
+            data = json.getObjectFromList("infos", 0);
+            let template = document.querySelector("#infos-billboard-template");
+            template.innerHTML = Sqrl.render(template.innerHTML, data);
+            domtoimage.toPng(template).then((pngData) => {
                 var img = new Image();
                 img.onload = function (argument) {
                     prepare(img);
                 };
-                img.src = data;
+                img.src = pngData;
             });
         })
-
     </script>
 
-    <div id="test">
+    <div id="infos-billboard-template">
         <table>
             <thead>
-                <th colspan="3">{{it.data.infos[0].fullName}}</th>
+                <th colspan="3">{{it.fullName}}</th>
             </thead>
             <tbody>
                 <tr>
-                    <td class="bold">Vocabulaire (nom français de la composante):</td>
-                    <td colspan="2">{{it.data.infos[0].vocableFR}}</td>
+                    <td class="font-bold">Vocabulaire (nom français de la composante):</td>
+                    <td class="bg-gray-600" colspan="2">{{it.vocableFR}}</td>
                 </tr>
                 <tr>
-                    <td class="bold">Vocabulaire (vocabulaire usuel de la composante):</td>
-                    <td colspan="2">{{it.data.infos[0].vocableEN}}</td>
+                    <td class="font-bold">Vocabulaire (vocabulaire usuel de la composante):</td>
+                    <td class="bg-gray-600" colspan="2">{{it.vocableEN}}</td>
                 </tr>
                 <tr>
-                    <td class="bold">Matériaux:</td>
-                    <td>{{it.data.infos[0].materials.name}}</td>
-                    <td>{{it.data.infos[0].materials.description}}</td>
+                    <td class="font-bold">Matériaux:</td>
+                    <td class="bg-gray-600">{{it.materials.name}}</td>
+                    <td class="bg-gray-600">{{it.materials.description}}</td>
                 </tr>
                 <tr>
-                    <td class="bold">Dimensions standards:</td>
-                    <td colspan="2">Hauteur {{it.data.infos[0].standradSizes.height}}<br>Largeur {{it.data.infos[0].standradSizes.width}}</td>
+                    <td class="font-bold">Dimensions standards:</td>
+                    <td class="bg-gray-600" colspan="2">Hauteur {{it.standradSizes.height}}<br>Largeur
+                        {{it.standradSizes.width}}</td>
                 </tr>
                 <tr>
-                    <td class="bold">Dimensions possibles: limite inférieur</td>
-                    <td>Hauteur : <br>{{it.data.infos[0].possibleSizes.height}}</td>
-                    <td>Largeur : <br>{{it.data.infos[0].possibleSizes.width}}</td>
+                    <td class="font-bold">Dimensions possibles: limite inférieur</td>
+                    <td class="bg-gray-600">Hauteur : <br>{{it.possibleSizes.height}}</td>
+                    <td class="bg-gray-600">Largeur : <br>{{it.possibleSizes.width}}</td>
                 </tr>
                 <tr>
-                    <td class="bold">Lien vers des images de constructions réelles (en différents contextes)</td>
-                    <td colspan="2">Voir plus bas</td>
+                    <td class="font-bold">Lien vers des images de constructions réelles (en différents contextes)</td>
+                    <td class="bg-gray-600" colspan="2"><img src="./docs/images/building.bmp" alt=""></td>
                 </tr>
                 <tr>
-                    <td class="bold">Norme du Code de construction du Québec:</td>
-                    <td>Extrait du Code construction du Québec <br>voir plus bas</td>
-                    <td>{{it.data.infos[0].code.article}}
-                        <br>{{it.data.infos[0].code.links[0].name}}
-                        <br> <a href="{{it.data.infos[0].code.links[0].url}}">{{it.data.infos[0].code.links[0].url}}</a>
+                    <td class="font-bold">Norme du Code de construction du Québec:</td>
+                    <td class="bg-gray-600">Extrait du Code construction du Québec <br>voir plus bas</td>
+                    <td class="bg-gray-600">{{it.code.article}}
+                        <br>{{it.code.links[0].name}}
+                        <br> <a href="{{it.code.links[0].url}}">{{it.code.links[0].url}}</a>
                         <br> et
-                        <br>{{it.data.infos[0].code.links[1].name}}
-                        <br> <a href="{{it.data.infos[0].code.links[1].url}}">{{it.data.infos[0].code.links[1].url}}</a>
+                        <br>{{it.code.links[1].name}}
+                        <br> <a href="{{it.code.links[1].url}}">{{it.code.links[1].url}}</a>
                     </td>
                 </tr>
                 <tr>
-                    <td class="bold">Information textuelle sur les prescriptions de pose et /ou techniques d’assemblages</td>
-                    <td colspan="2">{{it.data.infos[0].description}}</td>
+                    <td class="font-bold">Information textuelle sur les prescriptions de pose et /ou techniques
+                        d’assemblages
+                    </td>
+                    <td class="bg-gray-600" colspan="2">{{it.description}}</td>
                 </tr>
             </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3"> <button class="bg-gray-500 p-5" onclick="javascript:alert(123)">button</button>
+                    </td>
+                </tr>
+            </tfoot>
         </table>
     </div>
-
-
-
 </body>
 
 </html>
