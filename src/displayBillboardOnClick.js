@@ -46,6 +46,21 @@ const displayBillboardOnClick = (intersectionData, labelsData, billboards) => {
     billboard.getParameter("Alpha").setValue(1);
     billboards.addChild(billboard);
 
+    billboard.on("pointerEnter", (event) => {
+      billboard.addHighlight("pointerOver", new Color(1, 0, 0, 0.2), true);
+      console.log("pointerEnter", event);
+    });
+    billboard.on("pointerLeave", (event) => {
+      billboard.removeHighlight("pointerOver", true);
+      console.log("pointerLeave", event);
+    });
+    billboard.on("pointerDown", (event) => {
+      console.log("pointerDown", event);
+    });
+    billboard.on("pointerUp", (event) => {
+      console.log("pointerUp", event);
+    });
+
     billboards[layerName] = billboard;
     setActiveBillboard(billboard);
   } else {

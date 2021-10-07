@@ -45,7 +45,7 @@ const loadAsset = (url) => {
           numGeomItem++;
         }
       });
-      console.log("numItems:", numItems);
+      console.log("numItems:", numItems, "numGeomItem:", numGeomItem);
       const materials = asset.getMaterialLibrary().getMaterials();
       materials.forEach((material) => {
         material.setShaderName("ConstrucTAOSurfaceShader");
