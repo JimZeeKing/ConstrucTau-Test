@@ -5,36 +5,44 @@
 
 <head>
 
+
+
     <!-- download Zea Engine -- this downloads the latest build from version 3 of the engine -->
     <script src="./libs/zea-engine/index.umd.js"></script>
     <!-- download our stylesheet -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css" />
 
     <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/src/dom-to-image-more.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/squirrelly@8.0.8/dist/browser/squirrelly.min.js"></script>
+
+    <script src="./src/DataPool.js"></script>
 
     <title>Zea Engine App</title>
     <style>
-        #test {
-            background-color: #ccc;
-            border: 2px solid red;
-            width: 200px;
-            height: 200px;
+        table {
+            background-color: #666;
+            border: 2px solid #000;
             color: #fff;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+
         }
 
-        #test h2 {
+        thead {
+            background-color: #000;
+
+        }
+
+        th {
             font-size: 2em;
         }
 
-        #test button {
-            border: 1px solid #000;
-            border-radius: 5%;
-            padding: 0.3em;
-            margin: 0.2em;
+        td,
+        th {
+            border: 1px solid #fff;
+            padding: 15px;
+        }
+
+        .bold {
+            font-weight: bold;
         }
     </style>
 </head>
@@ -48,22 +56,80 @@
         </main>
     </div>
 
+
+
+
     <!-- Run your code here -->
     <script type="module">
         import { prepare } from './src/data.js'
-        domtoimage.toPng(document.querySelector("#test")).then((data) => {
-            var img = new Image();
-            img.onload = function (argument) {
-                prepare(img);
-            };
-            img.src = data;
-        });
+        let json = DataPool.create("./src/data.json");
+        json.loadData().then((data) => {
+            console.log(data);
+            document.querySelector("#test").innerHTML = Sqrl.render(document.querySelector("#test").innerHTML, data);
+
+            domtoimage.toPng(document.querySelector("#test")).then((data) => {
+                var img = new Image();
+                img.onload = function (argument) {
+                    prepare(img);
+                };
+                img.src = data;
+            });
+        })
+
     </script>
 
     <div id="test">
-        <h2>Ceci est un titre</h2>
-        <button>Ceci est un bouton</button>
+        <table>
+            <thead>
+                <th colspan="3">{{it.data.infos[0].fullName}}</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="bold">Vocabulaire (nom français de la composante):</td>
+                    <td colspan="2">{{it.data.infos[0].vocableFR}}</td>
+                </tr>
+                <tr>
+                    <td class="bold">Vocabulaire (vocabulaire usuel de la composante):</td>
+                    <td colspan="2">{{it.data.infos[0].vocableEN}}</td>
+                </tr>
+                <tr>
+                    <td class="bold">Matériaux:</td>
+                    <td>{{it.data.infos[0].materials.name}}</td>
+                    <td>{{it.data.infos[0].materials.description}}</td>
+                </tr>
+                <tr>
+                    <td class="bold">Dimensions standards:</td>
+                    <td colspan="2">Hauteur {{it.data.infos[0].standradSizes.height}}<br>Largeur {{it.data.infos[0].standradSizes.width}}</td>
+                </tr>
+                <tr>
+                    <td class="bold">Dimensions possibles: limite inférieur</td>
+                    <td>Hauteur : <br>{{it.data.infos[0].possibleSizes.height}}</td>
+                    <td>Largeur : <br>{{it.data.infos[0].possibleSizes.width}}</td>
+                </tr>
+                <tr>
+                    <td class="bold">Lien vers des images de constructions réelles (en différents contextes)</td>
+                    <td colspan="2">Voir plus bas</td>
+                </tr>
+                <tr>
+                    <td class="bold">Norme du Code de construction du Québec:</td>
+                    <td>Extrait du Code construction du Québec <br>voir plus bas</td>
+                    <td>{{it.data.infos[0].code.article}}
+                        <br>{{it.data.infos[0].code.links[0].name}}
+                        <br> <a href="{{it.data.infos[0].code.links[0].url}}">{{it.data.infos[0].code.links[0].url}}</a>
+                        <br> et
+                        <br>{{it.data.infos[0].code.links[1].name}}
+                        <br> <a href="{{it.data.infos[0].code.links[1].url}}">{{it.data.infos[0].code.links[1].url}}</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="bold">Information textuelle sur les prescriptions de pose et /ou techniques d’assemblages</td>
+                    <td colspan="2">{{it.data.infos[0].description}}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
+
+
 
 </body>
 

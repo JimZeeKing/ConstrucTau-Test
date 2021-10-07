@@ -7,7 +7,7 @@
                 "vocableFR": "Semelle filante",
                 "vocableEN": "Footing",
                 "materials": {
-                    "name": "béton",
+                    "name": "Béton",
                     "description": "Matériaux constituants: Ciment, agrégats, eau (les proportions sont régies par code)"
                 },
                 "standradSizes": {
