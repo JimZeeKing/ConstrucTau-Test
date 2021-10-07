@@ -40,17 +40,26 @@ function createBillboard(label, pos) {
     billboard.getParameter('LocalXfo').setValue(xfo);
     billboard.getParameter('PixelsPerMeter').setValue(300);
     billboard.getParameter('AlignedToCamera').setValue(true);
+    billboard.getParameter('DrawOnTop').setValue(false);
     billboard.getParameter('Alpha').setValue(1);
     return billboard;
 }
 let data;
-export function prepare() {
-    loadImage("../data/images/dog.jpg", (image) => {
+export function prepare(image) {
+    if (image) {
         const canvas = createCanvas(image.width, image.height);
         canvas.getContext("2d").drawImage(image, 0, 0);
         data = canvas.getContext("2d").getImageData(0, 0, image.width, image.height);
         main();
-    });
+    } else {
+        loadImage("../data/images/dog.jpg", (image) => {
+            const canvas = createCanvas(image.width, image.height);
+            canvas.getContext("2d").drawImage(image, 0, 0);
+            data = canvas.getContext("2d").getImageData(0, 0, image.width, image.height);
+            main();
+        });
+    }
+
 }
 
 export function main() {
@@ -97,6 +106,6 @@ export function main() {
     const billboard2 = createBillboard(label2, new Vec3(0, 0.05, 0.08))
     asset.addChild(billboard2)
 
-    renderer.resumeDrawing()
+    renderer.resumeDrawing();
 }
 

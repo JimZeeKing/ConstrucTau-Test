@@ -2,12 +2,16 @@
 <html>
 
 
-<!-- download Zea Engine -- this downloads the latest build from version 3 of the engine -->
-<script crossorigin src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@3/dist/index.umd.js"></script>
-<!-- download our stylesheet -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css" />
 
 <head>
+
+    <!-- download Zea Engine -- this downloads the latest build from version 3 of the engine -->
+    <script src="./libs/zea-engine/index.umd.js"></script>
+    <!-- download our stylesheet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/src/dom-to-image-more.min.js"></script>
+
     <title>Zea Engine App</title>
     <style>
         #test {
@@ -47,14 +51,13 @@
     <!-- Run your code here -->
     <script type="module">
         import { prepare } from './src/data.js'
-        //import * as htmlToImage from './src/html2image.min.js'
-
-        //htmlToImage.toPixelData(document.querySelector("#test")).then((data) => {
-        prepare();
-       // });
-
-
-
+        domtoimage.toPng(document.querySelector("#test")).then((data) => {
+            var img = new Image();
+            img.onload = function (argument) {
+                prepare(img);
+            };
+            img.src = data;
+        });
     </script>
 
     <div id="test">
