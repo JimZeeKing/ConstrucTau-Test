@@ -45,27 +45,25 @@ function createBillboard(label, pos) {
     return billboard;
 }
 let imgData = {};
-export function prepare(image) {
+let domRenderer;
+export function prepare(image, renderer) {
 
     imgData.source = image;
+    domRenderer = renderer;
 
     if (image) {
         const canvas = createCanvas(image.width, image.height);
         canvas.getContext("2d").drawImage(image, 0, 0);
         imgData.bytes = canvas.getContext("2d").getImageData(0, 0, image.width, image.height);
         main();
-    } else {
-        loadImage("../data/images/dog.jpg", (image) => {
-            imgData.source = image;
-            const canvas = createCanvas(image.width, image.height);
-            canvas.getContext("2d").drawImage(image, 0, 0);
-            imgData.bytes = canvas.getContext("2d").getImageData(0, 0, image.width, image.height);
-            main();
-        });
     }
 
 }
 
+export function updateBillboard(bytes) {
+    label0.setData(imgData.source.width, imgData.source.height, bytes);
+}
+let label0;
 export function main() {
 
 
@@ -98,8 +96,11 @@ export function main() {
     const asset = new TreeItem('labels')
     scene.getRoot().addChild(asset)
 
-    const label0 = createDataImage(imgData, 'Hello')
+    label0 = createDataImage(imgData, 'Hello')
     const billboard0 = createBillboard(label0, new Vec3(1, 1, 1))
+    billboard0.on("pointerUp", (event) => {
+        console.log(event);//not firing??
+    })
 
     asset.addChild(billboard0)
 

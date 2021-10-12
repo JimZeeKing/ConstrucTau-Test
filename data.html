@@ -12,6 +12,8 @@
     <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/src/dom-to-image-more.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/squirrelly@8.0.8/dist/browser/squirrelly.min.js"></script>
 
+    <script src="./src/jms/CanvasRenderer.js"></script>
+
     <title>Zea Engine App</title>
     <style>
         table {
@@ -41,6 +43,87 @@
         a {
             text-decoration: underline;
         }
+
+        #test {
+            width: 300px;
+            height: 400px;
+            border: 2px solid red;
+            padding: 1em;
+            background-color: #fff;
+        }
+
+        button {
+            border-radius: 5%;
+            border: 1px solid #000;
+        }
+
+        button:hover {
+            background-color: red;
+            ;
+        }
+
+        input[type='checkbox'] {
+            border: 1px solid #ccc;
+        }
+
+        .container {
+            display: block;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 22px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+
+        .btn-hover {
+            background-color: red;
+        }
+
+        .btn-click {
+            background-color: blue;
+        }
+
+        .radio {
+            width: 32px;
+            height: 32px;
+            background-color: #ccc;
+            border: 1px solid #000;
+            border-radius: 50%;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .radio::before {
+            position: absolute;
+            content: attr(data-label);
+            left: 80px;
+            width: 100px;
+        }
+
+        .radio-hover {
+
+            border: 1px solid #f00;
+
+        }
+
+        .radio-active::after {
+
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #000;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+        }
     </style>
 </head>
 
@@ -57,30 +140,66 @@
 
     <!-- Run your code here -->
     <script type="module">
-        import { prepare } from './src/data.js'
+        import { prepare, updateBillboard } from './src/data.js'
         import { DataPool } from './src/DataPool.js'
         import { template } from './data/templates/infos.js'
-
+        let renderer, templateContainer;
         let json = DataPool.create("./src/data.json");
         json.loadData().then((data) => {
             data = json.getObjectFromList("infos", 0);
-            let templateContainer = document.querySelector("#billboard-template");
-            templateContainer.innerHTML = Sqrl.render(template, data);
+            templateContainer = document.querySelector("#test");
+            //  templateContainer.innerHTML = Sqrl.render(template, data);
+            renderer = CanvasRenderer.setup(null, templateContainer);
+            templateContainer.addEventListener("render", function initOriginal(event) {
+                templateContainer.removeEventListener("render", initOriginal);
+                prepare(event.detail.renderData.img);
+            });
 
-            setTimeout(() => {
-                domtoimage.toPng(templateContainer).then((pngData) => {
-                    var img = new Image();
-                    img.onload = function (argument) {
-                        prepare(img);
+            const observer = new MutationObserver(function (mutationsList) {
+                for (const mutation of mutationsList) {
+                    if (mutation.type == 'attributes') {
+                        if (mutation.attributeName == "class") {
+                            renderer.renderElement(mutation.target, mutation.target.className, false, true);
+                        };
+                    } else if (mutation.type == 'childList') {
+                        //on childlist mutation we rerender original target
+                        renderer.renderOriginal();
                     };
-                    img.src = pngData;
-                });
-            }, 25);
+                }
+            });
+            templateContainer.addEventListener("render", (event) => {
+                if (event.detail.renderData.bytes) {
+                    updateBillboard(event.detail.renderData.bytes);
+                };
+
+            });
+
+
+            // observer
+            observer.observe(templateContainer, { attributes: true, childList: true, subtree: true, attributeOldValue: true });
 
         })
+
+
     </script>
 
+    <div id="test">
+        <h2>Titre</h2>
+        <p data-canvas-mapping id="infos">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minus et totam delectus perferendis soluta
+            repellat quam facere id ducimus numquam expedita sapiente sunt, eius molestias eum accusamus. Rerum,
+            corrupti dicta!</p>
 
+        <button data-canvas-mapping data-down-class="btn-click" data-hover-class="btn-hover" onclick="updateText()">Button</button>
+        <br>
+        <br>
+        <div>
+            <div data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
+            <div data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
+            <div data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
+        </div>
+
+
+    </div>
 </body>
 
 </html>
