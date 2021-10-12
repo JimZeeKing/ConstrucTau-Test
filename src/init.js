@@ -2,12 +2,24 @@ import "./ConstrucTAOSurfaceShader.js";
 import loadLabels from "./loadLabels.js";
 import loadAsset from "./loadAsset.js";
 import displayBillboardOnClick from "./displayBillboardOnClick.js";
+
+import "./dom-ui.js";
+
 export default function init() {
-  const { Color, Vec3, Scene, GLRenderer, EnvMap, resourceLoader, TreeItem } =
-    zeaEngine;
+  const {
+    Color,
+    Vec3,
+    Xfo,
+    Scene,
+    GLRenderer,
+    EnvMap,
+    resourceLoader,
+    TreeItem,
+  } = zeaEngine;
   const { CADBody } = zeaCad;
 
   const urlParams = new URLSearchParams(window.location.search);
+
   // //////////////////////////////////////////////////////
   // Scene and Renderer
   const scene = new Scene();
@@ -63,14 +75,18 @@ export default function init() {
     while (item && !(item instanceof CADBody)) item = item.getOwner();
     return item;
   };
-  // renderer.getViewport().on("pointerOverGeom", (event) => {
-  //   highlightedItem = filterItem(event.intersectionData.geomItem);
-  //   highlightedItem.addHighlight("pointerOverGeom", highlightColor, true);
-  // });
-  // renderer.getViewport().on("pointerLeaveGeom", (event) => {
-  //   highlightedItem.removeHighlight("pointerOverGeom", true);
-  //   highlightedItem = null;
-  // });
+  renderer.getViewport().on("pointerOverGeom", (event) => {
+    // highlightedItem = filterItem(event.intersectionData.geomItem);
+    event.intersectionData.geomItem.addHighlight(
+      "pointerOverGeom",
+      highlightColor,
+      true
+    );
+  });
+  renderer.getViewport().on("pointerLeaveGeom", (event) => {
+    event.leftGeometry.removeHighlight("pointerOverGeom", true);
+    highlightedItem = null;
+  });
 
   let pointerDownPos;
   renderer.getViewport().on("pointerDown", (event) => {
@@ -92,6 +108,7 @@ export default function init() {
         intersectionData.geomItem.hasParameter("LayerName")
       ) {
         displayBillboardOnClick(intersectionData, labelsData, billboards);
+        event.stopPropagation();
       }
     }
   });
@@ -117,6 +134,14 @@ export default function init() {
         xrButton.textContent = "Exit VR";
       } else {
         xrButton.textContent = "Launch VR";
+      }
+    });
+
+    xrvp.on("pointerUp", (event) => {
+      const { intersectionData } = event;
+      if (intersectionData) {
+        displayBillboardOnClick(intersectionData, labelsData, billboards);
+        event.stopPropagation();
       }
     });
 
@@ -148,9 +173,21 @@ export default function init() {
 
   // //////////////////////////
   // Load the Asset
-  loadAsset("./data/Projet%20construcTAU-2020.skp.zcad").then((data) => {
+  loadAsset("./data/Projet construcTAU-4-10-21-2020.skp.zcad").then((data) => {
     scene.getRoot().addChild(data.asset);
     scene.getRoot().addChild(data.layersRoot);
     renderer.frameAll();
   });
+
+  const domUI = document.createElement("dom-ui");
+  document.body.appendChild(domUI);
+
+  const tomTree = new DomTree("DomTree", domUI.contentDiv);
+
+  const localXfo = new Xfo();
+  localXfo.tr.set(10, 0, 3);
+  localXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.5);
+  tomTree.getParameter("LocalXfo").setValue(localXfo);
+  tomTree.getParameter("PixelsPerMeter").setValue(200);
+  scene.getRoot().addChild(tomTree);
 }

@@ -1,4 +1,4 @@
-const { GeomItem, TreeItem, SelectionSet } = zeaEngine;
+const { GeomItem, TreeItem, SelectionSet, InstanceItem, MeshProxy } = zeaEngine;
 const { CADAsset, CADBody } = zeaCad;
 
 const loadAsset = (url) => {
@@ -37,10 +37,16 @@ const loadAsset = (url) => {
       let numGeomItem = 0;
       asset.traverse((item) => {
         numItems++;
+        // if (item instanceof InstanceItem) {
+        //   return false;
+        // }
         if (item instanceof GeomItem) {
           if (item.hasParameter("LayerName")) {
             const layerName = item.getParameter("LayerName").getValue();
             if (layers[layerName]) layers[layerName].addItem(item);
+          }
+          const geom = item.getParameter("Geometry").getValue();
+          if (geom instanceof MeshProxy) {
           }
           numGeomItem++;
         }
