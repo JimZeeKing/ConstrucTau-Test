@@ -14,6 +14,7 @@
     />
     <link rel="stylesheet" href="./src/styles.css"/>
     <script src="./libs/zea-engine/index.umd.js"></script>
+    <script src="./libs/zea-ux/index.umd.js"></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@3/dist/index.umd.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@3/dist/index.umd.js"></script>
     
@@ -38,7 +39,7 @@
           <div class="separator" id="separatorV"></div>
           <div id="mainPanel">
             <div id="canvas-holder">
-              <canvas id="canvas" style="position: absolute;"> </canvas>
+              <canvas id="canvas" style="position: absolute; width: 100%; height: 100%;"> </canvas>
             </div>
             <div class="xr-button hidden" id="xr-button"></div>
             <zea-fps-display class="fps-display" id="fps"></zea-fps-display>

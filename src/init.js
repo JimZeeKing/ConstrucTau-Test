@@ -8,6 +8,8 @@ export default function init() {
   const { CADBody } = zeaCad;
 
   const urlParams = new URLSearchParams(window.location.search);
+  // //////////////////////////////////////////////////////
+  // Scene and Renderer
   const scene = new Scene();
   scene.setupGrid(10.0, 10);
 
@@ -25,13 +27,34 @@ export default function init() {
   envMap.load("../data/StudioG.zenv");
   scene.setEnvMap(envMap);
 
+  // //////////////////////////////////////////
+  // Setup Selection Manager.
+
+  const { SelectionManager, ToolManager, DomTree } = zeaUx;
+  const appData = {
+    renderer,
+    scene,
+  };
+  const selectionManager = new SelectionManager(appData, {
+    selectionOutlineColor: new Color(1, 1, 0.2, 0.1),
+    branchSelectionOutlineColor: new Color(1, 1, 0.2, 0.1),
+  });
+  // const cameraTool = renderer.getViewport().getManipulator();
+  // const toolManager = new ToolManager(appData);
+  // renderer.getViewport().setManipulator(toolManager);
+  // toolManager.registerTool("Camera Tool", cameraTool);
+  // toolManager.pushTool("Camera Tool");
+
+  // //////////////////////////////////////////
+  // UI Elements
+
   // Setup FPS Display
   const fpsElement = document.getElementById("fps");
   fpsElement.renderer = renderer;
 
   // Setup TreeView Display
   const treeElement = document.getElementById("tree");
-  treeElement.setTreeItem(scene.getRoot());
+  treeElement.setTreeItem(scene.getRoot(), selectionManager);
 
   let highlightedItem;
   const highlightColor = new Color("#F9CE03");
