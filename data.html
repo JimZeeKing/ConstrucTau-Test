@@ -12,7 +12,7 @@
     <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/src/dom-to-image-more.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/squirrelly@8.0.8/dist/browser/squirrelly.min.js"></script>
 
-    <script src="./src/jms/CanvasRenderer.js"></script>
+    <script src="https://tim.cgmatane.qc.ca/domcanvas/scripts/CanvasRenderer.js"></script>
 
     <title>Zea Engine App</title>
     <style>
@@ -163,11 +163,16 @@
                         };
                     } else if (mutation.type == 'childList') {
                         //on childlist mutation we rerender original target
-                        renderer.renderOriginal();
+                        renderer.renderMainContainer();
                     };
                 }
             });
+
+            setTimeout(() => {
+                document.querySelector("#infos").textContent = "Texte mis a jour";
+            }, 5000);
             templateContainer.addEventListener("render", (event) => {
+
                 if (event.detail.renderData.bytes) {
                     updateBillboard(event.detail.renderData.bytes);
                 };
