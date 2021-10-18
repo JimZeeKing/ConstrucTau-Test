@@ -4075,7 +4075,7 @@ void main(void) {
         // debugGeomItem.getParameter('LocalXfo').setValue(debugGeomItemXfo)
 
         traverse(domElement, 0, (elem, depth) => {
-          if (elem.classList.contains('widget')) {
+          if (elem && elem.classList && elem.classList.contains('widget')) {
             const size = elemSize(elem);
             // console.log(depth, elem.id, elem.className, size.width, size.height, elem.offsetLeft, elem.offsetTop)
             const localXfo = new zeaEngine.Xfo();
