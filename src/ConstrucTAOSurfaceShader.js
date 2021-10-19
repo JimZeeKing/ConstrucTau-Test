@@ -64,7 +64,7 @@ void main(void) {
 
 #ifdef ENABLE_TEXTURES
   v_textureCoord  = texCoords;
-  // v_textureCoord.y = 1.0 - v_textureCoord.y;// Flip y
+  v_textureCoord.y = 1.0 - v_textureCoord.y;// Flip y
 #endif
 
   //////////////////////////////////////////////

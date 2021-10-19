@@ -27,6 +27,7 @@ export default function init() {
 
   const renderer = new GLRenderer(document.getElementById("canvas"), {
     debugGeomIds: false,
+    enableFrustumCulling:true
   });
   // renderer.solidAngleLimit = 0.0;
   renderer.setScene(scene);
