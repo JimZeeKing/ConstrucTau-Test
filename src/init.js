@@ -27,14 +27,14 @@ export default function init() {
 
   const renderer = new GLRenderer(document.getElementById("canvas"), {
     debugGeomIds: false,
-    enableFrustumCulling:true
+    enableFrustumCulling: true,
   });
   // renderer.solidAngleLimit = 0.0;
   renderer.setScene(scene);
   renderer
     .getViewport()
     .getCamera()
-    .setPositionAndTarget(new Vec3(12, 12, 10), new Vec3(0, 0, 1.5));
+    .setPositionAndTarget(new Vec3(5, -5, 5), new Vec3(0, 0, 1.5));
 
   const envMap = new EnvMap();
   envMap.load("../data/StudioG.zenv");
@@ -140,7 +140,10 @@ export default function init() {
 
     xrvp.on("pointerUp", (event) => {
       const { intersectionData } = event;
-      if (intersectionData) {
+      if (
+        intersectionData &&
+        intersectionData.geomItem.hasParameter("LayerName")
+      ) {
         displayBillboardOnClick(intersectionData, labelsData, billboards);
         event.stopPropagation();
       }
