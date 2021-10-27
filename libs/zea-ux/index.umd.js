@@ -4075,7 +4075,7 @@ void main(void) {
         // debugGeomItem.getParameter('LocalXfo').setValue(debugGeomItemXfo)
 
         traverse(domElement, 0, (elem, depth) => {
-          if (elem && elem.classList && elem.classList.contains('widget')) {
+          if (elem.classList.contains('widget')) {
             const size = elemSize(elem);
             // console.log(depth, elem.id, elem.className, size.width, size.height, elem.offsetLeft, elem.offsetTop)
             const localXfo = new zeaEngine.Xfo();
@@ -4236,9 +4236,10 @@ void main(void) {
      * @param {object} event - The event param.
      */
     onPointerMove(event) {
-      this.rayIntersect(event.pointerRay, 'mousemove', {});
+      const ray = event.intersectionData.ray ? event.intersectionData.ray : event.intersectionData.pointerRay;
+      this.rayIntersect(ray, 'mousemove', {});
       event.stopPropagation();
-      event.preventDefault();
+      if (event.preventDefault) event.preventDefault();
     }
 
     /**
@@ -4246,9 +4247,10 @@ void main(void) {
      * @param {object} event - The event param.
      */
     onPointerDown(event) {
-      this.rayIntersect(event.pointerRay, 'mousedown', {});
+      const ray = event.intersectionData.ray ? event.intersectionData.ray : event.intersectionData.pointerRay;
+      this.rayIntersect(ray, 'mousedown', {});
       event.stopPropagation();
-      event.preventDefault();
+      if (event.preventDefault) event.preventDefault();
     }
 
     /**
@@ -4256,9 +4258,10 @@ void main(void) {
      * @param {object} event - The event param.
      */
     onPointerUp(event) {
-      this.rayIntersect(event.pointerRay, 'mouseup', {});
+      const ray = event.intersectionData.ray ? event.intersectionData.ray : event.intersectionData.pointerRay;
+      this.rayIntersect(ray, 'mouseup', {});
       event.stopPropagation();
-      event.preventDefault();
+      if (event.preventDefault) event.preventDefault();
     }
   }
 
