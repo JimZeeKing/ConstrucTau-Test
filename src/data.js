@@ -84,6 +84,8 @@ function createBillboard(label, pos, image, targetPos) {
   // xfo.tr = pos
   // xfo.ori.setFromDirectionAndUpvector(targetPos.subtract(pos), new Vec3(0, 0, 1))
   geomItem.getParameter('GlobalXfo').setValue(xfo)
+  geomItem.width = image.width
+  geomItem.height = image.height
   geomItem.pixelsPerMeter = ppm
   return geomItem
 
@@ -159,18 +161,14 @@ export function main() {
       if (res <= 0) {
         return -1
       }
-      const hitOffset = planeXfo.inverse().transformVec3(ray.pointAtDist(res))
-      const pageX = (1 - hitOffset.x * -0.5) / geomItem.pixelsPerMeter // + this.domElement.offsetLeft
-      const pageY = (1 - hitOffset.y * 0.5) / geomItem.pixelsPerMeter // + this.domElement.offsetTop
-      const hit = {
-        pageX,
-        pageY,
-        // clientX: pageX - this.domElement.offsetLeft,
-        // clientY: pageY - this.domElement.offsetTop,
-      }
-      hit.offsetX = hit.screenX = hit.clientX
-      hit.offsetY = hit.screenY = hit.clientY
-      console.log(pageX, pageY)
+
+      const invPlaneXfo = planeXfo.inverse()
+      // fix inv scale
+      invPlaneXfo.sc = invPlaneXfo.sc.inverse()
+      const hitOffset = invPlaneXfo.transformVec3(ray.pointAtDist(res))
+      const clientX = (hitOffset.x + 0.5) * geomItem.width
+      const clientY = (hitOffset.y + 0.5) * geomItem.height
+      console.log(clientX, clientY)
     }
   })
   billboard0.on('pointerUp', (event) => {
