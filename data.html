@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/squirrelly@8.0.8/dist/browser/squirrelly.min.js"></script>
 
     <script src="https://tim.cgmatane.qc.ca/domcanvas/scripts/CanvasRenderer.js"></script>
-    <script src="https://tim.cgmatane.qc.ca/domcanvas/scripts/CanvasDomMapper.js"></script>
+    <script src="https://tim.cgmatane.qc.ca/domcanvas/scripts/DomMapper.js"></script>
 
     <title>Zea Engine App</title>
     <style>
@@ -144,17 +144,21 @@
         import { prepare, updateBillboard } from './src/data.js'
         import { DataPool } from './src/DataPool.js'
         import { template } from './data/templates/infos.js'
-        let renderer, templateContainer;
+        let renderer, templateContainer, mapper;
         let json = DataPool.create("./src/data.json");
         json.loadData().then((data) => {
             data = json.getObjectFromList("infos", 0);
             templateContainer = document.querySelector("#test");
             //  templateContainer.innerHTML = Sqrl.render(template, data);
             renderer = CanvasRenderer.setup(null, templateContainer);
+            mapper = DomMapper.setup(templateContainer);
             templateContainer.addEventListener("render", function initOriginal(event) {
                 templateContainer.removeEventListener("render", initOriginal);
-                prepare(event.detail.renderData.img);
+                prepare(event.detail.renderData, renderer, mapper);
             });
+
+
+
 
             const observer = new MutationObserver(function (mutationsList) {
                 for (const mutation of mutationsList) {
@@ -169,9 +173,10 @@
                 }
             });
 
-            setTimeout(() => {
+            /*setTimeout(() => {
                 document.querySelector("#infos").textContent = "Texte mis a jour";
-            }, 5000);
+            }, 5000);*/
+
             templateContainer.addEventListener("render", (event) => {
 
                 if (event.detail.renderData.bytes) {
