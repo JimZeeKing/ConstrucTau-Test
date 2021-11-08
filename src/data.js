@@ -81,8 +81,8 @@ function createBillboard(label, pos, image, targetPos) {
   const xfo = new Xfo()
   const ppm = 0.005
   xfo.sc.set(image.width * ppm, image.height * ppm, 1)
-  // xfo.tr = pos
-  // xfo.ori.setFromDirectionAndUpvector(targetPos.subtract(pos), new Vec3(0, 0, 1))
+  xfo.tr = pos
+  xfo.ori.setFromDirectionAndUpvector(targetPos.subtract(pos), new Vec3(0, 0, 1))
   geomItem.getParameter('GlobalXfo').setValue(xfo)
   geomItem.pixelsPerMeter = ppm
   geomItem.width = image.width
@@ -153,8 +153,7 @@ export function main() {
       const ray = event.intersectionData.ray ? event.intersectionData.ray : event.intersectionData.pointerRay
 
       const geomItem = event.intersectionData.geomItem
-      const planeXfo = geomItem.getParameter('GlobalXfo').getValue() //.clone()
-      // planeXfo.sc.set(1, 1, 1)
+      const planeXfo = geomItem.getParameter('GlobalXfo').getValue().clone()
       const plane = new Ray(planeXfo.tr, planeXfo.ori.getZaxis())
 
       const res = ray.intersectRayPlane(plane)
@@ -162,14 +161,12 @@ export function main() {
         return -1
       }
 
+      planeXfo.sc.set(1, 1, 1)
       const invPlaneXfo = planeXfo.inverse()
-      // fix inv scale
-      invPlaneXfo.sc = invPlaneXfo.sc.inverse()
       const hitOffset = invPlaneXfo.transformVec3(ray.pointAtDist(res))
-      const clientX = (hitOffset.x + 0.5) * geomItem.width
-      const clientY = (-hitOffset.y + 0.5) * geomItem.height
+      const clientX = hitOffset.x / geomItem.pixelsPerMeter + geomItem.width * 0.5
+      const clientY = -hitOffset.y / geomItem.pixelsPerMeter + geomItem.height * 0.5
       console.log(clientX, clientY)
-      // console.log("y", hitOffset.y, hitOffset.y / geomItem.pixelsPerMeter);
     }
   })
 
