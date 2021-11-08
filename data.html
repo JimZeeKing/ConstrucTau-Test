@@ -155,6 +155,7 @@
             templateContainer.addEventListener("render", function initOriginal(event) {
                 templateContainer.removeEventListener("render", initOriginal);
                 prepare(event.detail.renderData, renderer, mapper);
+
             });
 
 
@@ -164,6 +165,7 @@
                 for (const mutation of mutationsList) {
                     if (mutation.type == 'attributes') {
                         if (mutation.attributeName == "class") {
+                            console.log(mutation.target, mutation.target.className);
                             renderer.renderElement(mutation.target, mutation.target.className, false, true);
                         };
                     } else if (mutation.type == 'childList') {
@@ -187,7 +189,7 @@
 
 
             // observer
-            observer.observe(templateContainer, { attributes: true, childList: true, subtree: true, attributeOldValue: true });
+            observer.observe(templateContainer, { attributes: true, childList: true, subtree: true });
 
         })
 
@@ -196,7 +198,7 @@
 
     <div id="test">
         <h2>Titre</h2>
-        <p data-canvas-mapping id="infos">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minus et totam delectus perferendis soluta
+        <p id="infos">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minus et totam delectus perferendis soluta
             repellat quam facere id ducimus numquam expedita sapiente sunt, eius molestias eum accusamus. Rerum,
             corrupti dicta!</p>
 
@@ -204,9 +206,9 @@
         <br>
         <br>
         <div>
-            <div data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
-            <div data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
-            <div data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
+            <div id="r1" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
+            <div id="r2" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
+            <div id="r3" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
         </div>
 
 
