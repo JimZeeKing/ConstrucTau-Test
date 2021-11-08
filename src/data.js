@@ -2,6 +2,43 @@
 // Zea Engine dependencies stored in new const variables. View the API to see what you can include and use.
 const { Scene, GLRenderer, Vec3, Color, Xfo, Ray, Label, DataImage, BillboardItem, TreeItem, GeomItem, Plane, Material } = window.zeaEngine
 
+class DomTree extends GeomItem {
+  /**
+   * The onVRPoseChanged method.
+   * @param {object} event - The event param.
+   */
+  onPointerMove(event) {
+    super.onPointerMove(event)
+    const ray = event.intersectionData.ray ? event.intersectionData.ray : event.intersectionData.pointerRay
+    // this.rayIntersect(ray, 'mousemove', {})
+    // event.stopPropagation()
+    // if (event.preventDefault) event.preventDefault()
+  }
+
+  /**
+   * The onVRControllerButtonDown method.
+   * @param {object} event - The event param.
+   */
+  onPointerDown(event) {
+    super.onPointerDown(event)
+    const ray = event.intersectionData.ray ? event.intersectionData.ray : event.intersectionData.pointerRay
+    // this.rayIntersect(ray, 'mousedown', {})
+    // event.stopPropagation()
+    // if (event.preventDefault) event.preventDefault()
+  }
+
+  /**
+   * The onVRControllerButtonUp method.
+   * @param {object} event - The event param.
+   */
+  onPointerUp(event) {
+    super.onPointerUp(event)
+    const ray = event.intersectionData.ray ? event.intersectionData.ray : event.intersectionData.pointerRay
+    // this.rayIntersect(ray, 'mouseup', {})
+    // event.stopPropagation()
+    // if (event.preventDefault) event.preventDefault()
+  }
+}
 const plane = new Plane(1, 1)
 function createLabel(color, labelText) {
   const label = new Label(labelText)
@@ -35,7 +72,7 @@ function createDataImage(imgData, name) {
 }
 
 function createBillboard(label, pos, image, targetPos) {
-  const geomItem = new GeomItem('billboard')
+  const geomItem = new DomTree('billboard')
   const material = new Material('material', 'FlatSurfaceShader')
   material.getParameter('BaseColor').setImage(image)
   geomItem.getParameter('Geometry').setValue(plane)
