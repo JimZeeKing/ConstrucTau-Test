@@ -166,15 +166,18 @@ export function main() {
             }
         });
 
+        xrvp.on("pointerMove", (event) => {
+            const { intersectionData } = event;
+            const pos = getIntersectionPosition(intersectionData)
+            domMapper.mapPosToDomElement(pos.x, pos.y);
+
+        });
+
         xrvp.on("pointerUp", (event) => {
             const { intersectionData } = event;
-            if (
-                intersectionData &&
-                intersectionData.geomItem.hasParameter("LayerName")
-            ) {
-                displayBillboardOnClick(intersectionData, labelsData, billboards);
-                event.stopPropagation();
-            }
+            const pos = getIntersectionPosition(intersectionData)
+            domMapper.mapClickToDomElement(pos.x, pos.y);
+
         });
 
         xrButton.addEventListener("click", function (event) {
