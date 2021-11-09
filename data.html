@@ -150,65 +150,50 @@
             data = json.getObjectFromList("infos", 0);
             templateContainer = document.querySelector("#test");
             //  templateContainer.innerHTML = Sqrl.render(template, data);
-            renderer = CanvasRenderer.setup(null, templateContainer);
             mapper = DomMapper.setup(templateContainer);
+            renderer = CanvasRenderer.setup(null, templateContainer, null, mapper.elements);
+
             templateContainer.addEventListener("render", function initOriginal(event) {
                 templateContainer.removeEventListener("render", initOriginal);
-                prepare(event.detail.renderData, renderer, mapper);
-
+                prepare(event.detail.renderData, mapper);
             });
 
-
-
-
-            const observer = new MutationObserver(function (mutationsList) {
-                for (const mutation of mutationsList) {
-                    if (mutation.type == 'attributes') {
-                        if (mutation.attributeName == "class") {
-                            console.log(mutation.target, mutation.target.className);
-                            renderer.renderElement(mutation.target, mutation.target.className, false, true);
-                        };
-                    } else if (mutation.type == 'childList') {
-                        //on childlist mutation we rerender original target
-                        renderer.renderMainContainer();
-                    };
-                }
+            templateContainer.addEventListener("domevent", function (event) {
+                renderer.renderElement(event.detail.element, event.detail.type, false, true);
             });
 
-            /*setTimeout(() => {
+            setTimeout(() => {
                 document.querySelector("#infos").textContent = "Texte mis a jour";
-            }, 5000);*/
+                mapper.updatePositions();
+                renderer.renderMainContainer();
+            }, 5000);
 
             templateContainer.addEventListener("render", (event) => {
-
                 if (event.detail.renderData.bytes) {
                     updateBillboard(event.detail.renderData.bytes);
                 };
-
             });
-
-
-            // observer
-            observer.observe(templateContainer, { attributes: true, childList: true, subtree: true });
-
         })
-
 
     </script>
 
     <div id="test">
         <h2>Titre</h2>
-        <p id="infos">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minus et totam delectus perferendis soluta
+        <p id="infos">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minus et totam delectus perferendis
+            soluta
             repellat quam facere id ducimus numquam expedita sapiente sunt, eius molestias eum accusamus. Rerum,
             corrupti dicta!</p>
 
-        <button data-canvas-mapping data-down-class="btn-click" data-hover-class="btn-hover" onclick="updateText()">Button</button>
+        <button data-canvas-mapping data-down-class="btn-click" data-hover-class="btn-hover">Button</button>
         <br>
         <br>
         <div>
-            <div id="r1" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
-            <div id="r2" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
-            <div id="r3" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
+            <div id="r1" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active"
+                class="radio" data-active-group="g1" data-label="Radio 1"></div>
+            <div id="r2" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active"
+                class="radio" data-active-group="g1" data-label="Radio 2"></div>
+            <div id="r3" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active"
+                class="radio" data-active-group="g1" data-label="Radio 3"></div>
         </div>
 
 

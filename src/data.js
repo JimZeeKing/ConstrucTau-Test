@@ -89,11 +89,11 @@ function createBillboard(label, pos, image, targetPos) {
     geomItem.height = image.height
     return geomItem
 }
-let imgData, domRenderer, domMapper;
+let imgData, domMapper;
 
-export function prepare(imageData, renderer, mapper) {
+export function prepare(imageData, mapper) {
     imgData = imageData
-    domRenderer = renderer
+
     domMapper = mapper
     main()
 }
@@ -127,7 +127,7 @@ export function main() {
     // create an empty TreeItem can be added to the scene tree to then add billboards to.
     const asset = new TreeItem('labels')
     scene.getRoot().addChild(asset)
-
+    console.log(imgData);
     label0 = createDataImage(imgData, 'Hello')
 
     const cameraXfo = camera.getParameter('GlobalXfo').getValue()
