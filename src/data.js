@@ -107,7 +107,10 @@ export function main() {
     const scene = new Scene()
 
     // create a new renderer and attach it to our HTML Canvas
-    const renderer = new GLRenderer(document.getElementById('canvas'))
+    const renderer = new GLRenderer(document.getElementById('canvas'), {
+        debugGeomIds: false,
+        enableFrustumCulling: true,
+    })
 
     // attach the scene to the renderer. Anything attached to this scene will now be rendererd.
     renderer.setScene(scene)
@@ -127,7 +130,6 @@ export function main() {
     // create an empty TreeItem can be added to the scene tree to then add billboards to.
     const asset = new TreeItem('labels')
     scene.getRoot().addChild(asset)
-    console.log(imgData);
     label0 = createDataImage(imgData, 'Hello')
 
     const cameraXfo = camera.getParameter('GlobalXfo').getValue()
@@ -145,11 +147,11 @@ export function main() {
     })
 
     asset.addChild(billboard0)
-    renderer.resumeDrawing();
 
+    //renderer.resumeDrawing();
 
     renderer.getXRViewport().then((xrvp) => {
-        fpsElement.style.bottom = "70px";
+
 
         const xrButton = document.getElementById("xr-button");
         xrButton.textContent = "Launch VR";

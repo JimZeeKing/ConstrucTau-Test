@@ -6,141 +6,87 @@
 <head>
     <!-- download Zea Engine -- this downloads the latest build from version 3 of the engine -->
     <script src="./libs/zea-engine/index.umd.js"></script>
+    <script src="./libs/zea-ux/index.umd.js"></script>
     <!-- download our stylesheet -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css" />
-
+    <link rel="stylesheet" href="./src/data.css">
+    <link rel="stylesheet" href="./src/styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/src/dom-to-image-more.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/squirrelly@8.0.8/dist/browser/squirrelly.min.js"></script>
 
     <script src="https://tim.cgmatane.qc.ca/domcanvas/scripts/CanvasRenderer.js"></script>
     <script src="https://tim.cgmatane.qc.ca/domcanvas/scripts/DomMapper.js"></script>
 
-    <title>Zea Engine App</title>
-    <style>
-        table {
-            background-color: #666;
-            border: 2px solid #000;
-            color: #fff;
-        }
-
-        table img {
-            max-width: 300px;
-        }
-
-        thead {
-            background-color: #000;
-        }
-
-        th {
-            font-size: 2em;
-        }
-
-        td,
-        th {
-            border: 1px solid #fff;
-            padding: 15px;
-        }
-
-        a {
-            text-decoration: underline;
-        }
-
-        #test {
-            width: 300px;
-            height: 400px;
-            border: 2px solid red;
-            padding: 1em;
-            background-color: #fff;
-        }
-
-        button {
-            border-radius: 5%;
-            border: 1px solid #000;
-        }
-
-        button:hover {
-            background-color: red;
-            ;
-        }
-
-        input[type='checkbox'] {
-            border: 1px solid #ccc;
-        }
-
-        .container {
-            display: block;
-            position: relative;
-            padding-left: 35px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            font-size: 22px;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
+    <script src="./src/zea-fps-display.js" type="module"></script>
 
 
-        .btn-hover {
-            background-color: red;
-        }
+    <title>ConstrucTAU</title>
 
-        .btn-click {
-            background-color: blue;
-        }
-
-        .radio {
-            width: 32px;
-            height: 32px;
-            background-color: #ccc;
-            border: 1px solid #000;
-            border-radius: 50%;
-            box-sizing: border-box;
-            position: relative;
-        }
-
-        .radio::before {
-            position: absolute;
-            content: attr(data-label);
-            left: 80px;
-            width: 100px;
-        }
-
-        .radio-hover {
-
-            border: 1px solid #f00;
-
-        }
-
-        .radio-active::after {
-
-            content: "";
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: #000;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-
-        }
-    </style>
 </head>
 
 <body class="overflow-hidden">
 
     <div class="layout grid h-screen">
+        <header class="border flex justify-left items-center m-2 border-none">
+            <img src="./data/logo-inverse.png" id="logo"></img>
+        </header>
         <main>
             <!-- HTML Canvas -- what we render to -->
-            <canvas id="canvas"></canvas>
-            <div class="xr-button hidden" id="xr-button"></div>
+
+            <div class="splitter">
+                <div id="leftPanel">
+                    <scene-tree-view id="tree" class="select-none"></scene-tree-view>
+                </div>
+                <div class="separator" id="separatorV"></div>
+                <div id="mainPanel">
+                    <div id="canvas-holder">
+                        <canvas id="canvas" style="position: absolute; width: 100%; height: 100%;"> </canvas>
+                    </div>
+                    <div class="xr-button hidden" id="xr-button"></div>
+                    <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
+                    <progress class="progress-display" id="progress" value="0" max="100">
+                        0%
+                    </progress>
+                </div>
+            </div>
         </main>
     </div>
 
-    <div id="billboard-template"></div>
+    <div class="layout grid h-screen">
 
-    <!-- Run your code here -->
+        <main>
+
+        </main>
+    </div>
+
+
+
+
+    <div id="test">
+        <h2>Titre</h2>
+        <p id="infos">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minus et totam delectus perferendis
+            soluta
+            repellat quam facere id ducimus numquam expedita sapiente sunt, eius molestias eum accusamus. Rerum,
+            corrupti dicta!</p>
+
+        <button data-canvas-mapping data-down-class="btn-click" data-hover-class="btn-hover">Button</button>
+        <br>
+        <br>
+        <div>
+            <div id="r1" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
+            <div id="r2" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
+            <div id="r3" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import dragElement from './src/panels.js'
+        const separatorV = document.getElementById("separatorV");
+        const leftPanel = document.getElementById("leftPanel");
+        const mainPanel = document.getElementById("mainPanel");
+        dragElement(separatorV, leftPanel, mainPanel, "H");
+    </script>
+
     <script type="module">
         import { prepare, updateBillboard } from './src/data.js'
         import { DataPool } from './src/DataPool.js'
@@ -178,24 +124,6 @@
 
     </script>
 
-    <div id="test">
-        <h2>Titre</h2>
-        <p id="infos">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minus et totam delectus perferendis
-            soluta
-            repellat quam facere id ducimus numquam expedita sapiente sunt, eius molestias eum accusamus. Rerum,
-            corrupti dicta!</p>
-
-        <button data-canvas-mapping data-down-class="btn-click" data-hover-class="btn-hover">Button</button>
-        <br>
-        <br>
-        <div>
-            <div id="r1" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
-            <div id="r2" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
-            <div id="r3" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
-        </div>
-
-
-    </div>
 </body>
 
 </html>
