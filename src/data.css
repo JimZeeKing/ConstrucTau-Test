@@ -1,108 +1,117 @@
-   table {
-       background-color: #666;
-       border: 2px solid #000;
-       color: #fff;
-   }
+  table {
+      background-color: #666;
+      border: 2px solid #000;
+      color: #fff;
 
-   table img {
-       max-width: 300px;
-   }
+  }
 
-   thead {
-       background-color: #000;
-   }
+  table img {
+      max-width: 300px;
+  }
 
-   th {
-       font-size: 2em;
-   }
+  thead {
+      background-color: #000;
+  }
 
-   td,
-   th {
-       border: 1px solid #fff;
-       padding: 15px;
-   }
+  th {
+      font-size: 2em;
+  }
 
-   a {
-       text-decoration: underline;
-   }
+  td,
+  th {
+      border: 1px solid #fff;
+      padding: 15px;
+  }
 
-   #test {
-       width: 300px;
-       height: 400px;
-       border: 2px solid red;
-       padding: 1em;
-       background-color: #fff;
-   }
+  a {
+      text-decoration: underline;
+  }
 
-   button {
-       border-radius: 5%;
-       border: 1px solid #000;
-   }
+  #test {
+      width: 300px;
+      height: 400px;
 
-   button:hover {
-       background-color: red;
-       ;
-   }
+      padding: 1em;
+      background-color: #fff;
+      top: 0;
+      left: 0;
+      box-sizing: border-box;
+      z-index: -1000;
+  }
 
-   input[type='checkbox'] {
-       border: 1px solid #ccc;
-   }
+  button {
+      border-radius: 5%;
+      border: 1px solid #000;
+  }
 
-   .container {
-       display: block;
-       position: relative;
-       padding-left: 35px;
-       margin-bottom: 12px;
-       cursor: pointer;
-       font-size: 22px;
-       -webkit-user-select: none;
-       -moz-user-select: none;
-       -ms-user-select: none;
-       user-select: none;
-   }
+  button:hover {
+      background-color: red;
+      ;
+  }
+
+  input[type='checkbox'] {
+      border: 1px solid #ccc;
+  }
+
+  .container {
+      display: block;
+      position: relative;
+      padding-left: 35px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      font-size: 22px;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+  }
 
 
-   .btn-hover {
-       background-color: red;
-   }
+  .btn-hover {
+      background-color: red;
+  }
 
-   .btn-click {
-       background-color: blue;
-   }
+  .btn-click {
+      background-color: blue;
+  }
 
-   .radio {
-       width: 32px;
-       height: 32px;
-       background-color: #ccc;
-       border: 1px solid #000;
-       border-radius: 50%;
-       box-sizing: border-box;
-       position: relative;
-   }
+  .radio {
+      width: 32px;
+      height: 32px;
+      background-color: #ccc;
+      border: 1px solid #000;
+      border-radius: 50%;
+      box-sizing: border-box;
+      position: relative;
+  }
 
-   .radio::before {
-       position: absolute;
-       content: attr(data-label);
-       left: 80px;
-       width: 100px;
-   }
+  .radio::before {
+      position: absolute;
+      content: attr(data-label);
+      left: 80px;
+      width: 100px;
+  }
 
-   .radio-hover {
+  .radio-hover {
 
-       border: 1px solid #f00;
+      border: 1px solid #f00;
 
-   }
+  }
 
-   .radio-active::after {
+  .radio-active::after {
 
-       content: "";
-       position: absolute;
-       width: 20px;
-       height: 20px;
-       background-color: #000;
-       border-radius: 50%;
-       top: 50%;
-       left: 50%;
-       transform: translate(-50%, -50%);
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: #000;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
 
-   }
+  }
+
+  .test {
+      background-color: red !important;
+  }

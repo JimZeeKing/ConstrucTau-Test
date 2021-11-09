@@ -1,10 +1,14 @@
-export const template = `<table>
+export const template = `<div data-mapping data-hover-class="test" onclick="javascript:alert(123)">
+{{it.fullName}}
+</div>`;
+
+export const template2 = `<table>
             <thead>
-                <th colspan="3">{{it.fullName}}</th>
+                <th colspan="3" data-mapping data-hover-class="test" onclick="javascript:alert(123)">{{it.fullName}}</th>
             </thead>
             <tbody>
                 <tr>
-                    <td class="font-bold">Vocabulaire (nom français de la composante):</td>
+                    <td class="font-bold" >Vocabulaire (nom français de la composante):</td>
                     <td class="bg-gray-600" colspan="2">{{it.vocableFR}}</td>
                 </tr>
                 <tr>
@@ -57,5 +61,6 @@ export const template = `<table>
                 </tr>
             </tfoot>
         </table>`;
+
 
 

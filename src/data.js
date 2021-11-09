@@ -38,6 +38,8 @@ class DomTree extends GeomItem {
         // event.stopPropagation()
         // if (event.preventDefault) event.preventDefault()
     }
+
+
 }
 const plane = new Plane(1, 1)
 function createLabel(color, labelText) {
@@ -138,6 +140,11 @@ export function main() {
     // https://github.com/ZeaInc/zea-ux/blob/feat/dom-to-tree/src/DomTree.js
     billboard0.on('pointerDown', (event) => {
         const pos = getIntersectionPosition(event.intersectionData)
+        domMapper.mapDownToDomElement(pos.x, pos.y);
+    })
+
+    billboard0.on('pointerUp', (event) => {
+        const pos = getIntersectionPosition(event.intersectionData)
         domMapper.mapClickToDomElement(pos.x, pos.y);
     })
 
@@ -145,6 +152,10 @@ export function main() {
         const pos = getIntersectionPosition(event.intersectionData)
         domMapper.mapPosToDomElement(pos.x, pos.y);
     })
+
+    renderer.getViewport().on("pointerLeaveGeom", (event) => {
+        console.log('TESTE');
+    });
 
     asset.addChild(billboard0)
 

@@ -31,8 +31,6 @@
             <img src="./data/logo-inverse.png" id="logo"></img>
         </header>
         <main>
-            <!-- HTML Canvas -- what we render to -->
-
             <div class="splitter">
                 <div id="leftPanel">
                     <scene-tree-view id="tree" class="select-none"></scene-tree-view>
@@ -52,12 +50,7 @@
         </main>
     </div>
 
-    <div class="layout grid h-screen">
 
-        <main>
-
-        </main>
-    </div>
 
 
 
@@ -69,15 +62,17 @@
             repellat quam facere id ducimus numquam expedita sapiente sunt, eius molestias eum accusamus. Rerum,
             corrupti dicta!</p>
 
-        <button data-canvas-mapping data-down-class="btn-click" data-hover-class="btn-hover">Button</button>
+        <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover">Button</button>
         <br>
         <br>
         <div>
-            <div id="r1" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
-            <div id="r2" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
-            <div id="r3" data-canvas-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
+            <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
+            <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
+            <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
         </div>
     </div>
+
+    <div id="infoTable"> </div>
 
     <script type="module">
         import dragElement from './src/panels.js'
@@ -95,8 +90,8 @@
         let json = DataPool.create("./src/data.json");
         json.loadData().then((data) => {
             data = json.getObjectFromList("infos", 0);
-            templateContainer = document.querySelector("#test");
-            //  templateContainer.innerHTML = Sqrl.render(template, data);
+            templateContainer = document.querySelector("#infoTable");
+            templateContainer.innerHTML = Sqrl.render(template, data);
             mapper = DomMapper.setup(templateContainer);
             renderer = CanvasRenderer.setup(null, templateContainer, null, mapper.elements);
 
@@ -106,14 +101,15 @@
             });
 
             templateContainer.addEventListener("domevent", function (event) {
+                console.log(event.detail);
                 renderer.renderElement(event.detail.element, event.detail.type, false, true);
             });
 
-            setTimeout(() => {
-                document.querySelector("#infos").textContent = "Texte mis a jour";
-                mapper.updatePositions();
-                renderer.renderMainContainer();
-            }, 5000);
+            /* setTimeout(() => {
+                 document.querySelector("#infos").textContent = "Texte mis a jour";
+                 mapper.updatePositions();
+                 renderer.renderMainContainer();
+             }, 5000);*/
 
             templateContainer.addEventListener("render", (event) => {
                 if (event.detail.renderData.bytes) {
