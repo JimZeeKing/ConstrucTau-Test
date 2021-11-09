@@ -169,14 +169,20 @@ export function main() {
         xrvp.on("pointerMove", (event) => {
             const { intersectionData } = event;
             const pos = getIntersectionPosition(intersectionData)
-            domMapper.mapPosToDomElement(pos.x, pos.y);
+            if (pos)
+                domMapper.mapPosToDomElement(pos.x, pos.y);
+
+
 
         });
 
         xrvp.on("pointerUp", (event) => {
             const { intersectionData } = event;
             const pos = getIntersectionPosition(intersectionData)
-            domMapper.mapClickToDomElement(pos.x, pos.y);
+            if (pos)
+                domMapper.mapClickToDomElement(pos.x, pos.y);
+
+
 
         });
 
@@ -206,7 +212,7 @@ function getIntersectionPosition(intersectionData) {
     if (intersectionData) {
         const ray = intersectionData.ray ? intersectionData.ray : intersectionData.pointerRay
 
-        const geomItem = event.intersectionData.geomItem
+        const geomItem = intersectionData.geomItem
         const planeXfo = geomItem.getParameter('GlobalXfo').getValue().clone()
         const plane = new Ray(planeXfo.tr, planeXfo.ori.getZaxis())
 
