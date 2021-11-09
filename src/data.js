@@ -148,7 +148,53 @@ export function main() {
     renderer.resumeDrawing();
 
 
+    renderer.getXRViewport().then((xrvp) => {
+        fpsElement.style.bottom = "70px";
+
+        const xrButton = document.getElementById("xr-button");
+        xrButton.textContent = "Launch VR";
+        xrButton.classList.remove("hidden");
+
+        xrvp.on("presentingChanged", (event) => {
+            const { state } = event;
+            if (state) {
+                xrButton.textContent = "Exit VR";
+            } else {
+                xrButton.textContent = "Launch VR";
+            }
+        });
+
+        xrvp.on("pointerUp", (event) => {
+            const { intersectionData } = event;
+            if (
+                intersectionData &&
+                intersectionData.geomItem.hasParameter("LayerName")
+            ) {
+                displayBillboardOnClick(intersectionData, labelsData, billboards);
+                event.stopPropagation();
+            }
+        });
+
+        xrButton.addEventListener("click", function (event) {
+            xrvp.togglePresenting();
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key == " ") {
+                xrvp.togglePresenting();
+            }
+        });
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if (urlParams.has("profile")) {
+        renderer.startContinuousDrawing();
+    }
+
 }
+
+
 
 
 function getIntersectionPosition(intersectionData) {
