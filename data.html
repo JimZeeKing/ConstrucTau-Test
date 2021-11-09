@@ -50,10 +50,7 @@
         </main>
     </div>
 
-
-
-
-
+    <div id="infoTable" class="table"></div>
 
     <div id="test">
         <h2>Titre</h2>
@@ -66,13 +63,16 @@
         <br>
         <br>
         <div>
-            <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
-            <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
-            <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
+            <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+                data-active-group="g1" data-label="Radio 1"></div>
+            <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+                data-active-group="g1" data-label="Radio 2"></div>
+            <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+                data-active-group="g1" data-label="Radio 3"></div>
         </div>
     </div>
 
-    <div id="infoTable"> </div>
+
 
     <script type="module">
         import dragElement from './src/panels.js'
@@ -92,8 +92,13 @@
             data = json.getObjectFromList("infos", 0);
             templateContainer = document.querySelector("#infoTable");
             templateContainer.innerHTML = Sqrl.render(template, data);
-            mapper = DomMapper.setup(templateContainer);
-            renderer = CanvasRenderer.setup(null, templateContainer, null, mapper.elements);
+
+
+            setTimeout(() => {
+                mapper = DomMapper.setup(templateContainer);
+                renderer = CanvasRenderer.setup(null, templateContainer, "#333", mapper.elements);
+            }, 1000);
+
 
             templateContainer.addEventListener("render", function initOriginal(event) {
                 templateContainer.removeEventListener("render", initOriginal);
@@ -104,12 +109,6 @@
                 console.log(event.detail);
                 renderer.renderElement(event.detail.element, event.detail.type, false, true);
             });
-
-            /* setTimeout(() => {
-                 document.querySelector("#infos").textContent = "Texte mis a jour";
-                 mapper.updatePositions();
-                 renderer.renderMainContainer();
-             }, 5000);*/
 
             templateContainer.addEventListener("render", (event) => {
                 if (event.detail.renderData.bytes) {
