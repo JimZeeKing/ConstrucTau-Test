@@ -159,12 +159,12 @@ export function main() {
                   domMapper.mapDownToDomElement(pos.x, pos.y);
           });*/
 
-        xrvp.on("pointerUp", (event) => {
-            const { intersectionData } = event;
-            const pos = getIntersectionPosition(intersectionData)
-            if (pos)
-                domMapper.mapClickToDomElement(pos.x, pos.y);
-        });
+        /*  xrvp.on("pointerUp", (event) => {
+              const { intersectionData } = event;
+              const pos = getIntersectionPosition(intersectionData)
+              if (pos)
+                  domMapper.mapClickToDomElement(pos.x, pos.y);
+          });*/
 
         xrButton.addEventListener("click", function (event) {
             xrvp.togglePresenting();
