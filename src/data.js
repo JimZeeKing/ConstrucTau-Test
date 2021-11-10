@@ -13,6 +13,7 @@ class DomTree extends GeomItem {
         // this.rayIntersect(ray, 'mousemove', {})
         // event.stopPropagation()
         // if (event.preventDefault) event.preventDefault()
+
     }
 
     /**
@@ -101,6 +102,7 @@ export function main() {
     const domBillboard = createDomBillboard(imgData, 'dombillboard', new Vec3(1, 1, 5), cameraXfo.tr);
 
     domBillboard.on('pointerDown', (event) => {
+
         const pos = getIntersectionPosition(event.intersectionData)
         if (pos)
             domMapper.mapDownToDomElement(pos.x, pos.y);
@@ -113,6 +115,7 @@ export function main() {
     })
 
     domBillboard.on('pointerMove', (event) => {
+        console.log('pointerMove');
         const pos = getIntersectionPosition(event.intersectionData)
         if (pos)
             domMapper.mapPosToDomElement(pos.x, pos.y);
