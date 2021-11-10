@@ -152,12 +152,12 @@ export function main() {
                 domMapper.mapPosToDomElement(pos.x, pos.y);
         });
 
-        xrvp.on("pointerDown", (event) => {
-            const { intersectionData } = event;
-            const pos = getIntersectionPosition(intersectionData)
-            if (pos)
-                domMapper.mapDownToDomElement(pos.x, pos.y);
-        });
+        /*  xrvp.on("pointerDown", (event) => {
+              const { intersectionData } = event;
+              const pos = getIntersectionPosition(intersectionData)
+              if (pos)
+                  domMapper.mapDownToDomElement(pos.x, pos.y);
+          });*/
 
         xrvp.on("pointerUp", (event) => {
             const { intersectionData } = event;
