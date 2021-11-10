@@ -189,7 +189,7 @@ function createDataImage(imgData, name) {
     return dataImg;
 }
 
-function createBillboard(label, pos, image, targetPos) {
+function createBillboard(label, pos, image, targetPos, targetPPM) {
     const geomItem = new DomTree(label)
     const material = new Material('material', 'FlatSurfaceShader')
     material.getParameter('BaseColor').setImage(image)
@@ -197,7 +197,7 @@ function createBillboard(label, pos, image, targetPos) {
     geomItem.getParameter('Material').setValue(material)
 
     const xfo = new Xfo()
-    const ppm = 0.005
+    const ppm = targetPPM || 0.0025
     xfo.sc.set(image.width * ppm, image.height * ppm, 1)
     xfo.tr = pos;
     if (targetPos) {
@@ -219,9 +219,11 @@ function getIntersectionPosition(intersectionData) {
 
         const geomItem = intersectionData.geomItem
 
+        //bug:pointerevent stil firing after maing it invisible
         if (geomItem.getParameter("Visible").getValue() == false) {
             return;
         };
+
         const planeXfo = geomItem.getParameter('GlobalXfo').getValue().clone()
         const plane = new Ray(planeXfo.tr, planeXfo.ori.getZaxis())
 
