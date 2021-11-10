@@ -1,163 +1,173 @@
-.table{
-    border:1px solid #fff;
-    display:flex;
-    flex-direction:column;
-    width:80%;
-  }
+.table {
+    border: 5px solid #000;
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+}
 
-  .table img{
+.table img {
     max-width: 200px;
     height: auto;
-  }
-
-  .flex{
-      display: flex;
-      justify-content: space-around;
-  }
-  
-  .head{
-    background-color:#000;
-    color:#fff;
-    text-align:center;
-    font-size:2em;
-    padding:1em;
-  }
-  
-  .row{
-    display:flex;
-    border-top:1px solid #fff;
-  }
-
-
-  .cell{
-    flex:3;
-    background-color:#666;
-    border-right:1px solid #fff;
-    padding:.5em;
-  }
-
-
-
-  .row .cell:first-of-type{
-    background-color:#333;
-    color:#fff;
-    flex:1;
-    font-weight:bold;
-    min-width:400px;
-  }
-
-  .cell-hover{
-    background-color: #111!important;
 }
-  
-  .row .cell:last-of-type{
-    border:none;
-  }
 
-  .button{
-      padding: 1em;
-      background-color: #666;
-  }
+.flex {
+    display: flex;
+    justify-content: space-around;
+}
 
-  .button-down{
+.head {
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    font-size: 2em;
+    padding: 1em;
+}
+
+.row {
+    display: flex;
+    border-top: 2px solid #fff;
+    background-color: #999;
+
+}
+
+
+.cell {
+    flex: 3;
+    background-color: #999;
+    border-right: 2px solid #fff;
+    padding: .5em;
+    width: 100%;
+}
+
+
+
+.row .cell:first-of-type {
+    background-color: #666;
+    color: #fff;
+    flex: 1;
+    font-weight: bold;
+    min-width: 400px;
+}
+
+.cell-hover {
+    background-color: #111 !important;
+}
+
+.cell-down {
+    background-color: #fff !important;
+    color: #000 !important;
+}
+
+.row .cell:last-of-type {
+    border: none;
+}
+
+.button {
+    padding: 1em;
+    background-color: #666;
+}
+
+.button-down {
     background-color: #fff;
-  }
-
-  .button-hover{
-    color:#000;
 }
-  
-  
 
-  a {
-      text-decoration: underline;
-  }
+.button-hover {
+    color: #000;
+}
 
-  #test {
-      width: 300px;
-      height: 400px;
+.invisible-text {
+    visibility: hidden;
+}
 
-      padding: 1em;
-      background-color: #fff;
-      top: 0;
-      left: 0;
-      box-sizing: border-box;
-      z-index: -1000;
-  }
+a {
+    text-decoration: underline;
+}
 
-  button {
-      border-radius: 15%;
-      border: 1px solid #000;
-  }
+#test {
+    width: 300px;
+    height: 400px;
 
-  button:hover {
-      background-color: red;
-      ;
-  }
+    padding: 1em;
+    background-color: #fff;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    z-index: -1000;
+}
 
-  input[type='checkbox'] {
-      border: 1px solid #ccc;
-  }
+button {
+    border-radius: 5%;
+    border: 1px solid #000;
+}
 
-  .container {
-      display: block;
-      position: relative;
-      padding-left: 35px;
-      margin-bottom: 12px;
-      cursor: pointer;
-      font-size: 22px;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-  }
+button:hover {
+    background-color: red;
+    ;
+}
+
+input[type='checkbox'] {
+    border: 1px solid #ccc;
+}
+
+.container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 
 
-  .btn-hover {
-      background-color: red;
-  }
+.btn-hover {
+    background-color: red;
+}
 
-  .btn-click {
-      background-color: blue;
-  }
+.btn-click {
+    background-color: blue;
+}
 
-  .radio {
-      width: 32px;
-      height: 32px;
-      background-color: #ccc;
-      border: 1px solid #000;
-      border-radius: 50%;
-      box-sizing: border-box;
-      position: relative;
-  }
+.radio {
+    width: 32px;
+    height: 32px;
+    background-color: #ccc;
+    border: 1px solid #000;
+    border-radius: 50%;
+    box-sizing: border-box;
+    position: relative;
+}
 
-  .radio::before {
-      position: absolute;
-      content: attr(data-label);
-      left: 80px;
-      width: 100px;
-  }
+.radio::before {
+    position: absolute;
+    content: attr(data-label);
+    left: 80px;
+    width: 100px;
+}
 
-  .radio-hover {
+.radio-hover {
 
-      border: 1px solid #f00;
+    border: 1px solid #f00;
 
-  }
+}
 
-  .radio-active::after {
+.radio-active::after {
 
-      content: "";
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background-color: #000;
-      border-radius: 50%;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #000;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 
-  }
+}
 
-  .test {
-      background-color: red !important;
-  }
+.test {
+    background-color: red !important;
+}

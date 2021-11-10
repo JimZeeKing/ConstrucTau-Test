@@ -63,12 +63,9 @@
         <br>
         <br>
         <div>
-            <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
-                data-active-group="g1" data-label="Radio 1"></div>
-            <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
-                data-active-group="g1" data-label="Radio 2"></div>
-            <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
-                data-active-group="g1" data-label="Radio 3"></div>
+            <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
+            <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
+            <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
         </div>
     </div>
 
@@ -83,7 +80,7 @@
     </script>
 
     <script type="module">
-        import { prepare, updateBillboard } from './src/data.js'
+        import { prepare, updateBillboard, showActiveBillboard } from './src/data.js'
         import { DataPool } from './src/DataPool.js'
         import { template } from './data/templates/infos.js'
         let renderer, templateContainer, mapper;
@@ -97,7 +94,7 @@
             setTimeout(() => {
                 mapper = DomMapper.setup(templateContainer);
                 renderer = CanvasRenderer.setup(null, templateContainer, "#333", mapper.elements);
-            }, 1000);
+            }, 500);
 
 
             templateContainer.addEventListener("render", function initOriginal(event) {
@@ -106,7 +103,6 @@
             });
 
             templateContainer.addEventListener("domevent", function (event) {
-                console.log(event.detail);
                 renderer.renderElement(event.detail.element, event.detail.type, false, true);
             });
 
@@ -115,6 +111,11 @@
                     updateBillboard(event.detail.renderData.bytes);
                 };
             });
+
+            window.closeActiveBillboard = function () {
+                showActiveBillboard(false);
+            }
+
         })
 
     </script>

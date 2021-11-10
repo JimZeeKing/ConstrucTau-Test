@@ -41,69 +41,32 @@ class DomTree extends GeomItem {
 
 
 }
-const plane = new Plane(1, 1)
-function createLabel(color, labelText) {
-    const label = new Label(labelText)
-
-    label.getParameter('FontSize').setValue(48)
-    label.getParameter('FontColor').setValue(color)
-    label.getParameter('BackgroundColor').setValue(new Color(0.3, 0.3, 0.3))
-    return label
-}
-
-function loadImage(src, callback) {
-    let img = new Image()
-
-    img.onload = function () {
-        callback(img)
-    }
-
-    img.src = src
-}
-
-function createCanvas(width, height) {
-    let canvas = document.createElement('canvas')
-    canvas.width = width
-    canvas.height = height
-    return canvas
-}
-function createDataImage(imgData, name) {
-    const di = new DataImage(name)
-    di.setData(imgData.img.width, imgData.img.height, imgData.bytes)
-    return di
-}
-
-function createBillboard(label, pos, image, targetPos) {
-    const geomItem = new DomTree('billboard')
-    const material = new Material('material', 'FlatSurfaceShader')
-    material.getParameter('BaseColor').setImage(image)
-    geomItem.getParameter('Geometry').setValue(plane)
-    geomItem.getParameter('Material').setValue(material)
-
-    const xfo = new Xfo()
-    const ppm = 0.005
-    xfo.sc.set(image.width * ppm, image.height * ppm, 1)
-    xfo.tr = pos
-    xfo.ori.setFromDirectionAndUpvector(targetPos.subtract(pos), new Vec3(0, 0, 1))
-    geomItem.getParameter('GlobalXfo').setValue(xfo)
-    geomItem.pixelsPerMeter = ppm
-    geomItem.width = image.width
-    geomItem.height = image.height
-    return geomItem
-}
-let imgData, domMapper;
+const plane = new Plane(1, 1);
+let imgData, domMapper, infoLabel, activeBillboard;
 
 export function prepare(imageData, mapper) {
     imgData = imageData
-
     domMapper = mapper
     main()
 }
 
 export function updateBillboard(bytes) {
-    label0.setData(imgData.img.width, imgData.img.height, bytes)
+    infoLabel.setData(imgData.img.width, imgData.img.height, bytes)
 }
-let label0
+
+export function showActiveBillboard(activeState) {
+    if (activeBillboard) {
+        activeBillboard.getParameter("Visible").setValue(activeState);
+        domMapper.resetLastElement();
+    };
+}
+
+export function createDomBillboard(data, label, pos, lookAt) {
+    infoLabel = createDataImage(data, label || 'dataimage');
+    activeBillboard = createBillboard("infos", pos, infoLabel, lookAt);
+    return activeBillboard;
+}
+
 export function main() {
     // create a new scene
     const scene = new Scene()
@@ -111,7 +74,7 @@ export function main() {
     // create a new renderer and attach it to our HTML Canvas
     const renderer = new GLRenderer(document.getElementById('canvas'), {
         debugGeomIds: false,
-        enableFrustumCulling: true,
+        enableFrustumCulling: false,
     })
 
     // attach the scene to the renderer. Anything attached to this scene will now be rendererd.
@@ -120,50 +83,55 @@ export function main() {
     // get the camera from renderer
     const camera = renderer.getViewport().getCamera()
     // set camera's target and position.
-    camera.setPositionAndTarget(new Vec3(6, 6, 5), new Vec3(0, 0, 1.5))
+    camera.setPositionAndTarget(new Vec3(6, 10, 12), new Vec3(0, 0, 1.5))
 
     // These variables can be used later in our program
     const grid_size = 10
     const grid_div = 10
-    const grid_div_size = grid_size / grid_div
 
     scene.setupGrid(grid_size, grid_div)
 
     // create an empty TreeItem can be added to the scene tree to then add billboards to.
     const asset = new TreeItem('labels')
     scene.getRoot().addChild(asset)
-    label0 = createDataImage(imgData, 'Hello')
 
+
+    //billboard setup
     const cameraXfo = camera.getParameter('GlobalXfo').getValue()
-    const billboard0 = createBillboard(label0, new Vec3(1, 1, 1), label0, cameraXfo.tr)
+    const domBillboard = createDomBillboard(imgData, 'dombillboard', new Vec3(1, 1, 5), cameraXfo.tr);
 
-    // https://github.com/ZeaInc/zea-ux/blob/feat/dom-to-tree/src/DomTree.js
-    billboard0.on('pointerDown', (event) => {
+    domBillboard.on('pointerDown', (event) => {
         const pos = getIntersectionPosition(event.intersectionData)
-        domMapper.mapDownToDomElement(pos.x, pos.y);
+        if (pos)
+            domMapper.mapDownToDomElement(pos.x, pos.y);
     })
 
-    billboard0.on('pointerUp', (event) => {
+    domBillboard.on('pointerUp', (event) => {
         const pos = getIntersectionPosition(event.intersectionData)
-        domMapper.mapClickToDomElement(pos.x, pos.y);
+        if (pos)
+            domMapper.mapClickToDomElement(pos.x, pos.y);
     })
 
-    billboard0.on('pointerMove', (event) => {
+    domBillboard.on('pointerMove', (event) => {
         const pos = getIntersectionPosition(event.intersectionData)
-        domMapper.mapPosToDomElement(pos.x, pos.y);
+        if (pos)
+            domMapper.mapPosToDomElement(pos.x, pos.y);
+
+
     })
 
+    //when out of billboard, we want last element to reset itself 
     renderer.getViewport().on("pointerLeaveGeom", (event) => {
-        console.log('TESTE');
+        domMapper.resetLastElement();
     });
 
-    asset.addChild(billboard0)
+    asset.addChild(domBillboard);
+    //activeBillboard = infoBillboard;
 
-    //renderer.resumeDrawing();
 
+
+    //xr (vr) setup
     renderer.getXRViewport().then((xrvp) => {
-
-
         const xrButton = document.getElementById("xr-button");
         xrButton.textContent = "Launch VR";
         xrButton.classList.remove("hidden");
@@ -182,9 +150,13 @@ export function main() {
             const pos = getIntersectionPosition(intersectionData)
             if (pos)
                 domMapper.mapPosToDomElement(pos.x, pos.y);
+        });
 
-
-
+        xrvp.on("pointerDown", (event) => {
+            const { intersectionData } = event;
+            const pos = getIntersectionPosition(intersectionData)
+            if (pos)
+                domMapper.mapDownToDomElement(pos.x, pos.y);
         });
 
         xrvp.on("pointerUp", (event) => {
@@ -192,31 +164,50 @@ export function main() {
             const pos = getIntersectionPosition(intersectionData)
             if (pos)
                 domMapper.mapClickToDomElement(pos.x, pos.y);
-
-
-
         });
 
         xrButton.addEventListener("click", function (event) {
             xrvp.togglePresenting();
         });
-
-        document.addEventListener("keydown", (event) => {
-            if (event.key == " ") {
-                xrvp.togglePresenting();
-            }
-        });
     });
 
-    const urlParams = new URLSearchParams(window.location.search);
 
+
+    const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("profile")) {
         renderer.startContinuousDrawing();
     }
 
 }
 
+function createDataImage(imgData, name) {
+    const dataImg = new DataImage(name)
+    dataImg.setData(imgData.img.width, imgData.img.height, imgData.bytes)
+    return dataImg;
+}
 
+function createBillboard(label, pos, image, targetPos) {
+    const geomItem = new DomTree(label)
+    const material = new Material('material', 'FlatSurfaceShader')
+    material.getParameter('BaseColor').setImage(image)
+    geomItem.getParameter('Geometry').setValue(plane)
+    geomItem.getParameter('Material').setValue(material)
+
+    const xfo = new Xfo()
+    const ppm = 0.005
+    xfo.sc.set(image.width * ppm, image.height * ppm, 1)
+    xfo.tr = pos;
+    if (targetPos) {
+
+        xfo.ori.setFromDirectionAndUpvector(targetPos.subtract(pos), new Vec3(0, 0, 1))
+    } else xfo.ori.setFromDirectionAndUpvector(new Vec3(0, 0, 0), new Vec3(0, 0, 1))
+
+    geomItem.getParameter('GlobalXfo').setValue(xfo)
+    geomItem.pixelsPerMeter = ppm
+    geomItem.width = image.width
+    geomItem.height = image.height
+    return geomItem
+}
 
 
 function getIntersectionPosition(intersectionData) {
@@ -224,6 +215,10 @@ function getIntersectionPosition(intersectionData) {
         const ray = intersectionData.ray ? intersectionData.ray : intersectionData.pointerRay
 
         const geomItem = intersectionData.geomItem
+
+        if (geomItem.getParameter("Visible").getValue() == false) {
+            return;
+        };
         const planeXfo = geomItem.getParameter('GlobalXfo').getValue().clone()
         const plane = new Ray(planeXfo.tr, planeXfo.ori.getZaxis())
 
