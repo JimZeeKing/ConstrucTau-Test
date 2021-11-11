@@ -43,37 +43,68 @@ class DomTree extends GeomItem {
 
 }
 const plane = new Plane(1, 1);
-let imgData, domMapper, infoLabel, activeBillboard;
+const billboardData = new Map();
+const activeBillboard = new Map();
 
-export function prepare(imageData, mapper) {
-    imgData = imageData
-    domMapper = mapper
+export function prepare() {
     main()
 }
 
-export function updateBillboard(bytes) {
-    infoLabel.setData(imgData.img.width, imgData.img.height, bytes)
+export function addDomBillboard(imageData, targetElement, mapper) {
+    const domBillboardData = createDomBillboard(imageData, targetElement.getAttribute("id"), new Vec3(1, 1, 5), camera.getParameter('GlobalXfo').getValue().tr);
+    const bData = { data: imageData, mapper: mapper, billboard: domBillboardData.billboard, label: domBillboardData.label };
+    billboardData.set(targetElement, bData);
+
+    domBillboardData.billboard.on('pointerDown', (event) => {
+        const pos = getIntersectionPosition(event.intersectionData)
+        if (pos)
+            mapper.mapDownToDomElement(pos.x, pos.y);
+    })
+
+    domBillboardData.billboard.on('pointerUp', (event) => {
+        const pos = getIntersectionPosition(event.intersectionData)
+        if (pos)
+            mapper.mapClickToDomElement(pos.x, pos.y);
+    })
+
+    domBillboardData.billboard.on('pointerMove', (event) => {
+        const pos = getIntersectionPosition(event.intersectionData)
+        if (pos)
+            mapper.mapPosToDomElement(pos.x, pos.y);
+    })
+    domBillboardData.billboard.on('pointerLeave', (event) => {
+        mapper.resetLastElement();
+    })
+
+    billboardTree.addChild(domBillboardData.billboard);
+    activeBillboard.set(targetElement, billboardData);
 }
 
-export function showActiveBillboard(activeState) {
-    if (activeBillboard) {
-        activeBillboard.getParameter("Visible").setValue(activeState);
-        domMapper.resetLastElement();
+export function updateBillboard(targetElement, bytes) {
+    if (billboardData.has(targetElement)) {
+        const bData = billboardData.get(targetElement)
+        bData.label.setData(bData.data.img.width, bData.data.img.height, bytes);
+    };
+
+}
+
+export function showActiveBillboard(targetElement, activeState) {
+    if (activeBillboard.has(targetElement)) {
+        const bData = activeBillboard.get(targetElement).get(targetElement);
+        bData.billboard.getParameter("Visible").setValue(activeState);
+        bData.mapper.resetLastElement();
+        renderer.requestRedraw();
     };
 }
 
-export function createDomBillboard(data, label, pos, lookAt) {
-    infoLabel = createDataImage(data, label || 'dataimage');
-    activeBillboard = createBillboard("infos", pos, infoLabel, lookAt);
-    return activeBillboard;
-}
 
+let billboardTree, camera, renderer;
 export function main() {
     // create a new scene
     const scene = new Scene()
 
     // create a new renderer and attach it to our HTML Canvas
-    const renderer = new GLRenderer(document.getElementById('canvas'), {
+    renderer = new GLRenderer(document.getElementById('canvas'), {
         debugGeomIds: false,
         enableFrustumCulling: false,
     })
@@ -82,7 +113,7 @@ export function main() {
     renderer.setScene(scene)
 
     // get the camera from renderer
-    const camera = renderer.getViewport().getCamera()
+    camera = renderer.getViewport().getCamera()
     // set camera's target and position.
     camera.setPositionAndTarget(new Vec3(6, 10, 12), new Vec3(0, 0, 1.5))
 
@@ -93,45 +124,13 @@ export function main() {
     scene.setupGrid(grid_size, grid_div)
 
     // create an empty TreeItem can be added to the scene tree to then add billboards to.
-    const asset = new TreeItem('labels')
-    scene.getRoot().addChild(asset)
+    billboardTree = new TreeItem('billboards');
+    scene.getRoot().addChild(billboardTree)
 
 
     //billboard setup
     const cameraXfo = camera.getParameter('GlobalXfo').getValue()
-    const domBillboard = createDomBillboard(imgData, 'dombillboard', new Vec3(1, 1, 5), cameraXfo.tr);
-
-    domBillboard.on('pointerDown', (event) => {
-
-        const pos = getIntersectionPosition(event.intersectionData)
-        if (pos)
-            domMapper.mapDownToDomElement(pos.x, pos.y);
-    })
-
-    domBillboard.on('pointerUp', (event) => {
-        const pos = getIntersectionPosition(event.intersectionData)
-        if (pos)
-            domMapper.mapClickToDomElement(pos.x, pos.y);
-    })
-
-    domBillboard.on('pointerMove', (event) => {
-        console.log('pointerMove');
-        const pos = getIntersectionPosition(event.intersectionData)
-        if (pos)
-            domMapper.mapPosToDomElement(pos.x, pos.y);
-
-
-    })
-
-    //when out of billboard, we want last element to reset itself 
-    renderer.getViewport().on("pointerLeaveGeom", (event) => {
-        domMapper.resetLastElement();
-    });
-
-    asset.addChild(domBillboard);
-    //activeBillboard = infoBillboard;
-
-
+    // const domBillboard = createDomBillboard(imgData, 'dombillboard', new Vec3(1, 1, 5), cameraXfo.tr);
 
     //xr (vr) setup
     renderer.getXRViewport().then((xrvp) => {
@@ -148,39 +147,22 @@ export function main() {
             }
         });
 
-        /*xrvp.on("pointerMove", (event) => {
-            const { intersectionData } = event;
-            const pos = getIntersectionPosition(intersectionData)
-            if (pos)
-                domMapper.mapPosToDomElement(pos.x, pos.y);
-        });*/
-
-        /*  xrvp.on("pointerDown", (event) => {
-              const { intersectionData } = event;
-              const pos = getIntersectionPosition(intersectionData)
-              if (pos)
-                  domMapper.mapDownToDomElement(pos.x, pos.y);
-          });*/
-
-        /*  xrvp.on("pointerUp", (event) => {
-              const { intersectionData } = event;
-              const pos = getIntersectionPosition(intersectionData)
-              if (pos)
-                  domMapper.mapClickToDomElement(pos.x, pos.y);
-          });*/
-
         xrButton.addEventListener("click", function (event) {
             xrvp.togglePresenting();
         });
     });
-
-
 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("profile")) {
         renderer.startContinuousDrawing();
     }
 
+}
+
+function createDomBillboard(data, label, pos, lookAt) {
+    const billboardLabel = createDataImage(data, label || 'dataimage');
+    const billboard = createBillboard("infos", pos, billboardLabel, lookAt);
+    return { billboard: billboard, label: billboardLabel };
 }
 
 function createDataImage(imgData, name) {

@@ -49,7 +49,7 @@ export const template = `
   
   <div class="row">
     <div class="cell">
-    <button data-mapping class='button' data-hover-class='button-hover' data-down-class='button-down'  onclick="closeActiveBillboard()">Fermer la fenêtre</button>
+    <button data-mapping class='button' data-hover-class='button-hover' data-down-class='button-down'  onclick="closeBillboard(this)">Fermer la fenêtre</button>
     </div>
   </div>
 `;

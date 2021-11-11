@@ -63,9 +63,12 @@
         <br>
         <br>
         <div>
-            <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
-            <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
-            <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
+            <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+                data-active-group="g1" data-label="Radio 1"></div>
+            <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+                data-active-group="g1" data-label="Radio 2"></div>
+            <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+                data-active-group="g1" data-label="Radio 3"></div>
         </div>
     </div>
 
@@ -80,7 +83,7 @@
     </script>
 
     <script type="module">
-        import { prepare, updateBillboard, showActiveBillboard } from './src/data.js'
+        import { prepare, updateBillboard, showActiveBillboard, addDomBillboard } from './src/data.js'
         import { DataPool } from './src/DataPool.js'
         import { template } from './data/templates/infos.js'
         let renderer, templateContainer, mapper;
@@ -90,6 +93,7 @@
             templateContainer = document.querySelector("#infoTable");
             templateContainer.innerHTML = Sqrl.render(template, data);
 
+            prepare();
 
             setTimeout(() => {
                 mapper = DomMapper.setup(templateContainer);
@@ -99,7 +103,7 @@
 
             templateContainer.addEventListener("render", function initOriginal(event) {
                 templateContainer.removeEventListener("render", initOriginal);
-                prepare(event.detail.renderData, mapper);
+                addDomBillboard(event.detail.renderData, templateContainer, mapper);
             });
 
             templateContainer.addEventListener("domevent", function (event) {
@@ -108,12 +112,24 @@
 
             templateContainer.addEventListener("render", (event) => {
                 if (event.detail.renderData.bytes) {
-                    updateBillboard(event.detail.renderData.bytes);
+                    updateBillboard(templateContainer, event.detail.renderData.bytes);
                 };
             });
 
-            window.closeActiveBillboard = function () {
-                showActiveBillboard(false);
+            window.closeBillboard = function (button) {
+                let mainContainer = button;
+                var els = [];
+                while (mainContainer) {
+                    els.unshift(mainContainer);
+                    if (mainContainer.parentNode == document.body)
+                        break;
+                    mainContainer = mainContainer.parentNode;
+                }
+
+                showActiveBillboard(mainContainer, false);
+                setTimeout(() => {
+                    showActiveBillboard(mainContainer, true);
+                }, 5000);
             }
 
         })
