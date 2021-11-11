@@ -63,12 +63,9 @@
         <br>
         <br>
         <div>
-            <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
-                data-active-group="g1" data-label="Radio 1"></div>
-            <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
-                data-active-group="g1" data-label="Radio 2"></div>
-            <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
-                data-active-group="g1" data-label="Radio 3"></div>
+            <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
+            <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
+            <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
         </div>
     </div>
 
@@ -83,12 +80,13 @@
     </script>
 
     <script type="module">
+        const { Vec3 } = window.zeaEngine
         import { prepare, updateBillboard, showActiveBillboard, addDomBillboard } from './src/data.js'
         import { DataPool } from './src/DataPool.js'
         import { template } from './data/templates/infos.js'
         let renderer, templateContainer, mapper;
         let json = DataPool.create("./src/data.json");
-        json.loadData().then((data) => {
+        /*json.loadData().then((data) => {
             data = json.getObjectFromList("infos", 0);
             templateContainer = document.querySelector("#infoTable");
             templateContainer.innerHTML = Sqrl.render(template, data);
@@ -132,7 +130,28 @@
                 }, 5000);
             }
 
-        })
+
+        })*/
+
+        prepare();
+
+        templateContainer = document.querySelector("#test");
+        mapper = DomMapper.setup(templateContainer);
+        renderer = CanvasRenderer.setup(null, templateContainer, "#fff", mapper.elements);
+        templateContainer.addEventListener("render", function initOriginal(event) {
+            templateContainer.removeEventListener("render", initOriginal);
+            addDomBillboard(event.detail.renderData, 'handDomBillboard', mapper, new Vec3(0, -1, 0));
+        });
+
+        templateContainer.addEventListener("domevent", function (event) {
+            renderer.renderElement(event.detail.element, event.detail.type, false, true);
+        });
+
+        templateContainer.addEventListener("render", (event) => {
+            if (event.detail.renderData.bytes) {
+                updateBillboard('handDomBillboard', event.detail.renderData.bytes);
+            };
+        });
 
     </script>
 

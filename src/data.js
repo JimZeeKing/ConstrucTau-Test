@@ -1,6 +1,6 @@
 // <!-- prettier-ignore-start -->
 // Zea Engine dependencies stored in new const variables. View the API to see what you can include and use.
-const { Scene, GLRenderer, Vec3, Color, Xfo, Ray, Label, DataImage, BillboardItem, TreeItem, GeomItem, Plane, Material } = window.zeaEngine
+const { Scene, GLRenderer, Vec3, Color, Xfo, Ray, Label, DataImage, BillboardItem, TreeItem, GeomItem, Plane, Material, VRViewManipulator } = window.zeaEngine
 
 class DomTree extends GeomItem {
     /**
@@ -50,8 +50,8 @@ export function prepare() {
     main()
 }
 
-export function addDomBillboard(imageData, targetElement, mapper) {
-    const domBillboardData = createDomBillboard(imageData, targetElement.getAttribute("id"), new Vec3(1, 1, 5), camera.getParameter('GlobalXfo').getValue().tr);
+export function addDomBillboard(imageData, targetElement, mapper, pos, lookAt) {
+    const domBillboardData = createDomBillboard(imageData, targetElement, pos || new Vec3(1, 1, 5), lookAt || camera.getParameter('GlobalXfo').getValue().tr);
     const bData = { data: imageData, mapper: mapper, billboard: domBillboardData.billboard, label: domBillboardData.label };
     billboardData.set(targetElement, bData);
 
@@ -138,6 +138,12 @@ export function main() {
         xrButton.textContent = "Launch VR";
         xrButton.classList.remove("hidden");
 
+        const vm = xrvp.getManipulator();
+        //always fired?
+        vm.onVRPoseChanged = (event) => {
+            //  console.log(event.controllers[0].getTreeItem().getParameter('LocalXfo').getValue().ori.toEulerAngles(0).z);
+        }
+
         xrvp.on("presentingChanged", (event) => {
             const { state } = event;
             if (state) {
@@ -145,7 +151,23 @@ export function main() {
             } else {
                 xrButton.textContent = "Launch VR";
             }
+
+
         });
+        let controllers = [];
+        xrvp.on('controllerAdded', (event) => {
+            // const xfo = activeBillboard.get('handDomBillboard').get('handDomBillboard').billboard.getParameter('GlobalXfo').getValue();
+            controllers = xrvp.getControllers();
+
+            controllers[0].getTreeItem().addChild(activeBillboard.get('handDomBillboard').get('handDomBillboard').billboard);
+            /* xrvp.on('onVRPoseChanged', (event) => {
+                 console.log('poschange');
+             })*/
+        });
+
+
+
+
 
         xrButton.addEventListener("click", function (event) {
             xrvp.togglePresenting();
