@@ -76,9 +76,10 @@
       let url = "https://localhost:3000/content/all/nocred";
 
       Promise.all([json.loadData(url), fetch("./data/templates/infos.mustache").then((resp) => resp.text())]).then((data) => {
+
         templateContainer = document.querySelector("#infoTable");
-        data[0] = json.getObjectFromListWithProp(url, "title", "Titre complet");
-        console.log(data[0]);
+        data[0] = json.getObjectFromListWithProp(url, "title", "Contenu 2");
+
         templateContainer.innerHTML = Mustache.render(data[1], data[0]);
         prepare();
 

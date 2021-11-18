@@ -8,8 +8,6 @@ DataPool.create = function name(targetHost) {
     let data = new Map();
 
     pool.loadData = async function (url) {
-
-
         const response = await fetch(host + url);
         const jsonData = await response.json();
         data.set(host + url, jsonData);
