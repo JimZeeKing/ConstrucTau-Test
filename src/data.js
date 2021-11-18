@@ -77,7 +77,7 @@ export function addDomBillboard(imageData, targetElement, mapper, pos, lookAt) {
     })
 
     billboardTree.addChild(domBillboardData.billboard);
-    activeBillboard.set(targetElement, billboardData);
+    activeBillboard.set(targetElement, bData);
 }
 
 export function updateBillboard(targetElement, bytes) {
@@ -90,7 +90,7 @@ export function updateBillboard(targetElement, bytes) {
 
 export function showActiveBillboard(targetElement, activeState) {
     if (activeBillboard.has(targetElement)) {
-        const bData = activeBillboard.get(targetElement).get(targetElement);
+        const bData = activeBillboard.get(targetElement);
         bData.billboard.getParameter("Visible").setValue(activeState);
         bData.mapper.resetLastElement();
         renderer.requestRedraw();
@@ -159,7 +159,7 @@ export function main() {
             // const xfo = activeBillboard.get('handDomBillboard').get('handDomBillboard').billboard.getParameter('GlobalXfo').getValue();
             controllers = xrvp.getControllers();
 
-            controllers[0].getTreeItem().addChild(activeBillboard.get('handDomBillboard').get('handDomBillboard').billboard);
+            controllers[0].getTreeItem().addChild(activeBillboard.get('handDomBillboard').billboard);
             /* xrvp.on('onVRPoseChanged', (event) => {
                  console.log('poschange');
              })*/
