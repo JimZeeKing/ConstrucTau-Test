@@ -73,7 +73,7 @@
 
       let renderer, templateContainer, mapper;
       let json = DataPool.create();
-      let url = "http://localhost:3000/content/all/nocred";
+      let url = "http://127.0.0.1:3000/content/all/nocred";
 
       Promise.all([json.loadData(url), fetch("./data/templates/infos.mustache").then((resp) => resp.text())]).then((data) => {
 

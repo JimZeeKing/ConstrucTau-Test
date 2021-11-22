@@ -140,9 +140,10 @@ export function main() {
 
         const vm = xrvp.getManipulator();
         //always fired?
-        /*vm.onVRPoseChanged = (event) => {
+        vm.onVRPoseChanged = (event) => {
+            super.onVRPoseChanged(event);
             //  console.log(event.controllers[0].getTreeItem().getParameter('LocalXfo').getValue().ori.toEulerAngles(0).z);
-        }*/
+        }
 
         xrvp.on("presentingChanged", (event) => {
             const { state } = event;
