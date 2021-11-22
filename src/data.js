@@ -50,8 +50,8 @@ export function prepare() {
     main()
 }
 
-export function addDomBillboard(imageData, targetElement, mapper, pos, lookAt) {
-    const domBillboardData = createDomBillboard(imageData, targetElement, pos || new Vec3(1, 1, 5), lookAt || camera.getParameter('GlobalXfo').getValue().tr);
+export function addDomBillboard(imageData, targetElement, mapper, pos, lookAt, ppm) {
+    const domBillboardData = createDomBillboard(imageData, targetElement, pos || new Vec3(1, 1, 5), lookAt || camera.getParameter('GlobalXfo').getValue().tr, ppm);
     const bData = { data: imageData, mapper: mapper, billboard: domBillboardData.billboard, label: domBillboardData.label };
     billboardData.set(targetElement, bData);
 
@@ -140,10 +140,10 @@ export function main() {
 
         const vm = xrvp.getManipulator();
         //always fired?
-        vm.onVRPoseChanged = (event) => {
-            super.onVRPoseChanged(event);
-            //  console.log(event.controllers[0].getTreeItem().getParameter('LocalXfo').getValue().ori.toEulerAngles(0).z);
-        }
+        /* vm.onVRPoseChanged = (event) => {
+            // super.onVRPoseChanged(event);
+             //  console.log(event.controllers[0].getTreeItem().getParameter('LocalXfo').getValue().ori.toEulerAngles(0).z);
+         }*/
 
         xrvp.on("presentingChanged", (event) => {
             const { state } = event;
@@ -156,11 +156,45 @@ export function main() {
 
         });
         let controllers = [];
+
+        /*  xrvp.on('viewChanged', (event) => {
+              const headXfo = event.viewXfo;
+              if (controllers.length == 2) {
+                  const xfoA = controllers[1].getTreeItem().getParameter('GlobalXfo').getValue()
+                  const headToCtrlA = xfoA.tr.subtract(headXfo.tr)
+                  headToCtrlA.normalizeInPlace();
+                  console.log(headToCtrlA.angleTo(xfoA.ori.getYaxis()), Math.PI * 0.25);
+                  if (headToCtrlA.angleTo(xfoA.ori.getYaxis()) < Math.PI * 0.25) {
+                      showHandUI(headXfo, controllers[1], controllers[0], true);
+                      // showActiveBillboard('templateContainer', true);
+                  } //else showHandUI(headXfo, false);
+              };
+  
+          });*/
         xrvp.on('controllerAdded', (event) => {
             // const xfo = activeBillboard.get('handDomBillboard').get('handDomBillboard').billboard.getParameter('GlobalXfo').getValue();
             controllers = xrvp.getControllers();
 
-          //  controllers[0].getTreeItem().addChild(activeBillboard.get('handDomBillboard').billboard);
+            /* const pointermat = new Material('pointermat', 'LinesShader')
+             pointermat.setSelectable(false)
+             pointermat.getParameter('BaseColor').setValue(new Color(1.2, 0, 0))*/
+
+            if (controllers.length == 2) {
+                //we have both controllers now
+
+                console.log(controllers);
+                // const uiLocalXfo = controllers[1].getTreeItem().getParameter('LocalXfo').getValue()
+                controllers[1].getTipItem().addChild(activeBillboard.get('templateContainer').billboard, false)
+                const uiLocalXfo = activeBillboard.get('templateContainer').billboard.getParameter('LocalXfo').getValue()
+                // uiLocalXfo.ori.set(0, 0, 0);
+                uiLocalXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.2);
+
+                uiLocalXfo.tr.set(0.35, -0.05, 0.08)
+                activeBillboard.get('templateContainer').billboard.getParameter('LocalXfo').setValue(uiLocalXfo)
+
+            };
+
+            //  controllers[0].getTreeItem().addChild(activeBillboard.get('handDomBillboard').billboard);
             /* xrvp.on('onVRPoseChanged', (event) => {
                  console.log('poschange');
              })*/
@@ -181,10 +215,40 @@ export function main() {
     }
 
 }
+let handUIActive = false;
+function showHandUI(headXfo, handController, pointerController, state) {
 
-function createDomBillboard(data, label, pos, lookAt) {
+    if (handUIActive != state) {
+        handUIActive = state;
+        //ui hand
+        const uiLocalXfo = handController.getTreeItem().getParameter('LocalXfo').getValue()
+        uiLocalXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.6);
+
+        //pointer hand
+        const xfoA = handController.getTreeItem().getParameter('GlobalXfo').getValue()
+        const xfoB = pointerController.getTreeItem().getParameter('GlobalXfo').getValue()
+        const headToCtrlA = xfoA.tr.subtract(headXfo.tr)
+        const headToCtrlB = xfoB.tr.subtract(headXfo.tr)
+        if (headToCtrlA.cross(headToCtrlB).dot(headXfo.ori.getYaxis()) > 0.0) {
+            uiLocalXfo.tr.set(0.05, -0.05, 0.08)
+        } else {
+            uiLocalXfo.tr.set(-0.05, -0.05, 0.08)
+        }
+
+        handController.getTreeItem().getParameter('LocalXfo').setValue(uiLocalXfo)
+
+        console.log(activeBillboard.get('templateContainer'));
+        handController.getTipItem().addChild(activeBillboard.get('templateContainer').billboard, false)
+    };
+
+
+
+
+}
+
+function createDomBillboard(data, label, pos, lookAt, ppm) {
     const billboardLabel = createDataImage(data, label || 'dataimage');
-    const billboard = createBillboard("infos", pos, billboardLabel, lookAt);
+    const billboard = createBillboard("infos", pos, billboardLabel, lookAt, ppm);
     return { billboard: billboard, label: billboardLabel };
 }
 
