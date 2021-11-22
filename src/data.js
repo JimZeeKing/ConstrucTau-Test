@@ -140,9 +140,9 @@ export function main() {
 
         const vm = xrvp.getManipulator();
         //always fired?
-        vm.onVRPoseChanged = (event) => {
+        /*vm.onVRPoseChanged = (event) => {
             //  console.log(event.controllers[0].getTreeItem().getParameter('LocalXfo').getValue().ori.toEulerAngles(0).z);
-        }
+        }*/
 
         xrvp.on("presentingChanged", (event) => {
             const { state } = event;
@@ -159,7 +159,7 @@ export function main() {
             // const xfo = activeBillboard.get('handDomBillboard').get('handDomBillboard').billboard.getParameter('GlobalXfo').getValue();
             controllers = xrvp.getControllers();
 
-            controllers[0].getTreeItem().addChild(activeBillboard.get('handDomBillboard').billboard);
+          //  controllers[0].getTreeItem().addChild(activeBillboard.get('handDomBillboard').billboard);
             /* xrvp.on('onVRPoseChanged', (event) => {
                  console.log('poschange');
              })*/
