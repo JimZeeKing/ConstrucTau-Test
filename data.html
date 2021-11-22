@@ -11,8 +11,8 @@
     <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/src/dom-to-image-more.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mustache@4.2.0/mustache.min.js"></script>
 
-    <script src="https://tim.cgmatane.qc.ca/domcanvas/scripts/CanvasRenderer.js"></script>
-    <script src="https://tim.cgmatane.qc.ca/domcanvas/scripts/DomMapper.js"></script>
+    <script src="./libs/CanvasRenderer.js"></script>
+    <script src="./libs/DomMapper.js"></script>
 
     <script src="./src/zea-fps-display.js" type="module"></script>
 
@@ -71,35 +71,51 @@
       import { prepare, updateBillboard, showActiveBillboard, addDomBillboard } from "./src/data.js";
       import { DataPool } from "./src/DataPool.js";
 
-      let renderer, templateContainer, mapper;
+      let templateContainer, handUI, mapper1, mapper2;
       let json = DataPool.create();
       let url = "http://127.0.0.1:3000/content/all/nocred";
+      let domrenderer = CanvasRenderer.setup();
 
       Promise.all([json.loadData(url), fetch("./data/templates/infos.mustache").then((resp) => resp.text())]).then((data) => {
-
-        templateContainer = document.querySelector("#test");
-        data[0] = json.getObjectFromListWithProp(url, "title", "Contenu 2");
-
-      //  templateContainer.innerHTML = Mustache.render(data[1], data[0]);
-        prepare();
-
+        templateContainer = document.querySelector('#infoTable')
+        handUI = document.querySelector("#test");
+        mapper2 = DomMapper.setup(handUI);
+        data[0] = json.getObjectFromListWithProp(url, "title", "bla");
+        templateContainer.innerHTML = Mustache.render(data[1], data[0]);
+       
         setTimeout(() => {
-          mapper = DomMapper.setup(templateContainer);
-          renderer = CanvasRenderer.setup(null, templateContainer, "#fff", mapper.elements);
+            mapper1 = DomMapper.setup(templateContainer);
         }, 500);
 
-        templateContainer.addEventListener("render", function initOriginal(event) {
-          templateContainer.removeEventListener("render", initOriginal);
-          addDomBillboard(event.detail.renderData, 'templateContainer', mapper, undefined, undefined, 0.001);
+        domrenderer.addRenderContainer(templateContainer, "#666", (renderData) => {
+            addDomBillboard(renderData, templateContainer, mapper1, undefined, undefined, 0.0025);
+        });
+        domrenderer.addRenderContainer(handUI, "#fff", (renderData) => {
+            addDomBillboard(renderData, 'handUI', mapper2, undefined, undefined, 0.001);
         });
 
-        templateContainer.addEventListener("domevent", function (event) {
-          renderer.renderElement(event.detail.element, event.detail.type, false, true);
+       
+     
+      prepare();
+       
+
+      templateContainer.addEventListener("domevent", function (event) {
+            domrenderer.renderElement(templateContainer, event.detail.element, event.detail.type, false, true);
         });
 
         templateContainer.addEventListener("render", (event) => {
           if (event.detail.renderData.bytes) {
-            updateBillboard('templateContainer', event.detail.renderData.bytes);
+            updateBillboard(templateContainer, event.detail.renderData.bytes);
+          }
+        });
+
+        handUI.addEventListener("domevent", function (event) {
+            domrenderer.renderElement(handUI, event.detail.element, event.detail.type, false, true);
+        });
+
+        handUI.addEventListener("render", (event) => {
+          if (event.detail.renderData.bytes) {
+            updateBillboard('handUI', event.detail.renderData.bytes);
           }
         });
 

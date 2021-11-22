@@ -71,6 +71,7 @@ export function addDomBillboard(imageData, targetElement, mapper, pos, lookAt, p
         const pos = getIntersectionPosition(event.intersectionData)
         if (pos)
             mapper.mapPosToDomElement(pos.x, pos.y);
+
     })
     domBillboardData.billboard.on('pointerLeave', (event) => {
         mapper.resetLastElement();
@@ -222,7 +223,7 @@ let handUIActive = false;
 function getHandController(controllers, handedness) {
     let found = null;
     controllers.forEach((controller) => {
-        if (controller.__inputSource.handedness == handedness) found= controller;
+        if (controller.__inputSource.handedness == handedness) found = controller;
     })
 
     return found;
