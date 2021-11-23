@@ -8,32 +8,39 @@
     <div class="cell" data-mapping data-hover-class='cell-hover' data-down-class='cell-down' data-target-id='vocableEN'>Vocabulaire (nom usuel):</div>
     <div class="cell invisible-data" id='vocableEN' data-remove-class='invisible-data'>{{titleEN}}</div>
   </div>
+  {{#if material}}
   <div class="row">
     <div class="cell" data-mapping data-hover-class='cell-hover' data-down-class='cell-down' data-target-id='mat-name,mat-desc'>Matériaux:</div>
     <div class="cell invisible-data" id='mat-name' data-remove-class='invisible-data'>{{material}}</div>
     <div class="cell invisible-data" id='mat-desc' data-remove-class='invisible-data'>{{material}}</div>
   </div>
+  {{/if}}
+   {{#if sdimensions}}
    <div class="row">
     <div class="cell" data-mapping data-hover-class='cell-hover' data-down-class='cell-down' data-target-id='sizes'>Dimensions standards:</div>
     <div class="cell invisible-data" id='sizes' data-remove-class='invisible-data'>Hauteur {{sdimensions}}
       <br>Largeur {{sdimensions}}
      </div>
   </div>
+  {{/if}}
+   {{#if pdimensions}}
   <div class="row">
     <div class="cell" data-mapping data-hover-class='cell-hover' data-down-class='cell-down' data-target-id='sizes-h,sizes-w'>Dimensions possibles: limite inférieure</div>
     <div class="cell invisible-data" id='sizes-h' data-remove-class='invisible-data'>Hauteur : <br>{{pdimensions}}</div>
     <div class="cell invisible-data" id='sizes-w' data-remove-class='invisible-data'>Largeur : <br>{{pdimensions}}</div>
   </div>
-  
+  {{/if}}
+  {{#if images.length}}
   <div class="row">
     <div class="cell" data-mapping data-hover-class='cell-hover' data-down-class='cell-down' data-target-id-sibling='allimages'>Images en différents contextes</div>
     <div class="cell flex " id='allimages'>
-    {{#images}}
-    <img  class='invisible-data' data-remove-class='invisible-data' src="{{images}}" alt="">
-    {{/images}}
+    {{#each images}}
+    <img  class='invisible-data' data-remove-class='invisible-data' src='{{this}}' alt="">
+    {{/each}}
     </div>
   </div>
-  
+  {{/if}}
+   {{#if ccq}}
   <div class="row">
     <div class="cell">Normes du Code de construction du Québec:</div>
     <div class="cell">Extrait du Code construction du Québec <br>voir plus bas</div>
@@ -41,14 +48,18 @@
       {{ccq}}
     </div>
   </div>
-  
+  {{/if}}
+   {{#if pose}}
   <div class="row">
     <div class="cell" data-mapping data-hover-class='cell-hover' data-down-class='cell-down' data-target-id='description'>Information textuelle sur les prescriptions de pose et /ou techniques d’assemblages</div>
     <div class="cell invisible-data" id='description' data-remove-class='invisible-data'>{{pose}}</div>
   </div>
-  
+  {{/if}}
+
   <div class="row">
     <div class="cell">
     <button data-mapping class='button' data-hover-class='button-hover' data-down-class='button-down'  onclick="closeBillboard(this)">Fermer la fenêtre</button>
     </div>
   </div>
+
+ 

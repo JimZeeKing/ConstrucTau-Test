@@ -1,160 +1,147 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <!-- download Zea Engine -- this downloads the latest build from version 3 of the engine -->
-    <script src="./libs/zea-engine/index.umd.js"></script>
-    <script src="./libs/zea-ux/index.umd.js"></script>
-    <!-- download our stylesheet -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css" />
-    <link rel="stylesheet" href="./src/data.css" />
-    <link rel="stylesheet" href="./src/styles.css" />
-    <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/src/dom-to-image-more.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mustache@4.2.0/mustache.min.js"></script>
 
-    <script src="./libs/CanvasRenderer.js"></script>
-    <script src="./libs/DomMapper.js"></script>
+<head>
+  <!-- download Zea Engine -- this downloads the latest build from version 3 of the engine -->
+  <script src="./libs/zea-engine/index.umd.js"></script>
+  <script src="./libs/zea-ux/index.umd.js"></script>
+  <!-- download our stylesheet -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css" />
+  <link rel="stylesheet" href="./src/data.css" />
+  <link rel="stylesheet" href="./src/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/src/dom-to-image-more.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
 
-    <script src="./src/zea-fps-display.js" type="module"></script>
+  <script src="./libs/CanvasRenderer.js"></script>
+  <script src="./libs/DomMapper.js"></script>
 
-    <title>ConstrucTAU</title>
-  </head>
+  <script src="./src/zea-fps-display.js" type="module"></script>
 
-  <body class="overflow-hidden">
-    <div class="layout grid h-screen">
-      <header class="border flex justify-left items-center m-2 border-none">
-        <img src="./data/logo-inverse.png" id="logo" />
-      </header>
-      <main>
-        <div class="splitter">
-          <div id="leftPanel">
-            <scene-tree-view id="tree" class="select-none"></scene-tree-view>
-          </div>
-          <div class="separator" id="separatorV"></div>
-          <div id="mainPanel">
-            <div id="canvas-holder">
-              <canvas id="canvas" style="position: absolute; width: 100%; height: 100%"> </canvas>
-            </div>
-            <div class="xr-button hidden" id="xr-button"></div>
-            <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
-            <progress class="progress-display" id="progress" value="0" max="100">0%</progress>
-          </div>
+  <title>ConstrucTAU</title>
+</head>
+
+<body class="overflow-hidden">
+  <div class="layout grid h-screen">
+    <header class="border flex justify-left items-center m-2 border-none">
+      <img src="./data/logo-inverse.png" id="logo" />
+    </header>
+    <main>
+      <div class="splitter">
+        <div id="leftPanel">
+          <scene-tree-view id="tree" class="select-none"></scene-tree-view>
         </div>
-      </main>
-    </div>
-
-    <div id="infoTable" class="table"></div>
-
-    <div id="test">
-      <h2>Titre</h2>
-      <p id="infos">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minus et totam delectus perferendis soluta repellat quam facere id ducimus numquam expedita sapiente sunt, eius molestias eum accusamus. Rerum, corrupti dicta!</p>
-
-      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover">Button</button>
-      <br />
-      <br />
-      <div>
-        <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
-        <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
-        <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
+        <div class="separator" id="separatorV"></div>
+        <div id="mainPanel">
+          <div id="canvas-holder">
+            <canvas id="canvas" style="position: absolute; width: 100%; height: 100%"> </canvas>
+          </div>
+          <div class="xr-button hidden" id="xr-button"></div>
+          <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
+          <progress class="progress-display" id="progress" value="0" max="100">0%</progress>
+        </div>
       </div>
+    </main>
+  </div>
+
+  <div id="infoTable" class="table"></div>
+
+  <div id="test">
+    <h2>Titre</h2>
+    <p id="infos">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minus et totam delectus perferendis soluta
+      repellat quam facere id ducimus numquam expedita sapiente sunt, eius molestias eum accusamus. Rerum, corrupti
+      dicta!</p>
+
+    <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover">Button</button>
+    <br />
+    <br />
+    <div>
+      <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+        data-active-group="g1" data-label="Radio 1"></div>
+      <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+        data-active-group="g1" data-label="Radio 2"></div>
+      <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+        data-active-group="g1" data-label="Radio 3"></div>
     </div>
+  </div>
 
-    <script type="module">
-      import dragElement from "./src/panels.js";
-      const separatorV = document.getElementById("separatorV");
-      const leftPanel = document.getElementById("leftPanel");
-      const mainPanel = document.getElementById("mainPanel");
-      dragElement(separatorV, leftPanel, mainPanel, "H");
-    </script>
+  <script type="module">
+    import dragElement from "./src/panels.js";
+    const separatorV = document.getElementById("separatorV");
+    const leftPanel = document.getElementById("leftPanel");
+    const mainPanel = document.getElementById("mainPanel");
+    dragElement(separatorV, leftPanel, mainPanel, "H");
+  </script>
 
-    <script type="module">
-      const { Vec3 } = window.zeaEngine;
-      import { prepare, updateBillboard, showActiveBillboard, addDomBillboard } from "./src/data.js";
-      import { DataPool } from "./src/DataPool.js";
+  <script type="module">
+    const { Vec3 } = window.zeaEngine;
+    import { prepare, updateBillboard, showActiveBillboard, addDomBillboard } from "./src/data.js";
+    import { DataPool } from "./src/DataPool.js";
 
-      let templateContainer, handUI, mapper1, mapper2;
-      let json = DataPool.create();
-      let url = "http://127.0.0.1:3000/content/all/nocred";
-      let domrenderer = CanvasRenderer.setup();
+    let templateContainer, handUI, mapper1, mapper2;
+    let json = DataPool.create();
+    let url = "http://127.0.0.1:3000/content/all/nocred";
+    let domrenderer = CanvasRenderer.setup();
 
-      Promise.all([json.loadData(url), fetch("./data/templates/infos.mustache").then((resp) => resp.text())]).then((data) => {
-        templateContainer = document.querySelector('#infoTable')
-        handUI = document.querySelector("#test");
-        mapper2 = DomMapper.setup(handUI);
-        data[0] = json.getObjectFromListWithProp(url, "title", "bla");
-        templateContainer.innerHTML = Mustache.render(data[1], data[0]);
-       
-        setTimeout(() => {
-            mapper1 = DomMapper.setup(templateContainer);
-        }, 500);
+    Promise.all([json.loadData(url), fetch("./data/templates/infos.mustache").then((resp) => resp.text())]).then((data) => {
+      templateContainer = document.querySelector('#infoTable')
+      handUI = document.querySelector("#test");
+      mapper2 = DomMapper.setup(handUI);
+      data[0] = json.getObjectFromListWithProp(url, "title", "Titre complet");
+      console.log(data[0].images);
 
+      const template = Handlebars.compile(data[1]);
+      templateContainer.innerHTML = template(data[0]);
+      mapper1 = DomMapper.setup(templateContainer);
+      setTimeout(() => {
+        mapper1.updatePositions();
         domrenderer.addRenderContainer(templateContainer, "#666", (renderData) => {
-            addDomBillboard(renderData, templateContainer, mapper1, undefined, undefined, 0.0025);
+          addDomBillboard(renderData, templateContainer, mapper1, new Vec3(5, 1, 5), undefined, 0.0025);
         });
-        domrenderer.addRenderContainer(handUI, "#fff", (renderData) => {
-            addDomBillboard(renderData, 'handUI', mapper2, undefined, undefined, 0.001);
-        });
+      }, 500);
 
-       
-     
+
+      domrenderer.addRenderContainer(handUI, "#fff", (renderData) => {
+        addDomBillboard(renderData, 'handUI', mapper2, undefined, undefined, 0.001);
+      });
+
       prepare();
-       
 
       templateContainer.addEventListener("domevent", function (event) {
-            domrenderer.renderElement(templateContainer, event.detail.element, event.detail.type, false, true);
-        });
-
-        templateContainer.addEventListener("render", (event) => {
-          if (event.detail.renderData.bytes) {
-            updateBillboard(templateContainer, event.detail.renderData.bytes);
-          }
-        });
-
-        handUI.addEventListener("domevent", function (event) {
-            domrenderer.renderElement(handUI, event.detail.element, event.detail.type, false, true);
-        });
-
-        handUI.addEventListener("render", (event) => {
-          if (event.detail.renderData.bytes) {
-            updateBillboard('handUI', event.detail.renderData.bytes);
-          }
-        });
-
-        window.closeBillboard = function (button) {
-          let mainContainer = button;
-          var els = [];
-          while (mainContainer) {
-            els.unshift(mainContainer);
-            if (mainContainer.parentNode == document.body) break;
-            mainContainer = mainContainer.parentNode;
-          }
-
-          showActiveBillboard(mainContainer, false);
-          setTimeout(() => {
-            showActiveBillboard(mainContainer, true);
-          }, 5000);
-        };
+        domrenderer.renderElement(templateContainer, event.detail.element, event.detail.type, false, true);
       });
-      /*
-                prepare();
-        
-                templateContainer = document.querySelector("#test");
-                mapper = DomMapper.setup(templateContainer);
-                renderer = CanvasRenderer.setup(null, templateContainer, "#fff", mapper.elements);
-                templateContainer.addEventListener("render", function initOriginal(event) {
-                    templateContainer.removeEventListener("render", initOriginal);
-                    addDomBillboard(event.detail.renderData, 'handDomBillboard', mapper, new Vec3(0, -1, 0));
-                });
-        
-                templateContainer.addEventListener("domevent", function (event) {
-                    renderer.renderElement(event.detail.element, event.detail.type, false, true);
-                });
-        
-                templateContainer.addEventListener("render", (event) => {
-                    if (event.detail.renderData.bytes) {
-                        updateBillboard('handDomBillboard', event.detail.renderData.bytes);
-                    };
-                });
-        */
-    </script>
-  </body>
+
+      templateContainer.addEventListener("render", (event) => {
+        if (event.detail.renderData.bytes) {
+          updateBillboard(templateContainer, event.detail.renderData.bytes);
+        }
+      });
+
+      handUI.addEventListener("domevent", function (event) {
+        domrenderer.renderElement(handUI, event.detail.element, event.detail.type, false, true);
+      });
+
+      handUI.addEventListener("render", (event) => {
+        if (event.detail.renderData.bytes) {
+          updateBillboard('handUI', event.detail.renderData.bytes);
+        }
+      });
+
+      window.closeBillboard = function (button) {
+        let mainContainer = button;
+        var els = [];
+        while (mainContainer) {
+          els.unshift(mainContainer);
+          if (mainContainer.parentNode == document.body) break;
+          mainContainer = mainContainer.parentNode;
+        }
+
+        showActiveBillboard(mainContainer, false);
+        setTimeout(() => {
+          showActiveBillboard(mainContainer, true);
+        }, 5000);
+      };
+    });
+  </script>
+</body>
+
 </html>
