@@ -1,6 +1,6 @@
 // <!-- prettier-ignore-start -->
 // Zea Engine dependencies stored in new const variables. View the API to see what you can include and use.
-const { Scene, GLRenderer, Vec3, Color, Xfo, Ray, Label, DataImage, BillboardItem, TreeItem, GeomItem, Plane, Material, VRViewManipulator } = window.zeaEngine
+const { Scene, GLRenderer, Vec3, Color, Xfo, Ray, Label, DataImage, BillboardItem, TreeItem, GeomItem, Plane, Material, VRViewManipulator, Lines } = window.zeaEngine
 
 class DomTree extends GeomItem {
     /**
@@ -102,7 +102,7 @@ export function showActiveBillboard(targetElement, activeState) {
 
 let billboardTree, camera, renderer, headScale;
 export function main() {
-    headScale=1;
+    headScale = 1;
     // create a new scene
     const scene = new Scene()
 
@@ -160,26 +160,48 @@ export function main() {
         });
         let controllers = [];
 
-          xrvp.on('viewChanged', (event) => {
-              const headXfo = event.viewXfo;
-              headScale = headXfo.sc.x;
-  
-          });
+        xrvp.on('viewChanged', (event) => {
+            const headXfo = event.viewXfo;
+            headScale = headXfo.sc.x;
+
+        });
         xrvp.on('controllerAdded', (event) => {
             // const xfo = activeBillboard.get('handDomBillboard').get('handDomBillboard').billboard.getParameter('GlobalXfo').getValue();
             controllers = xrvp.getControllers();
 
-            /* const pointermat = new Material('pointermat', 'LinesShader')
-             pointermat.setSelectable(false)
-             pointermat.getParameter('BaseColor').setValue(new Color(1.2, 0, 0))*/
+
+
 
             if (controllers.length == 2) {
                 //we have both controllers now
 
-               
+
+
+                const pointermat = new Material('pointermat', 'LinesShader')
+                pointermat.setSelectable(false)
+                pointermat.getParameter('BaseColor').setValue(new Color(1.2, 0, 0))
+
+                const line = new Lines()
+                line.setNumVertices(2)
+                line.setNumSegments(1)
+                line.setSegmentVertexIndices(0, 0, 1)
+
+                const positions = line.getVertexAttribute('positions')
+                positions.getValueRef(0).set(0.0, 0.0, 0.0)
+                positions.getValueRef(1).set(0.0, 0.0, -1.0)
+                line.setBoundingBoxDirty()
+                const __pointerLocalXfo = new Xfo()
+                __pointerLocalXfo.sc.set(1, 1, 0.1)
+                __pointerLocalXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.2)
+
+                const __uiPointerItem = new GeomItem('VRControllerPointer', line, pointermat)
+                __uiPointerItem.setSelectable(false)
+
+
+                const rightController = getHandController(controllers, "right");
+                rightController.getTipItem().addChild(__uiPointerItem, false)
 
                 const leftController = getHandController(controllers, "left");
-                console.log(leftController);
                 leftController.getTipItem().addChild(activeBillboard.get('handUI').billboard, false)
                 const uiLocalXfo = activeBillboard.get('handUI').billboard.getParameter('LocalXfo').getValue()
                 uiLocalXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.4);
@@ -188,11 +210,6 @@ export function main() {
                 activeBillboard.get('handUI').billboard.getParameter('LocalXfo').setValue(uiLocalXfo)
 
             };
-
-            //  controllers[0].getTreeItem().addChild(activeBillboard.get('handDomBillboard').billboard);
-            /* xrvp.on('onVRPoseChanged', (event) => {
-                 console.log('poschange');
-             })*/
         });
 
 
@@ -274,7 +291,7 @@ function getIntersectionPosition(intersectionData, isInHand) {
         if (res <= 0) {
             return -1
         }
-//if in hand we must update the scale according to headScale
+        //if in hand we must update the scale according to headScale
         planeXfo.sc.set(isInHand ? headScale : 1, isInHand ? headScale : 1, isInHand ? headScale : 1)
         const invPlaneXfo = planeXfo.inverse()
         const hitOffset = invPlaneXfo.transformVec3(ray.pointAtDist(res))
