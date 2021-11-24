@@ -100,7 +100,7 @@ export function showActiveBillboard(targetElement, activeState) {
 }
 
 
-let billboardTree, camera, renderer, headScale;
+let billboardTree, camera, renderer, headScale, pointerUILine, pointerUIXfo, vr;
 export function main() {
     headScale = 1;
     // create a new scene
@@ -152,8 +152,10 @@ export function main() {
             const { state } = event;
             if (state) {
                 xrButton.textContent = "Exit VR";
+                vr = true;
             } else {
                 xrButton.textContent = "Launch VR";
+                vr = false
             }
 
 
@@ -190,16 +192,16 @@ export function main() {
                 positions.getValueRef(0).set(0.0, 0.0, 0.0)
                 positions.getValueRef(1).set(0.0, 0.0, -1.0)
                 line.setBoundingBoxDirty()
-                const __pointerLocalXfo = new Xfo()
-                __pointerLocalXfo.sc.set(1, 1, 0.1)
-                __pointerLocalXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.2)
+                pointerUIXfo = new Xfo()
+                pointerUIXfo.sc.set(1, 1, 0.1)
+                pointerUIXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.2)
 
-                const __uiPointerItem = new GeomItem('VRControllerPointer', line, pointermat)
-                __uiPointerItem.setSelectable(false)
+                pointerUILine = new GeomItem('VRControllerPointer', line, pointermat)
+                pointerUILine.setSelectable(false)
 
 
                 const rightController = getHandController(controllers, "right");
-                rightController.getTipItem().addChild(__uiPointerItem, false)
+                rightController.getTipItem().addChild(pointerUILine, false)
 
                 const leftController = getHandController(controllers, "left");
                 leftController.getTipItem().addChild(activeBillboard.get('handUI').billboard, false)
@@ -272,9 +274,15 @@ function createBillboard(label, pos, image, targetPos, targetPPM) {
     return geomItem
 }
 
+function setPointerLength(length){
+    pointerUIXfo.sc.set(1, 1, length)
+    pointerUILine.getParameter('LocalXfo').setValue(pointerUIXfo)
+}
+
 
 function getIntersectionPosition(intersectionData, isInHand) {
     if (intersectionData) {
+        
         const ray = intersectionData.ray ? intersectionData.ray : intersectionData.pointerRay
 
         const geomItem = intersectionData.geomItem
@@ -291,6 +299,9 @@ function getIntersectionPosition(intersectionData, isInHand) {
         if (res <= 0) {
             return -1
         }
+
+        setPointerLength(res )
+
         //if in hand we must update the scale according to headScale
         planeXfo.sc.set(isInHand ? headScale : 1, isInHand ? headScale : 1, isInHand ? headScale : 1)
         const invPlaneXfo = planeXfo.inverse()
