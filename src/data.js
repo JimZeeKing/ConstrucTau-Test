@@ -50,25 +50,26 @@ export function prepare() {
     main()
 }
 
-export function addDomBillboard(imageData, targetElement, mapper, pos, lookAt, ppm) {
+export function addDomBillboard(imageData, targetElement, mapper, pos, lookAt, ppm, isInHand) {
     const domBillboardData = createDomBillboard(imageData, targetElement, pos || new Vec3(1, 1, 5), lookAt || camera.getParameter('GlobalXfo').getValue().tr, ppm);
     const bData = { data: imageData, mapper: mapper, billboard: domBillboardData.billboard, label: domBillboardData.label };
     billboardData.set(targetElement, bData);
 
     domBillboardData.billboard.on('pointerDown', (event) => {
-        const pos = getIntersectionPosition(event.intersectionData)
+        const pos = getIntersectionPosition(event.intersectionData, isInHand)
         if (pos)
             mapper.mapDownToDomElement(pos.x, pos.y);
     })
 
     domBillboardData.billboard.on('pointerUp', (event) => {
-        const pos = getIntersectionPosition(event.intersectionData)
+        const pos = getIntersectionPosition(event.intersectionData, isInHand)
         if (pos)
             mapper.mapClickToDomElement(pos.x, pos.y);
     })
 
     domBillboardData.billboard.on('pointerMove', (event) => {
-        const pos = getIntersectionPosition(event.intersectionData)
+        const pos = getIntersectionPosition(event.intersectionData, isInHand)
+        console.log(pos.x);
         if (pos)
             mapper.mapPosToDomElement(pos.x, pos.y);
 
@@ -99,8 +100,9 @@ export function showActiveBillboard(targetElement, activeState) {
 }
 
 
-let billboardTree, camera, renderer;
+let billboardTree, camera, renderer, headScale;
 export function main() {
+    headScale=1;
     // create a new scene
     const scene = new Scene()
 
@@ -158,20 +160,11 @@ export function main() {
         });
         let controllers = [];
 
-        /*  xrvp.on('viewChanged', (event) => {
+          xrvp.on('viewChanged', (event) => {
               const headXfo = event.viewXfo;
-              if (controllers.length == 2) {
-                  const xfoA = controllers[1].getTreeItem().getParameter('GlobalXfo').getValue()
-                  const headToCtrlA = xfoA.tr.subtract(headXfo.tr)
-                  headToCtrlA.normalizeInPlace();
-                  console.log(headToCtrlA.angleTo(xfoA.ori.getYaxis()), Math.PI * 0.25);
-                  if (headToCtrlA.angleTo(xfoA.ori.getYaxis()) < Math.PI * 0.25) {
-                      showHandUI(headXfo, controllers[1], controllers[0], true);
-                      // showActiveBillboard('templateContainer', true);
-                  } //else showHandUI(headXfo, false);
-              };
+              headScale = headXfo.sc.x;
   
-          });*/
+          });
         xrvp.on('controllerAdded', (event) => {
             // const xfo = activeBillboard.get('handDomBillboard').get('handDomBillboard').billboard.getParameter('GlobalXfo').getValue();
             controllers = xrvp.getControllers();
@@ -183,14 +176,13 @@ export function main() {
             if (controllers.length == 2) {
                 //we have both controllers now
 
-                // console.log(controllers);
+               
 
                 const leftController = getHandController(controllers, "left");
-                // const uiLocalXfo = controllers[1].getTreeItem().getParameter('LocalXfo').getValue()
+                console.log(leftController);
                 leftController.getTipItem().addChild(activeBillboard.get('handUI').billboard, false)
                 const uiLocalXfo = activeBillboard.get('handUI').billboard.getParameter('LocalXfo').getValue()
-                // uiLocalXfo.ori.set(0, 0, 0);
-                uiLocalXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.2);
+                uiLocalXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.4);
 
                 uiLocalXfo.tr.set(0.35, -0.05, 0.08)
                 activeBillboard.get('handUI').billboard.getParameter('LocalXfo').setValue(uiLocalXfo)
@@ -223,41 +215,9 @@ let handUIActive = false;
 function getHandController(controllers, handedness) {
     let found = null;
     controllers.forEach((controller) => {
-        //  console.log(controller.__inputSource.handedness, handedness);
         if (controller.__inputSource.handedness == handedness) found = controller;
     })
-
-    console.log(found);
     return found;
-}
-function showHandUI(headXfo, handController, pointerController, state) {
-
-    if (handUIActive != state) {
-        handUIActive = state;
-        //ui hand
-        const uiLocalXfo = handController.getTreeItem().getParameter('LocalXfo').getValue()
-        uiLocalXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.6);
-
-        //pointer hand
-        const xfoA = handController.getTreeItem().getParameter('GlobalXfo').getValue()
-        const xfoB = pointerController.getTreeItem().getParameter('GlobalXfo').getValue()
-        const headToCtrlA = xfoA.tr.subtract(headXfo.tr)
-        const headToCtrlB = xfoB.tr.subtract(headXfo.tr)
-        if (headToCtrlA.cross(headToCtrlB).dot(headXfo.ori.getYaxis()) > 0.0) {
-            uiLocalXfo.tr.set(0.05, -0.05, 0.08)
-        } else {
-            uiLocalXfo.tr.set(-0.05, -0.05, 0.08)
-        }
-
-        handController.getTreeItem().getParameter('LocalXfo').setValue(uiLocalXfo)
-
-        console.log(activeBillboard.get('templateContainer'));
-        handController.getTipItem().addChild(activeBillboard.get('templateContainer').billboard, false)
-    };
-
-
-
-
 }
 
 function createDomBillboard(data, label, pos, lookAt, ppm) {
@@ -296,7 +256,7 @@ function createBillboard(label, pos, image, targetPos, targetPPM) {
 }
 
 
-function getIntersectionPosition(intersectionData) {
+function getIntersectionPosition(intersectionData, isInHand) {
     if (intersectionData) {
         const ray = intersectionData.ray ? intersectionData.ray : intersectionData.pointerRay
 
@@ -314,8 +274,8 @@ function getIntersectionPosition(intersectionData) {
         if (res <= 0) {
             return -1
         }
-
-        planeXfo.sc.set(1, 1, 1)
+//if in hand we must update the scale according to headScale
+        planeXfo.sc.set(isInHand ? headScale : 1, isInHand ? headScale : 1, isInHand ? headScale : 1)
         const invPlaneXfo = planeXfo.inverse()
         const hitOffset = invPlaneXfo.transformVec3(ray.pointAtDist(res))
         const clientX = hitOffset.x / geomItem.pixelsPerMeter + geomItem.width * 0.5
