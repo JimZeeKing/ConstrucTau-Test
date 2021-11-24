@@ -55,12 +55,9 @@
     <br />
     <br />
     <div>
-      <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
-        data-active-group="g1" data-label="Radio 1"></div>
-      <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
-        data-active-group="g1" data-label="Radio 2"></div>
-      <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
-        data-active-group="g1" data-label="Radio 3"></div>
+      <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
+      <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
+      <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
     </div>
   </div>
 
@@ -86,8 +83,7 @@
       templateContainer = document.querySelector('#infoTable')
       handUI = document.querySelector("#test");
       mapper2 = DomMapper.setup(handUI);
-      data[0] = json.getObjectFromListWithProp(url, "title", "Titre complet");
-      console.log(data[0].images);
+      data[0] = json.getObjectFromListWithProp(url, "title", "Semelle flottante");
 
       const template = Handlebars.compile(data[1]);
       templateContainer.innerHTML = template(data[0]);

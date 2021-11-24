@@ -183,17 +183,17 @@ export function main() {
             if (controllers.length == 2) {
                 //we have both controllers now
 
-                console.log(controllers);
+                // console.log(controllers);
 
                 const leftController = getHandController(controllers, "left");
                 // const uiLocalXfo = controllers[1].getTreeItem().getParameter('LocalXfo').getValue()
-                leftController.getTipItem().addChild(activeBillboard.get('templateContainer').billboard, false)
-                const uiLocalXfo = activeBillboard.get('templateContainer').billboard.getParameter('LocalXfo').getValue()
+                leftController.getTipItem().addChild(activeBillboard.get('handUI').billboard, false)
+                const uiLocalXfo = activeBillboard.get('handUI').billboard.getParameter('LocalXfo').getValue()
                 // uiLocalXfo.ori.set(0, 0, 0);
                 uiLocalXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.2);
 
                 uiLocalXfo.tr.set(0.35, -0.05, 0.08)
-                activeBillboard.get('templateContainer').billboard.getParameter('LocalXfo').setValue(uiLocalXfo)
+                activeBillboard.get('handUI').billboard.getParameter('LocalXfo').setValue(uiLocalXfo)
 
             };
 
@@ -223,9 +223,11 @@ let handUIActive = false;
 function getHandController(controllers, handedness) {
     let found = null;
     controllers.forEach((controller) => {
+        //  console.log(controller.__inputSource.handedness, handedness);
         if (controller.__inputSource.handedness == handedness) found = controller;
     })
 
+    console.log(found);
     return found;
 }
 function showHandUI(headXfo, handController, pointerController, state) {
