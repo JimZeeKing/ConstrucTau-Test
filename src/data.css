@@ -1,6 +1,7 @@
-*{
+* {
     box-sizing: ;
 }
+
 .table {
     border: 5px solid #000;
     display: flex;
@@ -40,7 +41,7 @@
     flex: 3;
     background-color: #999;
     border: none;
-    border-right: 5px solid blue;
+    border-right: 2px solid #fff;
     padding: .5em;
     width: 100%;
     font-weight: 1.5em;
@@ -66,7 +67,7 @@
 }
 
 .row .cell:last-of-type {
-   /* border: none;*/
+    border: none;
 }
 
 .button {
@@ -83,7 +84,7 @@
 }
 
 .invisible-data {
-   visibility: hidden;
+    visibility: hidden;
 }
 
 a {
@@ -179,10 +180,10 @@ input[type='checkbox'] {
     background-color: red !important;
 }
 
-#test .page{
+#test .page {
     display: none;
 }
 
-#test .page.active{
+#test .page.active {
     display: block;
 }

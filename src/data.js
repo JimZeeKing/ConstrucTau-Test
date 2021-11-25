@@ -1,6 +1,9 @@
 // <!-- prettier-ignore-start -->
+import "./ConstrucTAOSurfaceShader.js";
+import loadAsset from "./loadAsset.js";
+
 // Zea Engine dependencies stored in new const variables. View the API to see what you can include and use.
-const { Scene, GLRenderer, Vec3, Color, Xfo, Ray, Label, DataImage, BillboardItem, TreeItem, GeomItem, Plane, Material, VRViewManipulator, Lines } = window.zeaEngine
+const { Scene, GLRenderer, Vec3, Color, Xfo, Ray, Label, DataImage, EnvMap, TreeItem, GeomItem, Plane, Material, VRViewManipulator, Lines } = window.zeaEngine
 
 class DomTree extends GeomItem {
     /**
@@ -47,6 +50,8 @@ const billboardData = new Map();
 const activeBillboard = new Map();
 
 export function prepare() {
+
+
     main()
 }
 
@@ -112,8 +117,8 @@ export function main() {
 
     // create a new renderer and attach it to our HTML Canvas
     renderer = new GLRenderer(document.getElementById('canvas'), {
-        debugGeomIds: false,
-        enableFrustumCulling: false,
+        debugGeomIds: true,
+        enableFrustumCulling: true,
     })
 
     // attach the scene to the renderer. Anything attached to this scene will now be rendererd.
@@ -123,6 +128,11 @@ export function main() {
     camera = renderer.getViewport().getCamera()
     // set camera's target and position.
     camera.setPositionAndTarget(new Vec3(6, 10, 12), new Vec3(0, 0, 1.5))
+
+
+    const envMap = new EnvMap();
+    envMap.load("../data/StudioG.zenv");
+    scene.setEnvMap(envMap);
 
     // These variables can be used later in our program
     const grid_size = 10
@@ -135,19 +145,39 @@ export function main() {
     scene.getRoot().addChild(billboardTree)
 
 
+    const { SelectionManager } = zeaUx;
+    const appData = {
+        renderer,
+        scene,
+    };
+    const selectionManager = new SelectionManager(appData, {
+        selectionOutlineColor: new Color(1, 1, 0.2, 0.1),
+        branchSelectionOutlineColor: new Color(1, 1, 0.2, 0.1),
+    });
+
+    // Setup FPS Display
+    const fpsElement = document.getElementById("fps");
+    fpsElement.renderer = renderer;
+
+    // Setup TreeView Display
+    const treeElement = document.getElementById("tree");
+    treeElement.setTreeItem(scene.getRoot(), selectionManager);
+
+
     //billboard setup
-    const cameraXfo = camera.getParameter('GlobalXfo').getValue()
-    // const domBillboard = createDomBillboard(imgData, 'dombillboard', new Vec3(1, 1, 5), cameraXfo.tr);
+    renderer.getViewport().on('pointerUp', (event) => {
+        if (event.intersectionData) {
+            if (event.intersectionData.geomItem.hasParameter("LayerName")) {
+                //not getting the real layer name
+                console.log(event.intersectionData.geomItem.getParameter("LayerName").getValue());
+            };
+        };
 
-    //xr (vr) setup
-
-
+    })
     renderer.getViewport().on('viewChanged', (event) => {
-
-        console.log('viewChanged');
-
-        activeBillboard.forEach((value, key, map) => {
-            value.mapper.resetLastElement();
+        //making sure render state are reseted
+        activeBillboard.forEach((billboard, key, map) => {
+            billboard.mapper.resetLastElement();
         })
 
     });
@@ -182,11 +212,9 @@ export function main() {
         xrvp.on('viewChanged', (event) => {
             const headXfo = event.viewXfo;
             headScale = headXfo.sc.x;
-            console.log('viewChanged');
-
-            activeBillboard.forEach((value, key, map) => {
-                value.mapper.resetLastElement();
-            })
+            /* activeBillboard.forEach((value, key, map) => {
+                 value.mapper.resetLastElement();
+             })*/
 
         });
         xrvp.on('controllerAdded', (event) => {
@@ -214,13 +242,13 @@ export function main() {
                 positions.getValueRef(0).set(0.0, 0.0, 0.0)
                 positions.getValueRef(1).set(0.0, 0.0, -1.0)
                 line.setBoundingBoxDirty()
+
                 pointerUIXfo = new Xfo()
                 pointerUIXfo.sc.set(1, 1, 0.1)
                 pointerUIXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.2)
 
                 pointerUILine = new GeomItem('VRControllerPointer', line, pointermat)
                 pointerUILine.setSelectable(false)
-
 
                 const rightController = getHandController(controllers, "right");
                 rightController.getTipItem().addChild(pointerUILine, false)
@@ -232,23 +260,26 @@ export function main() {
 
                 uiLocalXfo.tr.set(0.35, -0.05, 0.08)
                 activeBillboard.get('handUI').billboard.getParameter('LocalXfo').setValue(uiLocalXfo)
-
             };
         });
-
-
-
-
 
         xrButton.addEventListener("click", function (event) {
             xrvp.togglePresenting();
         });
     });
 
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has("profile")) {
-        renderer.startContinuousDrawing();
-    }
+    /* const urlParams = new URLSearchParams(window.location.search);
+     if (urlParams.has("profile")) {
+         renderer.startContinuousDrawing();
+     }*/
+
+
+    //loading the file
+    loadAsset("./data/data.skp.zcad").then((data) => {
+        scene.getRoot().addChild(data.asset);
+        scene.getRoot().addChild(data.layersRoot);
+        renderer.frameAll();
+    });
 
 }
 let handUIActive = false;
@@ -263,7 +294,7 @@ function getHandController(controllers, handedness) {
 
 function createDomBillboard(data, label, pos, lookAt, ppm) {
     const billboardLabel = createDataImage(data, label || 'dataimage');
-    const billboard = createBillboard("infos", pos, billboardLabel, lookAt, ppm);
+    const billboard = createBillboard(label instanceof HTMLElement ? label.id : label, pos, billboardLabel, lookAt, ppm);
     return { billboard: billboard, label: billboardLabel };
 }
 

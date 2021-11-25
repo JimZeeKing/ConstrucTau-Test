@@ -5,6 +5,7 @@
   <!-- download Zea Engine -- this downloads the latest build from version 3 of the engine -->
   <script src="./libs/zea-engine/index.umd.js"></script>
   <script src="./libs/zea-ux/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@3/dist/index.umd.js"></script>
   <!-- download our stylesheet -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css" />
   <link rel="stylesheet" href="./src/data.css" />
@@ -14,10 +15,10 @@
 
   <script src="./libs/CanvasRenderer.js"></script>
   <script src="./libs/DomMapper.js"></script>
-
+  <script src="./src/scene-tree-view.js" type="module"></script>
   <script src="./src/zea-fps-display.js" type="module"></script>
 
-  <title>ConstrucTAU</title>
+  <title>ConstrucTAU - Data</title>
 </head>
 
 <body class="overflow-hidden">
@@ -57,12 +58,9 @@
       <br />
       <br />
       <div>
-        <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
-          data-active-group="g1" data-label="Radio 1"></div>
-        <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
-          data-active-group="g1" data-label="Radio 2"></div>
-        <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
-          data-active-group="g1" data-label="Radio 3"></div>
+        <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
+        <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
+        <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
       </div>
     </section>
 
@@ -98,7 +96,7 @@
       mapper2 = DomMapper.setup(handUI);
 
       const template = Handlebars.compile(data[1]);
-      prepareInfos("Semelle flottante", template);
+      prepareInfos("Contenu 2", template);
 
       domrenderer.addRenderContainer(handUI, "#fff", (renderData) => {
         addDomBillboard(renderData, 'handUI', mapper2, undefined, undefined, 0.001, true);
@@ -137,7 +135,7 @@
 
         showActiveBillboard(mainContainer, false);
         setTimeout(() => {
-          updateInfos("Toiture", template);
+          updateInfos("Contenu 2", template);
         }, 1000);
       };
 

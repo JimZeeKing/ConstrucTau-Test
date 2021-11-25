@@ -5,9 +5,10 @@ const loadAsset = (url) => {
   return new Promise((resolve) => {
     const asset = new CADAsset();
     const layers = {};
-    const layersRoot = new TreeItem("Layers");
+    const layersRoot = new TreeItem("Couches");
 
     asset.load(url).then(() => {
+
       if (asset.hasParameter("LayerPaths")) {
         const layerPaths = asset.getParameter("LayerPaths").getValue();
         layerPaths.forEach((path) => {
@@ -18,6 +19,7 @@ const loadAsset = (url) => {
               if (layers[name]) {
                 console.warn("Duplicate layer names found");
               }
+
               const layerItem = new SelectionSet(name);
               item.addChild(layerItem);
               layers[name] = layerItem;
@@ -31,7 +33,7 @@ const loadAsset = (url) => {
             }
           });
         });
-      }
+      } else console.log("No layers detected");
 
       let numItems = 0;
       let numGeomItem = 0;
