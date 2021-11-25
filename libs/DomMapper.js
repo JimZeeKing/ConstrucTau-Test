@@ -20,6 +20,12 @@ DomMapper.setup = function (domTargetElement) {
         return null;
     };
 
+    api.updateMapping = function () {
+        api.elements = api.domTargetElement.querySelectorAll("[data-mapping]");
+        api.updatePositions();
+        api.updatePositions();
+    }
+
     api.updatePositions = function () {
         api.elementsPositions = [];
         api.elements.forEach((element) => {

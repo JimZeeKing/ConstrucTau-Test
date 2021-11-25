@@ -9,6 +9,12 @@ CanvasRenderer.setup = function () {
         api.renderMainContainer(container, cb);
     };
 
+    api.resetStates = function (container) {
+        api.renderContainers.get(container).renders = new Map();
+    }
+
+
+
     api.renderElement = function (container, element, stateName, forceCanvasDimension, clearBefore, forceStateUpdate, cb) {
 
         const renderContainer = api.renderContainers.get(container);
@@ -43,8 +49,10 @@ CanvasRenderer.setup = function () {
 
         } else {
             domtoimage.toPng(element).then((pngData) => {
+                // console.log('toPng', pngData);
                 var img = new Image();
                 img.onload = function () {
+                    //  console.log('IMGLOADED');
                     if (forceCanvasDimension) {
                         renderContainer.canvas.width = img.width;
                         renderContainer.canvas.height = img.height;
@@ -66,9 +74,9 @@ CanvasRenderer.setup = function () {
                         img: img,
                         position: position,
                         bytes: renderContainer.ctx.getImageData(0, 0, renderContainer.canvas.width, renderContainer.canvas.height)
-
                     }
                     renderStates.currentState = stateName;
+
                     renderContainer.renders.set(element, renderStates);
                     api.renderContainers.set(container, renderContainer)
                     dispatchRenderEvent(container, renderStates[stateName]);

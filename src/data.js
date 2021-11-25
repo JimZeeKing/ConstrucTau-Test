@@ -68,8 +68,7 @@ export function addDomBillboard(imageData, targetElement, mapper, pos, lookAt, p
     })
 
     domBillboardData.billboard.on('pointerMove', (event) => {
-        const pos = getIntersectionPosition(event.intersectionData, isInHand)
-        console.log(pos.x);
+        const pos = getIntersectionPosition(event.intersectionData, isInHand);
         if (pos)
             mapper.mapPosToDomElement(pos.x, pos.y);
 
@@ -82,10 +81,15 @@ export function addDomBillboard(imageData, targetElement, mapper, pos, lookAt, p
     activeBillboard.set(targetElement, bData);
 }
 
-export function updateBillboard(targetElement, bytes) {
+export function updateBillboard(targetElement, bytes, w, h) {
     if (billboardData.has(targetElement)) {
         const bData = billboardData.get(targetElement)
-        bData.label.setData(bData.data.img.width, bData.data.img.height, bytes);
+        bData.billboard.width = bytes.width;
+        bData.billboard.height = bytes.height;
+        const xfo = bData.billboard.getParameter('GlobalXfo').getValue()
+        xfo.sc.set(bytes.width * bData.billboard.pixelsPerMeter, bytes.height * bData.billboard.pixelsPerMeter, 1)
+        bData.billboard.getParameter('GlobalXfo').setValue(xfo)
+        bData.label.setData(bytes.width, bytes.height, bytes);
     };
 
 }
@@ -136,6 +140,19 @@ export function main() {
     // const domBillboard = createDomBillboard(imgData, 'dombillboard', new Vec3(1, 1, 5), cameraXfo.tr);
 
     //xr (vr) setup
+
+
+    renderer.getViewport().on('viewChanged', (event) => {
+
+        console.log('viewChanged');
+
+        activeBillboard.forEach((value, key, map) => {
+            value.mapper.resetLastElement();
+        })
+
+    });
+
+
     renderer.getXRViewport().then((xrvp) => {
         const xrButton = document.getElementById("xr-button");
         xrButton.textContent = "Launch VR";
@@ -165,6 +182,11 @@ export function main() {
         xrvp.on('viewChanged', (event) => {
             const headXfo = event.viewXfo;
             headScale = headXfo.sc.x;
+            console.log('viewChanged');
+
+            activeBillboard.forEach((value, key, map) => {
+                value.mapper.resetLastElement();
+            })
 
         });
         xrvp.on('controllerAdded', (event) => {
@@ -274,7 +296,7 @@ function createBillboard(label, pos, image, targetPos, targetPPM) {
     return geomItem
 }
 
-function setPointerLength(length){
+function setPointerLength(length) {
     pointerUIXfo.sc.set(1, 1, length)
     pointerUILine.getParameter('LocalXfo').setValue(pointerUIXfo)
 }
@@ -282,7 +304,7 @@ function setPointerLength(length){
 
 function getIntersectionPosition(intersectionData, isInHand) {
     if (intersectionData) {
-        
+
         const ray = intersectionData.ray ? intersectionData.ray : intersectionData.pointerRay
 
         const geomItem = intersectionData.geomItem
@@ -299,8 +321,6 @@ function getIntersectionPosition(intersectionData, isInHand) {
         if (res <= 0) {
             return -1
         }
-
-        setPointerLength(res )
 
         //if in hand we must update the scale according to headScale
         planeXfo.sc.set(isInHand ? headScale : 1, isInHand ? headScale : 1, isInHand ? headScale : 1)

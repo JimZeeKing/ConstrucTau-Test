@@ -46,19 +46,32 @@
   <div id="infoTable" class="table"></div>
 
   <div id="test">
-    <h2>Titre</h2>
-    <p id="infos">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minus et totam delectus perferendis soluta
-      repellat quam facere id ducimus numquam expedita sapiente sunt, eius molestias eum accusamus. Rerum, corrupti
-      dicta!</p>
+    <section id='page1' class="page active">
+      <h2>Page 1</h2>
+      <p id="infos">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minus et totam delectus perferendis soluta
+        repellat quam facere id ducimus numquam expedita sapiente sunt, eius molestias eum accusamus. Rerum, corrupti
+        dicta!</p>
 
-    <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover">Button</button>
-    <br />
-    <br />
-    <div>
-      <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
-      <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
-      <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
-    </div>
+      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" onclick="goToPage('page2')">Page
+        2</button>
+      <br />
+      <br />
+      <div>
+        <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+          data-active-group="g1" data-label="Radio 1"></div>
+        <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+          data-active-group="g1" data-label="Radio 2"></div>
+        <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+          data-active-group="g1" data-label="Radio 3"></div>
+      </div>
+    </section>
+
+    <section id='page2' class="page">
+      <h2>Page 2</h2>
+      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" onclick="goToPage('page1')">Page
+        1</button>
+    </section>
+
   </div>
 
   <script type="module">
@@ -83,18 +96,9 @@
       templateContainer = document.querySelector('#infoTable')
       handUI = document.querySelector("#test");
       mapper2 = DomMapper.setup(handUI);
-      data[0] = json.getObjectFromListWithProp(url, "title", "Semelle flottante");
 
       const template = Handlebars.compile(data[1]);
-      templateContainer.innerHTML = template(data[0]);
-      mapper1 = DomMapper.setup(templateContainer);
-      setTimeout(() => {
-        mapper1.updatePositions();
-        domrenderer.addRenderContainer(templateContainer, "#666", (renderData) => {
-          addDomBillboard(renderData, templateContainer, mapper1, new Vec3(5, 1, 5), undefined, 0.0025);
-        });
-      }, 500);
-
+      prepareInfos("Semelle flottante", template);
 
       domrenderer.addRenderContainer(handUI, "#fff", (renderData) => {
         addDomBillboard(renderData, 'handUI', mapper2, undefined, undefined, 0.001, true);
@@ -133,10 +137,57 @@
 
         showActiveBillboard(mainContainer, false);
         setTimeout(() => {
-          showActiveBillboard(mainContainer, true);
-        }, 5000);
+          updateInfos("Toiture", template);
+        }, 1000);
       };
+
+      window.goToPage = function (pageID) {
+        const currentPage = handUI.querySelector(".active");
+        if (currentPage) {
+          currentPage.classList.remove("active");
+        };
+
+        const newCurrentPage = handUI.querySelector(`#${pageID}`);
+
+        if (newCurrentPage) {
+          newCurrentPage.classList.add("active");
+        };
+
+
+        domrenderer.resetStates(handUI);
+        domrenderer.renderMainContainer(handUI, (argument) => {
+          mapper2.updateMapping();
+
+        });
+
+      }
     });
+
+
+    function prepareInfos(title, template) {
+      const data = json.getObjectFromListWithProp(url, "title", title);
+      templateContainer.innerHTML = template(data);
+      mapper1 = DomMapper.setup(templateContainer);
+      setTimeout(() => {
+        domrenderer.addRenderContainer(templateContainer, "#666", (renderData) => {
+          mapper1.updatePositions();
+          addDomBillboard(renderData, templateContainer, mapper1, new Vec3(5, 1, 5), undefined, 0.0025);
+        });
+
+      }, 100);
+    }
+
+    function updateInfos(title, template) {
+      const data = json.getObjectFromListWithProp(url, "title", title);
+      templateContainer.innerHTML = template(data);
+      domrenderer.resetStates(templateContainer);
+      setTimeout(() => {
+        domrenderer.renderMainContainer(templateContainer, (argument) => {
+          mapper1.updateMapping();
+          showActiveBillboard(templateContainer, true);
+        });
+      }, 100);
+    }
   </script>
 </body>
 
