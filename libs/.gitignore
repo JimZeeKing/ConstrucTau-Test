@@ -2,3 +2,6 @@
 *.esm.js.map
 *.cjs.js
 *.cjs.js.map
+
+*.ts
+*.d.ts
