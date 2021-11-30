@@ -1,5 +1,5 @@
 /* eslint-disable require-jsdoc */
-const { Color, GLShader, Registry } = zeaEngine;
+const { Color, GLShader, Registry, Material, MaterialColorParam, MaterialFloatParam } = zeaEngine
 
 const vert = `
 precision highp float;
@@ -77,7 +77,7 @@ void main(void) {
   v_worldPos      = (modelMatrix * pos).xyz;
 }
 
-`;
+`
 
 const frag = `
 precision highp float;
@@ -269,7 +269,7 @@ void main(void) {
 #ifndef ENABLE_ES3
   gl_FragColor = fragColor;
 #endif
-}`;
+}`
 
 /** A simple shader with no support for PBR or textures
  * @ignore
@@ -280,9 +280,9 @@ class ConstrucTAOSurfaceShader extends GLShader {
    * @param {any} gl - gl context
    */
   constructor(gl) {
-    super(gl);
-    this.setShaderStage("VERTEX_SHADER", vert);
-    this.setShaderStage("FRAGMENT_SHADER", frag);
+    super(gl)
+    this.setShaderStage('VERTEX_SHADER', vert)
+    this.setShaderStage('FRAGMENT_SHADER', frag)
   }
 
   /**
@@ -292,10 +292,10 @@ class ConstrucTAOSurfaceShader extends GLShader {
    * @return {boolean} - The return value.
    */
   bind(renderstate, key) {
-    super.bind(renderstate, key);
-    const gl = this.__gl;
-    gl.disable(gl.CULL_FACE);
-    return true;
+    super.bind(renderstate, key)
+    const gl = this.__gl
+    gl.disable(gl.CULL_FACE)
+    return true
   }
 
   /**
@@ -304,26 +304,26 @@ class ConstrucTAOSurfaceShader extends GLShader {
    * @return {any} - The return value.
    */
   unbind(renderstate) {
-    super.unbind(renderstate);
-    const gl = this.__gl;
-    gl.enable(gl.CULL_FACE);
-    return true;
+    super.unbind(renderstate)
+    const gl = this.__gl
+    gl.enable(gl.CULL_FACE)
+    return true
   }
 
   static getParamDeclarations() {
-    const paramDescs = super.getParamDeclarations();
+    const paramDescs = super.getParamDeclarations()
     paramDescs.push({
-      name: "BaseColor",
+      name: 'BaseColor',
       defaultValue: new Color(1.0, 1.0, 0.5),
-    });
-    paramDescs.push({ name: "Opacity", defaultValue: 1.0, range: [0, 1] });
+    })
+    paramDescs.push({ name: 'Opacity', defaultValue: 1.0, range: [0, 1] })
     paramDescs.push({
-      name: "EmissiveStrength",
+      name: 'EmissiveStrength',
       defaultValue: 0.0,
       range: [0, 1],
-    });
-    paramDescs.push({ name: "Overlay", defaultValue: 0.0, range: [0, 1] });
-    return paramDescs;
+    })
+    paramDescs.push({ name: 'Overlay', defaultValue: 0.0, range: [0, 1] })
+    return paramDescs
   }
 
   /**
@@ -332,18 +332,39 @@ class ConstrucTAOSurfaceShader extends GLShader {
    * @return {any} - The return value.
    */
   static getPackedMaterialData(material) {
-    const matData = new Float32Array(8);
-    const baseColor = material.getParameter("BaseColor").getValue();
-    matData[0] = baseColor.r;
-    matData[1] = baseColor.g;
-    matData[2] = baseColor.b;
-    matData[3] = baseColor.a;
-    matData[4] = material.getParameter("Opacity").getValue();
-    matData[5] = material.getParameter("EmissiveStrength").getValue();
-    matData[6] = material.getParameter("Overlay").getValue();
-    return matData;
+    const matData = new Float32Array(8)
+    const baseColor = material.getParameter('BaseColor').getValue()
+    matData[0] = baseColor.r
+    matData[1] = baseColor.g
+    matData[2] = baseColor.b
+    matData[3] = baseColor.a
+    matData[4] = material.getParameter('Opacity').getValue()
+    matData[5] = material.getParameter('EmissiveStrength').getValue()
+    matData[6] = material.getParameter('Overlay').getValue()
+    return matData
+  }
+
+  static getMaterialTemplate() {
+    return template
   }
 }
 
-Registry.register("ConstrucTAOSurfaceShader", ConstrucTAOSurfaceShader);
-export { ConstrucTAOSurfaceShader };
+export class ConstrucTAOSurfaceMaterial extends Material {
+  constructor(name) {
+    super(name)
+    this.__shaderName = 'SimpleSurfaceShader'
+    this.baseColorParam = new MaterialColorParam('BaseColor', new Color(1.0, 1, 0.5))
+    this.opacityParam = new MaterialFloatParam('Opacity', 1, [0, 1])
+    this.emissiveStrengthParam = new MaterialFloatParam('EmissiveStrength', 0, [0, 1])
+    this.overlayParam = new MaterialFloatParam('Overlay', 0, [0, 1])
+    this.addParameter(this.baseColorParam)
+    this.addParameter(this.opacityParam)
+    this.addParameter(this.emissiveStrengthParam)
+    this.addParameter(this.overlayParam)
+  }
+}
+
+const template = new ConstrucTAOSurfaceMaterial()
+
+Registry.register('ConstrucTAOSurfaceShader', ConstrucTAOSurfaceShader)
+export { ConstrucTAOSurfaceShader }
