@@ -1,0 +1,27 @@
+{
+  "name": "ConstrucTau-Test",
+  "version": "1.0.0",
+  "description": "![Live Demo](docs/images/Screenshot.png)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "servessl": "http-server . --ssl --cert=localhost.crt --key=localhost.key --cors",
+    "serve": "http-server . --cors"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JimZeeKing/ConstrucTau-Test.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JimZeeKing/ConstrucTau-Test/issues"
+  },
+  "homepage": "https://github.com/JimZeeKing/ConstrucTau-Test#readme",
+  "dependencies": {
+    "http-server": "^14.0.0"
+  }
+}

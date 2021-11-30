@@ -5,7 +5,7 @@ const loadAsset = (url) => {
   return new Promise((resolve) => {
     const asset = new CADAsset()
     const layers = {}
-    const layersRoot = new TreeItem('Layers')
+    const layersRoot = new TreeItem('Couches')
 
     asset.load(url).then(() => {
       if (asset.hasParameter('LayerPaths')) {

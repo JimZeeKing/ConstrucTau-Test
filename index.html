@@ -1,81 +1,74 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>ConstrucTAO</title>
-    <link
-      rel="shortcut icon"
-      type="image/png"
-      href="./data/favicon.ico"
-    />
-    <meta charset="UTF-8" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css"
-    />
-    <link rel="stylesheet" href="./src/styles.css"/>
-    <!-- <script src="./libs/zea-engine/index.umd.js"></script>
-    <script src="./libs/zea-ux/index.umd.js"></script>
-    <script src="./libs/zea-cad/index.umd.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@4.0.1/dist/index.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@4.0.1/dist/index.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-ux@4.0.1/dist/index.umd.js"></script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/src/dom-to-image-more.min.js"></script>
-    <script src="./libs/jszip.js"></script>
-    <script src="./libs/xlsx.js"></script>
 
-    <script src="./src/zea-fps-display.js" type="module"></script>
-    <script src="./src/scene-tree-view.js" type="module"></script>
-    <script src="./src/login-dialog.js" type="module"></script>
-  </head>
-  <body class="overflow-hidden">
-    <div class="layout grid h-screen">
-      <header class="border flex justify-left items-center m-2 border-none">
-        <img src="./data/logo-inverse.png" id="logo"></img>
-      </header>
-      <main>
-        <div class="splitter">
-          <div id="leftPanel">
-            <scene-tree-view id="tree" class="select-none"></scene-tree-view>
-          </div>
-          <div class="separator" id="separatorV"></div>
-          <div id="mainPanel">
-            <div id="canvas-holder">
-              <canvas id="canvas" style="position: absolute; width: 100%; height: 100%;"> </canvas>
-            </div>
-            <div class="xr-button hidden" id="xr-button"></div>
-            <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
-            <progress class="progress-display" id="progress" value="0" max="100">
-              0%
-            </progress>
-          </div>
+<head>
+  <title>ConstrucTAU</title>
+  <link rel="shortcut icon" type="image/png" href="./data/favicon.ico" />
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css" />
+  <link rel="stylesheet" href="./src/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@4.0.1/dist/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@4.0.1/dist/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-ux@4.0.1/dist/index.umd.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/src/dom-to-image-more.min.js"></script>
+  <script src="./libs/jszip.js"></script>
+  <script src="./libs/xlsx.js"></script>
+
+  <script src="./src/zea-fps-display.js" type="module"></script>
+  <script src="./src/scene-tree-view.js" type="module"></script>
+  <script src="./src/login-dialog.js" type="module"></script>
+</head>
+
+<body class="overflow-hidden">
+  <div class="layout grid h-screen">
+    <header class="border flex justify-left items-center m-2 border-none">
+      <img src="./data/logo-inverse.png" id="logo"></img>
+    </header>
+    <main>
+      <div class="splitter">
+        <div id="leftPanel">
+          <scene-tree-view id="tree" class="select-none"></scene-tree-view>
         </div>
-      </main>
-    </div>
-    <login-dialog id="login" class="select-none"></login-dialog>
-    <script type="module">
-      import dragElement from './src/panels.js'
-      const separatorV = document.getElementById("separatorV");
-      const leftPanel = document.getElementById("leftPanel");
-      const mainPanel = document.getElementById("mainPanel");
-      dragElement(separatorV, leftPanel, mainPanel, "H");
-    </script>
+        <div class="separator" id="separatorV"></div>
+        <div id="mainPanel">
+          <div id="canvas-holder">
+            <canvas id="canvas" style="position: absolute; width: 100%; height: 100%;"> </canvas>
+          </div>
+          <div class="xr-button hidden" id="xr-button"></div>
+          <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
+          <progress class="progress-display" id="progress" value="0" max="100">
+            0%
+          </progress>
+        </div>
+      </div>
+    </main>
+  </div>
+  <login-dialog id="login" class="select-none"></login-dialog>
+  <script type="module">
+    import dragElement from './src/panels.js'
+    const separatorV = document.getElementById("separatorV");
+    const leftPanel = document.getElementById("leftPanel");
+    const mainPanel = document.getElementById("mainPanel");
+    dragElement(separatorV, leftPanel, mainPanel, "H");
+  </script>
 
-    <script type="module">
-      import init from './src/init.js'
+  <script type="module">
+    import init from './src/init.js'
 
-      // To enable simple authentication in this app
-      // change this value to true.
-      if (false) {
-        // Show the login page.
-        const login = document.getElementById("login");
-        login.show(()=> {
-          // When it is closed, init the scene.
-          init()
-        })
-      } else {
+    // To enable simple authentication in this app
+    // change this value to true.
+    if (false) {
+      // Show the login page.
+      const login = document.getElementById("login");
+      login.show(() => {
+        // When it is closed, init the scene.
         init()
-      }
-    </script>
-  </body>
+      })
+    } else {
+      init()
+    }
+  </script>
+</body>
+
 </html>

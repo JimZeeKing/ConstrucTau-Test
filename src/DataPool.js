@@ -1,18 +1,25 @@
 let DataPool = {};
 
-DataPool.create = function name(JSONUrl) {
+DataPool.create = function name(targetHost) {
 
-    let pool = {};
 
-    pool.loadData = async function () {
-        const response = await fetch(JSONUrl);
-        const text = await response.text();
-        pool.data = JSON.parse(text);
-        return pool.data;
+    const host = targetHost || "";
+    const pool = {};
+    let data = new Map();
+
+    pool.loadData = async function (url) {
+        const response = await fetch(host + url);
+        const jsonData = await response.json();
+        data.set(host + url, jsonData);
+        return jsonData;
     }
 
-    pool.getObjectFromList = function (key, index) {
-        return pool.data[key] ? pool.data[key][index] : null;
+    pool.getObjectFromListWithProp = function (url, prop, value) {
+        if (data.has(host + url)) {
+            return data.get(host + url).find(item => item[prop] == value);
+        } else {
+            return null;
+        };
     };
 
     return pool;

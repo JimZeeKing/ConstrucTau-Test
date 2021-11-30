@@ -1,8 +1,14 @@
+* {
+    box-sizing: ;
+}
+
 .table {
     border: 5px solid #000;
     display: flex;
     flex-direction: column;
     width: 80%;
+    min-width: 1280px;
+    font-size: 1em;
 }
 
 .table img {
@@ -34,9 +40,11 @@
 .cell {
     flex: 3;
     background-color: #999;
+    border: none;
     border-right: 2px solid #fff;
     padding: .5em;
     width: 100%;
+    font-weight: 1.5em;
 }
 
 
@@ -75,7 +83,7 @@
     color: #000;
 }
 
-.invisible-text {
+.invisible-data {
     visibility: hidden;
 }
 
@@ -170,4 +178,12 @@ input[type='checkbox'] {
 
 .test {
     background-color: red !important;
+}
+
+#test .page {
+    display: none;
+}
+
+#test .page.active {
+    display: block;
 }
