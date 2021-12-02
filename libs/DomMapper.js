@@ -53,13 +53,26 @@ DomMapper.setup = function (domTargetElement) {
                         activeElement.active = false;
                         activeElement.classList.remove(activeElement.dataset.activeClass);
                         dispatchDomEvent(api.domTargetElement, { x: x, y: y, element: activeElement, type: "out" });
-                    };
-                };
 
-                if (!api.element.classList.contains(api.element.dataset.activeClass)) {
-                    api.element.classList.add(api.element.dataset.activeClass);
-                    api.element.active = true;
+                    };
+                    if (!api.element.classList.contains(api.element.dataset.activeClass)) {
+                        api.element.classList.add(api.element.dataset.activeClass);
+                        api.element.active = true;
+                        dispatchDomEvent(api.domTargetElement, { x: x, y: y, element: api.element, type: "active" });
+                    }
+                } else {
+                    if (!api.element.classList.contains(api.element.dataset.activeClass)) {
+                        api.element.classList.add(api.element.dataset.activeClass);
+                        api.element.active = true;
+                        dispatchDomEvent(api.domTargetElement, { x: x, y: y, element: api.element, type: "active" });
+                    } else {
+                        api.element.classList.remove(api.element.dataset.activeClass);
+                        api.element.active = false;
+                        dispatchDomEvent(api.domTargetElement, { x: x, y: y, element: api.element, type: "out" });
+                    }
                 }
+
+
             };
 
             if (api.element.hasAttribute("data-target-id")) {
@@ -107,7 +120,7 @@ DomMapper.setup = function (domTargetElement) {
                 }
             };
 
-            dispatchDomEvent(api.domTargetElement, { x: x, y: y, element: api.element, type: "click" });
+            //  dispatchDomEvent(api.domTargetElement, { x: x, y: y, element: api.element, type: "click" });
         };
     }
 

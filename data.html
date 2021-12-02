@@ -3,9 +3,9 @@
 
 <head>
   <!-- download Zea Engine -- this downloads the latest build from version 3 of the engine -->
-  <script src="./libs/zea-engine/index.umd.js"></script>
-  <script src="./libs/zea-ux/index.umd.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@3/dist/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@4.0.1/dist/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@4.0.1/dist/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-ux@4.0.1/dist/index.umd.js"></script>
   <!-- download our stylesheet -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css" />
   <link rel="stylesheet" href="./src/data.css" />
@@ -68,6 +68,7 @@
       <h2>Page 2</h2>
       <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" onclick="goToPage('page1')">Page
         1</button>
+      <div></div>
     </section>
 
   </div>
@@ -85,7 +86,7 @@
     import { prepare, updateBillboard, showActiveBillboard, addDomBillboard } from "./src/data.js";
     import { DataPool } from "./src/DataPool.js";
 
-    let templateContainer, handUI, mapper1, mapper2;
+    let templateContainer, handUI, mapper1, mapper2, currentContent;
     let json = DataPool.create();
     let url = "http://127.0.0.1:3000/content/all/nocred";
     let domrenderer = CanvasRenderer.setup();
@@ -98,11 +99,8 @@
       const template = Handlebars.compile(data[1]);
       prepareInfos("Contenu 2", template);
 
-      domrenderer.addRenderContainer(handUI, "#fff", (renderData) => {
-        addDomBillboard(renderData, 'handUI', mapper2, undefined, undefined, 0.001, true);
-      });
 
-      prepare();
+      prepare(CADReady);
 
       templateContainer.addEventListener("domevent", function (event) {
         domrenderer.renderElement(templateContainer, event.detail.element, event.detail.type, false, true);
@@ -159,6 +157,37 @@
         });
 
       }
+
+
+
+
+
+      window.newContentRequest = function (contentTitle) {
+        updateInfos(contentTitle, template);
+      };
+
+      function CADReady(asset) {
+        const visibilityTogglesContainer = handUI.querySelector("#page2 div");
+
+        asset.forEach((geomItem) => {
+          const btn = document.createElement("button");
+          btn.classList.add("btn-init");
+          btn.dataset.mapping = true;
+          btn.dataset.activeClass = 'btn-active';
+          btn.geomitem = geomItem;
+          btn.addEventListener("click", (event) => {
+            const visible = btn.geomitem.getParameter("Visible").getValue();
+            btn.geomitem.getParameter("Visible").setValue(!visible);
+          });
+          visibilityTogglesContainer.appendChild(btn);
+          btn.innerText = geomItem.getParameter("LayerName").getValue();
+        });
+
+        domrenderer.addRenderContainer(handUI, "#fff", (renderData) => {
+          addDomBillboard(renderData, 'handUI', mapper2, undefined, undefined, 0.001, true, true);
+        });
+      }
+
     });
 
 
@@ -169,23 +198,27 @@
       setTimeout(() => {
         domrenderer.addRenderContainer(templateContainer, "#666", (renderData) => {
           mapper1.updatePositions();
-          addDomBillboard(renderData, templateContainer, mapper1, new Vec3(5, 1, 5), undefined, 0.0025);
+          addDomBillboard(renderData, templateContainer, mapper1, new Vec3(5, 1, 1), undefined, 0.0025);
         });
 
       }, 100);
     }
 
     function updateInfos(title, template) {
+      if (currentContent == title) return;
       const data = json.getObjectFromListWithProp(url, "title", title);
       templateContainer.innerHTML = template(data);
       domrenderer.resetStates(templateContainer);
+      currentContent = title;
       setTimeout(() => {
         domrenderer.renderMainContainer(templateContainer, (argument) => {
           mapper1.updateMapping();
-          showActiveBillboard(templateContainer, true);
+          showActiveBillboard(templateContainer, true, true);
         });
       }, 100);
     }
+
+
   </script>
 </body>
 
