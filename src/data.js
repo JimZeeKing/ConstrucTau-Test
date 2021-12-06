@@ -53,7 +53,7 @@ export function prepare(readyCb) {
     main()
 }
 
-let billboardTree, camera, renderer, headScale, sceneScale, pointerUILine, pointerUIXfo, vr, leftController
+let billboardTree, camera, renderer, headScale, sceneScale, pointerUILine, pointerUIXfo, vr, leftController, xrview
 const initState = new Map()
 
 function main() {
@@ -131,7 +131,7 @@ function main() {
         const xrButton = document.getElementById('xr-button')
         xrButton.textContent = 'Launch VR'
         xrButton.classList.remove('hidden')
-
+        xrview = xrvp;
         //getstagexfo
         //getXfo
 
@@ -151,8 +151,23 @@ function main() {
             const headXfo = event.viewXfo
             headScale = headXfo.sc.x
 
-            const sceneXfo = event.getXfo();
-            sceneScale = sceneXfo.sc.x
+            const sceneXfo = xrvp.getXfo();
+            sceneScale = sceneXfo.sc
+
+
+
+            /* const hxfo = activeBillboard.get('handUI').billboard.localXfoParam.value;
+ 
+             if (sceneScale < 1) {
+                 hxfo.sc = sceneScale * 2;
+             } else if (sceneScale > 1) {
+                 hxfo.sc = sceneScale / 2;
+             } else {
+                 hxfo.sc = sceneScale;
+             }
+             activeBillboard.get('handUI').billboard.localXfoParam.value = hxfo
+ */
+            // console.log(sceneScale, headScale);
 
             if (leftController) {
                 callControllerButtonPress(leftController);
@@ -192,18 +207,19 @@ function main() {
                 const rightController = getHandController(controllers, 'right')
                 rightController.getTipItem().addChild(pointerUILine, false)
 
-
+                //Give  Wy to chANGE POINTER RAY LENGTHs
                 const getGeomItemAtTip = () => {
-                    if (rightController.hitTested) return rightController.intersectionData
+                    //  if (rightController.hitTested) return rightController.intersectionData
                     rightController.hitTested = true
                     const renderer = rightController.xrvp.getRenderer()
                     const xfo = rightController.tipItem.globalXfoParam.value
                     const vol = rightController.activeVolumeSize
-                    const dist = 3.0
+                    const dist = 5.0
+                    setPointerLength(dist);
                     rightController.intersectionData = renderer.raycastWithXfo(xfo, vol, dist)
-                    console.log(123);
                     return rightController.intersectionData
                 }
+
                 rightController.getGeomItemAtTip = getGeomItemAtTip
 
                 leftController = getHandController(controllers, 'left', [() => {
@@ -268,12 +284,23 @@ export function saveCamLocal() {
 export function goto(posIndex) {
     const pos = typeof positions[posIndex] == 'string' ? JSON.parse(positions[posIndex]) : positions[posIndex]
     if (pos) {
-        console.log(pos)
-        const xfo = camera.getParameter('LocalXfo').getValue()
-        xfo.ori = new Quat(pos.ori.x, pos.ori.y, pos.ori.z, pos.ori.w)
-        xfo.tr = new Vec3(pos.tr.x, pos.tr.y, pos.tr.z)
-        xfo.sc = new Vec3(pos.sc.x, pos.sc.y, pos.sc.z)
-        camera.getParameter('LocalXfo').setValue(xfo)
+        console.log(pos, vr)
+
+        if (vr) {
+
+            const xfo = xrview.getXfo()
+            xfo.ori = new Quat(pos.ori.x, pos.ori.y, pos.ori.z, pos.ori.w)
+            xfo.tr = new Vec3(pos.tr.x, pos.tr.y, pos.tr.z)
+            xfo.sc = new Vec3(pos.sc.x, pos.sc.y, pos.sc.z)
+            xrview.setXfo(xfo);
+        } else {
+            const xfo = camera.getParameter('LocalXfo').getValue()
+            xfo.ori = new Quat(pos.ori.x, pos.ori.y, pos.ori.z, pos.ori.w)
+            xfo.tr = new Vec3(pos.tr.x, pos.tr.y, pos.tr.z)
+            xfo.sc = new Vec3(pos.sc.x, pos.sc.y, pos.sc.z)
+            camera.getParameter('LocalXfo').setValue(xfo)
+        }
+
     }
 }
 export function addDomBillboard(imageData, targetElement, mapper, pos, lookAt, ppm, isInHand, showOnCreation) {
@@ -351,11 +378,9 @@ function getHandController(controllers, handedness, buttonsCallback) {
         if (controller.inputSource.handedness == handedness) {
             found = controller
             if (controller.inputSource.gamepad && buttonsCallback) {
-
                 controller.inputSource.gamepad.buttons.forEach((button, index) => {
                     if (buttonsCallback[index]) {
                         leftHandButtons.set(button, { callback: buttonsCallback[index], isPressed: false });
-
                     }
                 })
             }
@@ -367,7 +392,7 @@ function getHandController(controllers, handedness, buttonsCallback) {
 function callControllerButtonPress(controller) {
     controller.inputSource.gamepad.buttons.forEach((button, index) => {
         const buttonData = leftHandButtons.get(button);
-        if (button.pressed && !buttonData.isPressed && button.callback) {
+        if (button.pressed && !buttonData.isPressed && buttonData.callback) {
             buttonData.callback();
             buttonData.isPressed = true;
         } else if (!button.pressed) {
@@ -418,6 +443,7 @@ function setPointerLength(length) {
 
 function getIntersectionPosition(intersectionData, isInHand) {
     if (intersectionData) {
+        //   console.log(intersectionData);
         const ray = intersectionData.ray ? intersectionData.ray : intersectionData.pointerRay
 
         const geomItem = intersectionData.geomItem
@@ -435,8 +461,12 @@ function getIntersectionPosition(intersectionData, isInHand) {
             return -1
         }
 
-        //if in hand we must update the scale according to headScale
+        setPointerLength(res);
+
+        //if in hand we must update the scale according to headScale (working in v3, but not v4)
         planeXfo.sc.set(isInHand ? headScale : 1, isInHand ? headScale : 1, isInHand ? headScale : 1)
+        //planeXfo.sc.set(isInHand ? activeBillboard.get('handUI').billboard.localXfoParam.value.sc.x : 1, isInHand ? activeBillboard.get('handUI').billboard.localXfoParam.value.sc.y : 1, isInHand ? activeBillboard.get('handUI').billboard.localXfoParam.value.sc.z : 1)
+
         const invPlaneXfo = planeXfo.inverse()
         const hitOffset = invPlaneXfo.transformVec3(ray.pointAtDist(res))
         const clientX = hitOffset.x / geomItem.pixelsPerMeter + geomItem.width * 0.5
