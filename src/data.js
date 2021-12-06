@@ -53,7 +53,7 @@ export function prepare(readyCb) {
     main()
 }
 
-let billboardTree, camera, renderer, headScale, pointerUILine, pointerUIXfo, vr, leftController
+let billboardTree, camera, renderer, headScale, sceneScale, pointerUILine, pointerUIXfo, vr, leftController
 const initState = new Map()
 
 function main() {
@@ -124,7 +124,7 @@ function main() {
         })
 
 
-     
+
     })
 
     renderer.getXRViewport().then((xrvp) => {
@@ -132,6 +132,8 @@ function main() {
         xrButton.textContent = 'Launch VR'
         xrButton.classList.remove('hidden')
 
+        //getstagexfo
+        //getXfo
 
         xrvp.on('presentingChanged', (event) => {
             const { state } = event
@@ -148,6 +150,9 @@ function main() {
         xrvp.on('viewChanged', (event) => {
             const headXfo = event.viewXfo
             headScale = headXfo.sc.x
+
+            const sceneXfo = event.getXfo();
+            sceneScale = sceneXfo.sc.x
 
             if (leftController) {
                 callControllerButtonPress(leftController);
@@ -187,25 +192,39 @@ function main() {
                 const rightController = getHandController(controllers, 'right')
                 rightController.getTipItem().addChild(pointerUILine, false)
 
-                 leftController = getHandController(controllers, 'left', [()=>{
+
+                const getGeomItemAtTip = () => {
+                    if (rightController.hitTested) return rightController.intersectionData
+                    rightController.hitTested = true
+                    const renderer = rightController.xrvp.getRenderer()
+                    const xfo = rightController.tipItem.globalXfoParam.value
+                    const vol = rightController.activeVolumeSize
+                    const dist = 3.0
+                    rightController.intersectionData = renderer.raycastWithXfo(xfo, vol, dist)
+                    console.log(123);
+                    return rightController.intersectionData
+                }
+                rightController.getGeomItemAtTip = getGeomItemAtTip
+
+                leftController = getHandController(controllers, 'left', [() => {
                     console.log(0);
-                },()=>{
+                }, () => {
                     console.log(1);
-                },()=>{
+                }, () => {
                     console.log(2);
-                },()=>{
+                }, () => {
                     console.log(3);
-                },()=>{
+                }, () => {
                     console.log(4);
                     //x button
                     activeBillboard.get('handUI').billboard.setVisible(!activeBillboard.get('handUI').billboard.isVisible())
 
-                  
-                },()=>{
+
+                }, () => {
                     console.log(5);
-                },()=>{
+                }, () => {
                     console.log(6);
-                },()=>{
+                }, () => {
                     console.log(7);
                 }])
                 leftController.getTipItem().addChild(activeBillboard.get('handUI').billboard, false)
@@ -311,14 +330,19 @@ export function showActiveBillboard(targetElement, activeState, orientTowardsCam
         bData.billboard.getParameter('Visible').setValue(activeState)
         bData.mapper.resetLastElement()
         if (orientTowardsCamera) {
-            const xfo = bData.billboard.getParameter('GlobalXfo').getValue()
-            xfo.setLookAt(xfo.tr, camera.getParameter('GlobalXfo').getValue().tr, new Vec3(0, 0, 1)) //sacle in x is inversed?
+            const xfo = bData.billboard.globalXfoParam.value;
+            const cxfo = camera.globalXfoParam.value;
+            xfo.tr = cxfo.tr.add(cxfo.ori.getZaxis().scale(-5));
+            const dir = cxfo.tr.subtract(xfo.tr);
+            xfo.ori.setFromDirectionAndUpvector(dir, new Vec3(0, 0, 1));
+            bData.billboard.globalXfoParam.value = xfo;
+            //   xfo.setLookAt(xfo.tr, cxfo.tr.subtract(), new Vec3(0, 0, 1)) //sacle in x is inversed?
         }
         renderer.requestRedraw()
     }
 }
 
-let handUIActive = false
+let leftHandButtons = new Map();
 
 function getHandController(controllers, handedness, buttonsCallback) {
     let found = null
@@ -330,7 +354,8 @@ function getHandController(controllers, handedness, buttonsCallback) {
 
                 controller.inputSource.gamepad.buttons.forEach((button, index) => {
                     if (buttonsCallback[index]) {
-                        button.callback = buttonsCallback[index];
+                        leftHandButtons.set(button, { callback: buttonsCallback[index], isPressed: false });
+
                     }
                 })
             }
@@ -339,14 +364,16 @@ function getHandController(controllers, handedness, buttonsCallback) {
     return found
 }
 
-function callControllerButtonPress(controller){
+function callControllerButtonPress(controller) {
     controller.inputSource.gamepad.buttons.forEach((button, index) => {
-        if (button.pressed && !button.isPressed && button.callback) {
-            button.callback();
-            button.isPressed = true;
-        }else if(!button.pressed){
-            button.isPressed = false;
+        const buttonData = leftHandButtons.get(button);
+        if (button.pressed && !buttonData.isPressed && button.callback) {
+            buttonData.callback();
+            buttonData.isPressed = true;
+        } else if (!button.pressed) {
+            buttonData.isPressed = false;
         }
+        leftHandButtons.set(button, buttonData);
     })
 }
 
