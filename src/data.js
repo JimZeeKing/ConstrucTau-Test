@@ -53,7 +53,7 @@ export function prepare(readyCb) {
     main()
 }
 
-let billboardTree, camera, renderer, headScale, pointerUILine, pointerUIXfo
+let billboardTree, camera, renderer, headScale, pointerUILine, pointerUIXfo, vr, leftController
 const initState = new Map()
 
 function main() {
@@ -123,8 +123,8 @@ function main() {
             billboard.mapper.resetLastElement()
         })
 
-        const headXfo = event.viewXfo
-        headScale = headXfo.sc.x
+
+     
     })
 
     renderer.getXRViewport().then((xrvp) => {
@@ -132,11 +132,6 @@ function main() {
         xrButton.textContent = 'Launch VR'
         xrButton.classList.remove('hidden')
 
-        const vm = xrvp.getManipulator()
-        //always fired?
-        vm.onVRPoseChanged = (event) => {
-            console.log(123);
-        }
 
         xrvp.on('presentingChanged', (event) => {
             const { state } = event
@@ -150,71 +145,96 @@ function main() {
         })
         let controllers = []
 
-        /*  xrvp.on('viewChanged', (event) => {
-              const headXfo = event.viewXfo
-              headScale = headXfo.sc.x
-              /* activeBillboard.forEach((value, key, map) => {
-                         value.mapper.resetLastElement();
-                     })*/
+        xrvp.on('viewChanged', (event) => {
+            const headXfo = event.viewXfo
+            headScale = headXfo.sc.x
+
+            if (leftController) {
+                callControllerButtonPress(leftController);
+            }
+            /* activeBillboard.forEach((value, key, map) => {
+                       value.mapper.resetLastElement();
+                   })*/
+        })
+        xrvp.on('controllerAdded', (event) => {
+            // const xfo = activeBillboard.get('handDomBillboard').get('handDomBillboard').billboard.getParameter('GlobalXfo').getValue();
+            controllers = xrvp.getControllers()
+
+            if (controllers.length == 2) {
+                //we have both controllers now
+
+                const pointermat = new Material('pointermat', 'LinesShader')
+                pointermat.setSelectable(false)
+                pointermat.getParameter('BaseColor').setValue(new Color(1.2, 0, 0))
+
+                const line = new Lines()
+                line.setNumVertices(2)
+                line.setNumSegments(1)
+                line.setSegmentVertexIndices(0, 0, 1)
+
+                const positions = line.getVertexAttribute('positions')
+                positions.getValueRef(0).set(0.0, 0.0, 0.0)
+                positions.getValueRef(1).set(0.0, 0.0, -1.0)
+                line.setBoundingBoxDirty()
+
+                pointerUIXfo = new Xfo()
+                pointerUIXfo.sc.set(1, 1, 0.1)
+                pointerUIXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.2)
+
+                pointerUILine = new GeomItem('VRControllerPointer', line, pointermat)
+                pointerUILine.setSelectable(false)
+
+                const rightController = getHandController(controllers, 'right')
+                rightController.getTipItem().addChild(pointerUILine, false)
+
+                 leftController = getHandController(controllers, 'left', [()=>{
+                    console.log(0);
+                },()=>{
+                    console.log(1);
+                },()=>{
+                    console.log(2);
+                },()=>{
+                    console.log(3);
+                },()=>{
+                    console.log(4);
+                    //x button
+                    activeBillboard.get('handUI').billboard.setVisible(!activeBillboard.get('handUI').billboard.isVisible())
+
+                  
+                },()=>{
+                    console.log(5);
+                },()=>{
+                    console.log(6);
+                },()=>{
+                    console.log(7);
+                }])
+                leftController.getTipItem().addChild(activeBillboard.get('handUI').billboard, false)
+                const uiLocalXfo = activeBillboard.get('handUI').billboard.getParameter('LocalXfo').getValue()
+                uiLocalXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.4)
+
+                uiLocalXfo.tr.set(0.35, -0.05, 0.08)
+                activeBillboard.get('handUI').billboard.getParameter('LocalXfo').setValue(uiLocalXfo)
+                activeBillboard.get('handUI').billboard.setVisible(false)
+            }
+        })
+
+        xrButton.addEventListener('click', function (event) {
+            xrvp.togglePresenting()
+        })
     })
-    xrvp.on('controllerAdded', (event) => {
-        // const xfo = activeBillboard.get('handDomBillboard').get('handDomBillboard').billboard.getParameter('GlobalXfo').getValue();
-        controllers = xrvp.getControllers()
 
-        if (controllers.length == 2) {
-            //we have both controllers now
+    /* const urlParams = new URLSearchParams(window.location.search);
+       if (urlParams.has("profile")) {
+           renderer.startContinuousDrawing();
+       }*/
 
-            const pointermat = new Material('pointermat', 'LinesShader')
-            pointermat.setSelectable(false)
-            pointermat.getParameter('BaseColor').setValue(new Color(1.2, 0, 0))
-
-            const line = new Lines()
-            line.setNumVertices(2)
-            line.setNumSegments(1)
-            line.setSegmentVertexIndices(0, 0, 1)
-
-            const positions = line.getVertexAttribute('positions')
-            positions.getValueRef(0).set(0.0, 0.0, 0.0)
-            positions.getValueRef(1).set(0.0, 0.0, -1.0)
-            line.setBoundingBoxDirty()
-
-            pointerUIXfo = new Xfo()
-            pointerUIXfo.sc.set(1, 1, 0.1)
-            pointerUIXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.2)
-
-            pointerUILine = new GeomItem('VRControllerPointer', line, pointermat)
-            pointerUILine.setSelectable(false)
-
-            const rightController = getHandController(controllers, 'right')
-            rightController.getTipItem().addChild(pointerUILine, false)
-
-            const leftController = getHandController(controllers, 'left')
-            leftController.getTipItem().addChild(activeBillboard.get('handUI').billboard, false)
-            const uiLocalXfo = activeBillboard.get('handUI').billboard.getParameter('LocalXfo').getValue()
-            uiLocalXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.4)
-
-            uiLocalXfo.tr.set(0.35, -0.05, 0.08)
-            activeBillboard.get('handUI').billboard.getParameter('LocalXfo').setValue(uiLocalXfo)
-        }
+    //loading the file
+    loadAsset('./data/data.skp.zcad').then((data) => {
+        scene.getRoot().addChild(data.asset)
+        scene.getRoot().addChild(data.layersRoot)
+        renderer.frameAll()
+        readyCallback(data.asset.__childItems[0].__childItems)
     })
-
-    xrButton.addEventListener('click', function (event) {
-        xrvp.togglePresenting()
-    })
-})
-
-/* const urlParams = new URLSearchParams(window.location.search);
-   if (urlParams.has("profile")) {
-       renderer.startContinuousDrawing();
-   }*/
-
-//loading the file
-loadAsset('./data/data.skp.zcad').then((data) => {
-    scene.getRoot().addChild(data.asset)
-    scene.getRoot().addChild(data.layersRoot)
-    renderer.frameAll()
-    readyCallback(data.asset.__childItems[0].__childItems)
-})
 }
 const positions = [pos1, pos2]
 export function saveCamLocal() {
@@ -300,12 +320,34 @@ export function showActiveBillboard(targetElement, activeState, orientTowardsCam
 
 let handUIActive = false
 
-function getHandController(controllers, handedness) {
+function getHandController(controllers, handedness, buttonsCallback) {
     let found = null
     controllers.forEach((controller) => {
-        if (controller.inputSource.handedness == handedness) found = controller
+        console.log(controller.inputSource);
+        if (controller.inputSource.handedness == handedness) {
+            found = controller
+            if (controller.inputSource.gamepad && buttonsCallback) {
+
+                controller.inputSource.gamepad.buttons.forEach((button, index) => {
+                    if (buttonsCallback[index]) {
+                        button.callback = buttonsCallback[index];
+                    }
+                })
+            }
+        }
     })
     return found
+}
+
+function callControllerButtonPress(controller){
+    controller.inputSource.gamepad.buttons.forEach((button, index) => {
+        if (button.pressed && !button.isPressed && button.callback) {
+            button.callback();
+            button.isPressed = true;
+        }else if(!button.pressed){
+            button.isPressed = false;
+        }
+    })
 }
 
 function createDomBillboard(data, label, pos, lookAt, ppm) {
