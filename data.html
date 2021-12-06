@@ -1,220 +1,236 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <!-- download Zea Engine -- this downloads the latest build from version 3 of the engine -->
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@4.0.1/dist/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@4.0.1/dist/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-ux@4.0.1/dist/index.umd.js"></script>
+    <!-- download our stylesheet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css" />
+    <link rel="stylesheet" href="./src/data.css" />
+    <link rel="stylesheet" href="./src/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/src/dom-to-image-more.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
 
-<head>
-  <!-- download Zea Engine -- this downloads the latest build from version 3 of the engine -->
-  <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@4.0.1/dist/index.umd.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@4.0.1/dist/index.umd.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-ux@4.0.1/dist/index.umd.js"></script>
-  <!-- download our stylesheet -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.9/tailwind.min.css" />
-  <link rel="stylesheet" href="./src/data.css" />
-  <link rel="stylesheet" href="./src/styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/src/dom-to-image-more.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+    <script src="./libs/CanvasRenderer.js"></script>
+    <script src="./libs/DomMapper.js"></script>
+    <script src="./src/scene-tree-view.js" type="module"></script>
+    <script src="./src/zea-fps-display.js" type="module"></script>
 
-  <script src="./libs/CanvasRenderer.js"></script>
-  <script src="./libs/DomMapper.js"></script>
-  <script src="./src/scene-tree-view.js" type="module"></script>
-  <script src="./src/zea-fps-display.js" type="module"></script>
+    <title>ConstrucTAU - Data</title>
+  </head>
 
-  <title>ConstrucTAU - Data</title>
-</head>
-
-<body class="overflow-hidden">
-  <div class="layout grid h-screen">
-    <header class="border flex justify-left items-center m-2 border-none">
-      <img src="./data/logo-inverse.png" id="logo" />
-    </header>
-    <main>
-      <div class="splitter">
-        <div id="leftPanel">
-          <scene-tree-view id="tree" class="select-none"></scene-tree-view>
-        </div>
-        <div class="separator" id="separatorV"></div>
-        <div id="mainPanel">
-          <div id="canvas-holder">
-            <canvas id="canvas" style="position: absolute; width: 100%; height: 100%"> </canvas>
+  <body class="overflow-hidden">
+    <div class="layout grid h-screen">
+      <header class="border flex justify-left items-center m-2 border-none">
+        <img src="./data/logo-inverse.png" id="logo" />
+      </header>
+      <main>
+        <div class="splitter">
+          <div id="leftPanel">
+            <scene-tree-view id="tree" class="select-none"></scene-tree-view>
           </div>
-          <div class="xr-button hidden" id="xr-button"></div>
-          <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
-          <progress class="progress-display" id="progress" value="0" max="100">0%</progress>
+          <div class="separator" id="separatorV"></div>
+          <div id="mainPanel">
+            <div id="canvas-holder">
+              <canvas id="canvas" style="position: absolute; width: 100%; height: 100%"> </canvas>
+            </div>
+            <div class="xr-button hidden" id="xr-button"></div>
+            <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
+            <progress class="progress-display" id="progress" value="0" max="100">0%</progress>
+          </div>
         </div>
-      </div>
-    </main>
-  </div>
+      </main>
+    </div>
 
-  <div id="infoTable" class="table"></div>
+    <div id="infoTable" class="table"></div>
 
-  <div id="test">
+    <div id="test">
+      <section id="page1" class="page active">
+        <h2>Quiz</h2>
+        <p class="infos">Ceci est un exemple de quiz intégré au VR</p>
 
-    <section id="page1" class="page active">
-      <h2>Quiz</h2>
-      <p class="infos">Ceci est un exemple de quiz intégré au VR</p>
-
-      <section>
-        <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
-        <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
-        <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
+        <section>
+          <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
+          <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
+          <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
+        </section>
       </section>
-    </section>
 
-    <section id="page2" class="page">
-      <h2>Éléments</h2>
-      <p class="infos">Ceci est un exemple de controles sur la visibilité des éléments 3D</p>
-      <div></div>
-    </section>
-    <nav>
+      <section id="page2" class="page">
+        <h2>Éléments</h2>
+        <p class="infos">Options des éléments</p>
+        <div></div>
+      </section>
 
-      <button class="menu-active" data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page1')">Quiz</button>
-      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page2')">Éléments</button>
-    </nav>
-  </div>
+      <section id="page3" class="page">
+        <h2>Scène</h2>
+        <p class="infos">Options de la scène</p>
+        <div>
+          <button onclick="gotoPosition(0)" data-mapping data-hover-class="btn-hover">Position 1</button>
+          <button onclick="gotoPosition(1)" data-mapping data-hover-class="btn-hover">Position 2</button>
+          <button onclick="resetScene()" data-mapping data-hover-class="btn-hover">Réinitialiser la scène</button>
+        </div>
+      </section>
 
-  <script type="module">
-    import dragElement from './src/panels.js'
-    const separatorV = document.getElementById('separatorV')
-    const leftPanel = document.getElementById('leftPanel')
-    const mainPanel = document.getElementById('mainPanel')
-    dragElement(separatorV, leftPanel, mainPanel, 'H')
-  </script>
+      <nav>
+        <button class="menu-active" data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page1')">Quiz</button>
+        <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page2')">Éléments</button>
+        <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page3')">Scène</button>
+      </nav>
+    </div>
 
-  <script type="module">
-    const { Vec3 } = window.zeaEngine
-    import { prepare, updateBillboard, showActiveBillboard, addDomBillboard } from './src/data.js'
-    import { DataPool } from './src/DataPool.js'
+    <script type="module">
+      import dragElement from './src/panels.js'
+      const separatorV = document.getElementById('separatorV')
+      const leftPanel = document.getElementById('leftPanel')
+      const mainPanel = document.getElementById('mainPanel')
+      dragElement(separatorV, leftPanel, mainPanel, 'H')
+    </script>
 
-    let templateContainer, handUI, mapper1, mapper2, currentContent
-    let json = DataPool.create()
-    let url = 'http://127.0.0.1:3000/content/all/nocred'
-    let domrenderer = CanvasRenderer.setup()
+    <script type="module">
+      const { Vec3 } = window.zeaEngine
+      import { prepare, updateBillboard, showActiveBillboard, addDomBillboard, resetAll, saveCamLocal, goto } from './src/data.js'
+      import { DataPool } from './src/DataPool.js'
 
-    Promise.all([json.loadData(url), fetch('./data/templates/infos.mustache').then((resp) => resp.text())]).then((data) => {
-      templateContainer = document.querySelector('#infoTable')
-      handUI = document.querySelector('#test')
-      mapper2 = DomMapper.setup(handUI)
+      let templateContainer, handUI, mapper1, mapper2, currentContent
+      let json = DataPool.create()
+      let url = 'http://127.0.0.1:3000/content/all/nocred'
+      let domrenderer = CanvasRenderer.setup()
 
-      const template = Handlebars.compile(data[1])
-      prepareInfos('Contenu 2', template)
+      Promise.all([json.loadData(url), fetch('./data/templates/infos.mustache').then((resp) => resp.text())]).then((data) => {
+        templateContainer = document.querySelector('#infoTable')
+        handUI = document.querySelector('#test')
+        mapper2 = DomMapper.setup(handUI)
 
-      prepare(CADReady)
+        const template = Handlebars.compile(data[1])
+        prepareInfos('Semelle Flottante', template)
 
-      templateContainer.addEventListener('domevent', function (event) {
-        domrenderer.renderElement(templateContainer, event.detail.element, event.detail.type, false, true)
-      })
+        prepare(CADReady)
 
-      templateContainer.addEventListener('render', (event) => {
-        if (event.detail.renderData.bytes) {
-          updateBillboard(templateContainer, event.detail.renderData.bytes)
-        }
-      })
-
-      handUI.addEventListener('domevent', function (event) {
-        domrenderer.renderElement(handUI, event.detail.element, event.detail.type, false, true)
-      })
-
-      handUI.addEventListener('render', (event) => {
-        if (event.detail.renderData.bytes) {
-          updateBillboard('handUI', event.detail.renderData.bytes)
-        }
-      })
-
-      window.closeBillboard = function (button) {
-        let mainContainer = button
-        var els = []
-        while (mainContainer) {
-          els.unshift(mainContainer)
-          if (mainContainer.parentNode == document.body) break
-          mainContainer = mainContainer.parentNode
-        }
-
-        showActiveBillboard(mainContainer, false)
-        setTimeout(() => {
-          updateInfos('Contenu 2', template)
-        }, 1000)
-      }
-
-      window.goToPage = function (pageID) {
-        const currentPage = handUI.querySelector('.active')
-        if (currentPage) {
-          currentPage.classList.remove('active')
-        }
-
-        const newCurrentPage = handUI.querySelector(`#${pageID}`)
-
-        if (newCurrentPage) {
-          newCurrentPage.classList.add('active')
-        }
-
-        domrenderer.resetStates(handUI)
-        domrenderer.renderMainContainer(handUI, (argument) => {
-          mapper2.updateMapping()
+        templateContainer.addEventListener('domevent', function (event) {
+          domrenderer.renderElement(templateContainer, event.detail.element, event.detail.type, false, true)
         })
-      }
 
-      window.newContentRequest = function (contentTitle) {
-        updateInfos(contentTitle, template)
-      }
+        templateContainer.addEventListener('render', (event) => {
+          if (event.detail.renderData.bytes) {
+            updateBillboard(templateContainer, event.detail.renderData.bytes)
+          }
+        })
 
-      function CADReady(asset) {
-        const visibilityTogglesContainer = handUI.querySelector('#page2 div')
+        handUI.addEventListener('domevent', function (event) {
+          console.log(event.detail)
+          domrenderer.renderElement(handUI, event.detail.element, event.detail.type, false, true)
+        })
 
-        asset.forEach((geomItem) => {
-          const itemName = geomItem.getParameter('LayerName').getValue()
-          const itemContainer = document.createElement('div')
-          const title = document.createElement('h3')
-          title.innerText = itemName
-          itemContainer.appendChild(title)
+        handUI.addEventListener('render', (event) => {
+          if (event.detail.renderData.bytes) {
+            updateBillboard('handUI', event.detail.renderData.bytes)
+          }
+        })
 
-          const btn = document.createElement('button')
-          btn.classList.add('btn-init')
-          btn.dataset.mapping = true
-          btn.dataset.activeClass = 'btn-active'
-          btn.geomitem = geomItem
-          btn.addEventListener('click', (event) => {
-            btn.innerText = btn.innerText == 'Afficher' ? 'Cacher' : 'Afficher';
-            const visible = btn.geomitem.isVisible();
-            btn.geomitem.setVisible(!visible);
+        window.closeBillboard = function (button) {
+          let mainContainer = button
+          var els = []
+          while (mainContainer) {
+            els.unshift(mainContainer)
+            if (mainContainer.parentNode == document.body) break
+            mainContainer = mainContainer.parentNode
+          }
+          showActiveBillboard(mainContainer, false)
+        }
+
+        window.goToPage = function (pageID) {
+          const currentPage = handUI.querySelector('.active')
+          if (currentPage) {
+            currentPage.classList.remove('active')
+          }
+
+          const newCurrentPage = handUI.querySelector(`#${pageID}`)
+
+          if (newCurrentPage) {
+            newCurrentPage.classList.add('active')
+          }
+
+          domrenderer.resetStates(handUI)
+          domrenderer.renderMainContainer(handUI, (argument) => {
+            mapper2.updateMapping()
+          })
+        }
+
+        window.newContentRequest = function (contentTitle) {
+          updateInfos(contentTitle, template)
+        }
+        window.resetScene = function () {
+          resetAll()
+        }
+
+        window.gotoPosition = function (positionIndex) {
+          goto(positionIndex)
+        }
+
+        window.saveCam = function (positionName) {
+          saveCamLocal()
+        }
+
+        function CADReady(asset) {
+          const visibilityTogglesContainer = handUI.querySelector('#page2 div')
+
+          asset.forEach((geomItem) => {
+            const itemName = geomItem.getParameter('LayerName').getValue()
+            const itemContainer = document.createElement('div')
+            const title = document.createElement('h3')
+            title.innerText = itemName
+            itemContainer.appendChild(title)
+
+            const btn = document.createElement('button')
+            btn.classList.add('btn-init')
+            btn.dataset.mapping = true
+            btn.dataset.activeClass = 'btn-active'
+            btn.geomitem = geomItem
+            btn.addEventListener('click', (event) => {
+              btn.innerText = btn.innerText == 'Afficher' ? 'Cacher' : 'Afficher'
+              const visible = btn.geomitem.isVisible()
+              btn.geomitem.setVisible(!visible)
+            })
+
+            btn.innerText = 'Cacher'
+
+            itemContainer.appendChild(btn)
+            visibilityTogglesContainer.appendChild(itemContainer)
           })
 
-          btn.innerText = 'Cacher';
+          domrenderer.addRenderContainer(handUI, '#fff', (renderData) => {
+            addDomBillboard(renderData, 'handUI', mapper2, undefined, undefined, 0.001, true, true)
+          })
+        }
+      })
 
-          itemContainer.appendChild(btn)
-          visibilityTogglesContainer.appendChild(itemContainer)
-        })
-
-        domrenderer.addRenderContainer(handUI, '#fff', (renderData) => {
-          addDomBillboard(renderData, 'handUI', mapper2, undefined, undefined, 0.001, true, true)
-        })
+      function prepareInfos(title, template) {
+        const data = json.getObjectFromListWithProp(url, 'title', title)
+        templateContainer.innerHTML = template(data)
+        mapper1 = DomMapper.setup(templateContainer)
+        setTimeout(() => {
+          domrenderer.addRenderContainer(templateContainer, '#666', (renderData) => {
+            mapper1.updatePositions()
+            addDomBillboard(renderData, templateContainer, mapper1, new Vec3(5, 1, 1), undefined, 0.0025)
+          })
+        }, 100)
       }
-    })
 
-    function prepareInfos(title, template) {
-      const data = json.getObjectFromListWithProp(url, 'title', title)
-      templateContainer.innerHTML = template(data)
-      mapper1 = DomMapper.setup(templateContainer)
-      setTimeout(() => {
-        domrenderer.addRenderContainer(templateContainer, '#666', (renderData) => {
-          mapper1.updatePositions()
-          addDomBillboard(renderData, templateContainer, mapper1, new Vec3(5, 1, 1), undefined, 0.0025)
-        })
-      }, 100)
-    }
-
-    function updateInfos(title, template) {
-      if (currentContent == title) return
-      const data = json.getObjectFromListWithProp(url, 'title', title)
-      templateContainer.innerHTML = template(data)
-      domrenderer.resetStates(templateContainer)
-      currentContent = title
-      setTimeout(() => {
-        domrenderer.renderMainContainer(templateContainer, (argument) => {
-          mapper1.updateMapping()
-          showActiveBillboard(templateContainer, true, true)
-        })
-      }, 100)
-    }
-  </script>
-</body>
-
+      function updateInfos(title, template) {
+        if (currentContent == title) return
+        const data = json.getObjectFromListWithProp(url, 'title', title)
+        templateContainer.innerHTML = template(data)
+        domrenderer.resetStates(templateContainer)
+        currentContent = title
+        setTimeout(() => {
+          domrenderer.renderMainContainer(templateContainer, (argument) => {
+            mapper1.updateMapping()
+            showActiveBillboard(templateContainer, true, true)
+          })
+        }, 100)
+      }
+    </script>
+  </body>
 </html>
