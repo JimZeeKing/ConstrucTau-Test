@@ -52,9 +52,12 @@
       <p class="infos">Ceci est un exemple de quiz intégré au VR</p>
 
       <section>
-        <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
-        <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
-        <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
+        <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+          data-active-group="g1" data-label="Radio 1"></div>
+        <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+          data-active-group="g1" data-label="Radio 2"></div>
+        <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+          data-active-group="g1" data-label="Radio 3"></div>
       </section>
     </section>
 
@@ -75,9 +78,12 @@
     </section>
 
     <nav>
-      <button class="menu-active" data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page1')">Quiz</button>
-      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page2')">Éléments</button>
-      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page3')">Scène</button>
+      <button class="menu-active" data-mapping data-down-class="btn-click" data-hover-class="btn-hover"
+        data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page1')">Quiz</button>
+      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active"
+        data-active-group="menu" onclick="goToPage('page2')">Éléments</button>
+      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active"
+        data-active-group="menu" onclick="goToPage('page3')">Scène</button>
     </nav>
   </div>
 
@@ -115,7 +121,7 @@
 
       templateContainer.addEventListener('render', (event) => {
         if (event.detail.renderData.bytes) {
-          updateBillboard(templateContainer, event.detail.renderData.bytes)
+          updateBillboard(templateContainer, event.detail.renderData.bytes, true)
         }
       })
 
@@ -126,7 +132,7 @@
 
       handUI.addEventListener('render', (event) => {
         if (event.detail.renderData.bytes) {
-          updateBillboard('handUI', event.detail.renderData.bytes)
+          updateBillboard('handUI', event.detail.renderData.bytes, false)
         }
       })
 

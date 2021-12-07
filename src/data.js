@@ -73,7 +73,7 @@ function main() {
     // get the camera from renderer
     camera = renderer.getViewport().getCamera()
     // set camera's target and position.
-    camera.setPositionAndTarget(new Vec3(6, 10, 12), new Vec3(0, 0, 1.5))
+    camera.setPositionAndTarget(new Vec3(2, 1.7, 2), new Vec3(0, 0, 1.7))
 
     initState.set(camera, camera.getParameter('LocalXfo').getValue())
 
@@ -117,6 +117,19 @@ function main() {
             }
         }
     })
+
+    let highlightedItem
+    const highlightColor = new Color('#F9CE03')
+    highlightColor.a = 0.1
+
+    /*  renderer.getViewport().on('pointerOverGeom', (event) => {
+          // highlightedItem = filterItem(event.intersectionData.geomItem);
+          event.intersectionData.geomItem.addHighlight('pointerOverGeom', highlightColor, true)
+      })
+      renderer.getViewport().on('pointerLeaveGeom', (event) => {
+          event.leftGeometry.removeHighlight('pointerOverGeom', true)
+          highlightedItem = null
+      })*/
     renderer.getViewport().on('viewChanged', (event) => {
         //making sure render state are reseted
         activeBillboard.forEach((billboard, key, map) => {
@@ -146,6 +159,23 @@ function main() {
             }
         })
         let controllers = []
+
+        xrvp.on("pointerUp", (event) => {
+            if (event.intersectionData) {
+                if (event.intersectionData.geomItem.hasParameter('LayerName')) {
+                    window.newContentRequest(event.intersectionData.geomItem.getParameter('LayerName').getValue())
+                }
+            }
+        })
+
+        xrvp.on('pointerOverGeom', (event) => {
+            // highlightedItem = filterItem(event.intersectionData.geomItem);
+            event.intersectionData.geomItem.addHighlight('pointerOverGeom', highlightColor, true)
+        })
+        xrvp.on('pointerLeaveGeom', (event) => {
+            event.leftGeometry.removeHighlight('pointerOverGeom', true)
+            highlightedItem = null
+        })
 
         xrvp.on('viewChanged', (event) => {
             const headXfo = event.viewXfo
@@ -238,6 +268,7 @@ function main() {
 
                 }, () => {
                     console.log(5);
+                    saveCamLocal()
                 }, () => {
                     console.log(6);
                 }, () => {
@@ -273,7 +304,8 @@ function main() {
 }
 const positions = [pos1, pos2]
 export function saveCamLocal() {
-    const xfo = camera.getParameter('LocalXfo').getValue()
+
+    const xfo = vr ? xrview.getXfo() : camera.globalXfoParam.value
 
     const id = positions.length
     const pos = { id: id, tr: xfo.tr, ori: xfo.ori, sc: xfo.sc }
@@ -338,14 +370,17 @@ export function resetAll() {
     renderer.requestRedraw()
 }
 
-export function updateBillboard(targetElement, bytes, w, h) {
+export function updateBillboard(targetElement, bytes, updateScale) {
     if (billboardData.has(targetElement)) {
         const bData = billboardData.get(targetElement)
         bData.billboard.width = bytes.width
         bData.billboard.height = bytes.height
-        const xfo = bData.billboard.getParameter('GlobalXfo').getValue()
-        xfo.sc.set(bytes.width * bData.billboard.pixelsPerMeter, bytes.height * bData.billboard.pixelsPerMeter, 1)
-        bData.billboard.getParameter('GlobalXfo').setValue(xfo)
+        if (updateScale) {
+            const xfo = bData.billboard.getParameter('GlobalXfo').getValue()
+            xfo.sc.set(bytes.width * bData.billboard.pixelsPerMeter, bytes.height * bData.billboard.pixelsPerMeter, 1)
+            bData.billboard.getParameter('GlobalXfo').setValue(xfo)
+        }
+
         bData.label.setData(bytes.width, bytes.height, bytes)
     }
 }
@@ -359,7 +394,7 @@ export function showActiveBillboard(targetElement, activeState, orientTowardsCam
         if (orientTowardsCamera) {
             const xfo = bData.billboard.globalXfoParam.value;
             const cxfo = camera.globalXfoParam.value;
-            xfo.tr = cxfo.tr.add(cxfo.ori.getZaxis().scale(-5));
+            xfo.tr = cxfo.tr.add(cxfo.ori.getZaxis().scale(-2));
             const dir = cxfo.tr.subtract(xfo.tr);
             xfo.ori.setFromDirectionAndUpvector(dir, new Vec3(0, 0, 1));
             bData.billboard.globalXfoParam.value = xfo;
@@ -465,7 +500,6 @@ function getIntersectionPosition(intersectionData, isInHand) {
 
         //if in hand we must update the scale according to headScale (working in v3, but not v4)
         planeXfo.sc.set(isInHand ? headScale : 1, isInHand ? headScale : 1, isInHand ? headScale : 1)
-        //planeXfo.sc.set(isInHand ? activeBillboard.get('handUI').billboard.localXfoParam.value.sc.x : 1, isInHand ? activeBillboard.get('handUI').billboard.localXfoParam.value.sc.y : 1, isInHand ? activeBillboard.get('handUI').billboard.localXfoParam.value.sc.z : 1)
 
         const invPlaneXfo = planeXfo.inverse()
         const hitOffset = invPlaneXfo.transformVec3(ray.pointAtDist(res))
