@@ -397,7 +397,7 @@ export function showActiveBillboard(targetElement, activeState, orientTowardsCam
         if (orientTowardsCamera) {
             const xfo = bData.billboard.globalXfoParam.value;
             const cxfo = camera.globalXfoParam.value;
-            xfo.tr = cxfo.tr.add(cxfo.ori.getZaxis().scale(-2));
+            xfo.tr = cxfo.tr.add(cxfo.ori.getZaxis().scale(-3));
             const dir = cxfo.tr.subtract(xfo.tr);
             xfo.ori.setFromDirectionAndUpvector(dir, new Vec3(0, 0, 1));
             bData.billboard.globalXfoParam.value = xfo;

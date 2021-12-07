@@ -8,7 +8,15 @@ DataPool.create = function name(targetHost) {
     let data = new Map();
 
     pool.loadData = async function (url) {
-        const response = await fetch(host + url);
+        const response = await fetch(host + url, {
+            method: "GET",
+            mode: "cors",
+            headers: {
+                'Accept': 'application/json',
+                "Content-Type": "application/json",
+            },
+        });
+
         const jsonData = await response.json();
         data.set(host + url, jsonData);
         return jsonData;
