@@ -232,18 +232,26 @@ function main() {
 
                 //Give  Wy to chANGE POINTER RAY LENGTHs
                 const getGeomItemAtTip = () => {
-                    //  if (rightController.hitTested) return rightController.intersectionData
+                    if (rightController.hitTested) return rightController.intersectionData
                     rightController.hitTested = true
                     const renderer = rightController.xrvp.getRenderer()
-                    const xfo = rightController.tipItem.globalXfoParam.value
+                    const xfo = pointerUILine.globalXfoParam.value
+                    //  const xfo = rightController.tipItem.globalXfoParam.value
                     const vol = rightController.activeVolumeSize
                     const dist = 5.0
                     setPointerLength(dist);
-                    rightController.intersectionData = renderer.raycastWithXfo(xfo, vol, dist)
+                    rightController.intersectionData = renderer.raycastWithXfo(xfo, dist, vol)
+                    if (rightController.intersectionData) {
+                        console.log(rightController.intersectionData.geomItem.getName());
+                    }
                     return rightController.intersectionData
                 }
 
+
+
+
                 rightController.getGeomItemAtTip = getGeomItemAtTip
+
 
                 leftController = getHandController(controllers, 'left', [() => {
                     console.log(0);
@@ -267,6 +275,9 @@ function main() {
                 }, () => {
                     console.log(7);
                 }])
+
+                leftController.getGeomItemAtTip = function () { }
+
                 leftController.getTipItem().addChild(activeBillboard.get('handUI').billboard, false)
                 const uiLocalXfo = activeBillboard.get('handUI').billboard.getParameter('LocalXfo').getValue()
                 uiLocalXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.4)
@@ -312,7 +323,6 @@ export function goto(posIndex) {
         console.log(pos, vr)
 
         if (vr) {
-
             const xfo = xrview.getXfo()
             xfo.ori = new Quat(pos.ori.x, pos.ori.y, pos.ori.z, pos.ori.w)
             xfo.tr = new Vec3(pos.tr.x, pos.tr.y, pos.tr.z)
@@ -325,7 +335,6 @@ export function goto(posIndex) {
             xfo.sc = new Vec3(pos.sc.x, pos.sc.y, pos.sc.z)
             camera.getParameter('LocalXfo').setValue(xfo)
         }
-
     }
 }
 export function addDomBillboard(imageData, targetElement, mapper, pos, lookAt, ppm, isInHand, showOnCreation) {
