@@ -168,14 +168,7 @@ function main() {
             }
         })
 
-        xrvp.on('pointerOverGeom', (event) => {
-            // highlightedItem = filterItem(event.intersectionData.geomItem);
-            event.intersectionData.geomItem.addHighlight('pointerOverGeom', highlightColor, true)
-        })
-        xrvp.on('pointerLeaveGeom', (event) => {
-            event.leftGeometry.removeHighlight('pointerOverGeom', true)
-            highlightedItem = null
-        })
+
 
         xrvp.on('viewChanged', (event) => {
             const headXfo = event.viewXfo
@@ -341,6 +334,7 @@ export function addDomBillboard(imageData, targetElement, mapper, pos, lookAt, p
     billboardData.set(targetElement, bData)
 
     domBillboardData.billboard.on('pointerDown', (event) => {
+
         const pos = getIntersectionPosition(event.intersectionData, isInHand)
         if (pos) mapper.mapDownToDomElement(pos.x, pos.y)
     })
@@ -496,7 +490,8 @@ function getIntersectionPosition(intersectionData, isInHand) {
             return -1
         }
 
-        setPointerLength(res);
+        if (vr)
+            setPointerLength(res);
 
         //if in hand we must update the scale according to headScale (working in v3, but not v4)
         planeXfo.sc.set(isInHand ? headScale : 1, isInHand ? headScale : 1, isInHand ? headScale : 1)
