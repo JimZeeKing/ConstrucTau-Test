@@ -168,7 +168,7 @@ function main() {
             }
         })
 
-        initState.set(xrvp, xrvp.getXfo())
+        initState.set(xrview, xrview.getXfo())
 
         xrvp.on('viewChanged', (event) => {
             const headXfo = event.viewXfo
@@ -370,6 +370,12 @@ export function addDomBillboard(imageData, targetElement, mapper, pos, lookAt, p
 export function resetAll() {
 
     if (vr) {
+        const xfo = xrview.getXfo()
+        const rxfo = initState.get(xrview);
+        xfo.ori = new Quat(rxfo.ori.x, rxfo.ori.y, rxfo.ori.z, rxfo.ori.w)
+        xfo.tr = new Vec3(rxfo.tr.x, rxfo.tr.y, rxfo.tr.z)
+        xfo.sc = new Vec3(rxfo.sc.x, rxfo.sc.y, rxfo.sc.z)
+        xrview.setXfo(xfo);
         xrview.getParameter('LocalXfo').setValue(initState.get(xrview))
     } else {
         camera.getParameter('LocalXfo').setValue(initState.get(camera))
