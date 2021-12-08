@@ -96,8 +96,8 @@
 
     let templateContainer, handUI, mapper1, mapper2, currentContent
     let json = DataPool.create()
-    // let url = 'http://127.0.0.1:3000/content/all/nocred'
-    let url = 'https://tim.cgmatane.qc.ca:3000/content/all/nocred'
+   // let url = 'http://127.0.0.1:3000/content/all/nocred'
+     let url = 'https://tim.cgmatane.qc.ca:3000/content/all/nocred'
     let domrenderer = CanvasRenderer.setup()
 
     Promise.all([json.loadData(url), fetch('./data/templates/infos.mustache').then((resp) => resp.text())]).then((data) => {

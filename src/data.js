@@ -78,7 +78,7 @@ function main() {
     initState.set(camera, camera.getParameter('LocalXfo').getValue())
 
     const envMap = new EnvMap()
-    envMap.load('../data/StudioG.zenv')
+    envMap.load('./data/StudioG.zenv')
     scene.setEnvMap(envMap)
 
     // These variables can be used later in our program
