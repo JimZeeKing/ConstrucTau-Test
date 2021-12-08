@@ -168,7 +168,7 @@ function main() {
             }
         })
 
-
+        initState.set(xrvp, xrvp.getXfo())
 
         xrvp.on('viewChanged', (event) => {
             const headXfo = event.viewXfo
@@ -368,7 +368,13 @@ export function addDomBillboard(imageData, targetElement, mapper, pos, lookAt, p
 }
 
 export function resetAll() {
-    camera.getParameter('LocalXfo').setValue(initState.get(camera))
+
+    if (vr) {
+        xrview.getParameter('LocalXfo').setValue(initState.get(xrview))
+    } else {
+        camera.getParameter('LocalXfo').setValue(initState.get(camera))
+    }
+
 
     renderer.requestRedraw()
 }
