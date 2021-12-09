@@ -236,3 +236,28 @@
 .btn-hover {
   background-color: gray;
 }
+
+/*override*/
+main {
+  width: 100vw;
+  height: 100vh;
+}
+
+.controls {
+  position: fixed;
+  z-index: 1000;
+  width: 20%;
+  height: 100vh;
+  background-color: #ccc;
+  border-right: 2px solid #ff0;
+}
+
+.controls button {
+  position: absolute;
+  right: -2em;
+  width: 2em;
+  height: 2em;
+  border: 2px solid red;
+}
+
+/*left controls*/
