@@ -6,7 +6,7 @@ import displayBillboardOnClick from './displayBillboardOnClick.js'
 import './dom-ui.js'
 
 export default function init() {
-  const { Color, Vec3, Xfo, Scene, GLRenderer, EnvMap, resourceLoader, TreeItem } = zeaEngine
+  const { Color, Vec3, Xfo, Scene, GLRenderer, EnvMap, resourceLoader, TreeItem, Lines, Material, GeomItem } = zeaEngine
   const { CADBody } = zeaCad
 
   const urlParams = new URLSearchParams(window.location.search)
@@ -23,6 +23,8 @@ export default function init() {
   // renderer.solidAngleLimit = 0.0;
   renderer.setScene(scene)
   renderer.getViewport().getCamera().setPositionAndTarget(new Vec3(5, -5, 5), new Vec3(0, 0, 1.5))
+
+  globalThis.renderer = renderer
 
   const envMap = new EnvMap()
   envMap.load('../data/StudioG.zenv')
@@ -64,11 +66,20 @@ export default function init() {
     while (item && !(item instanceof CADBody)) item = item.getOwner()
     return item
   }
-  renderer.getViewport().on('pointerOverGeom', (event) => {
-    // highlightedItem = filterItem(event.intersectionData.geomItem);
+  // renderer.getViewport().on('pointerOverGeom', (event) => {
+  //   // highlightedItem = filterItem(event.intersectionData.geomItem);
+  //   event.intersectionData.geomItem.addHighlight('pointerOverGeom', highlightColor, true)
+  // })
+  // renderer.getViewport().on('pointerLeaveGeom', (event) => {
+  //   event.leftGeometry.removeHighlight('pointerOverGeom', true)
+  //   highlightedItem = null
+  // })
+
+  scene.getRoot().on('pointerEnter', (event) => {
+    highlightedItem = filterItem(event.intersectionData.geomItem)
     event.intersectionData.geomItem.addHighlight('pointerOverGeom', highlightColor, true)
   })
-  renderer.getViewport().on('pointerLeaveGeom', (event) => {
+  scene.getRoot().on('pointerLeave', (event) => {
     event.leftGeometry.removeHighlight('pointerOverGeom', true)
     highlightedItem = null
   })
@@ -116,6 +127,9 @@ export default function init() {
         xrButton.textContent = 'Launch VR'
       }
     })
+    // xrvp.on('viewChanged', (event) => {
+    //   console.log('VR Rendering', event.viewXfo.toString())
+    // })
 
     xrvp.on('pointerUp', (event) => {
       const { intersectionData } = event
@@ -133,6 +147,41 @@ export default function init() {
       if (event.key == ' ') {
         xrvp.togglePresenting()
       }
+    })
+
+    const line = new Lines()
+    line.setNumVertices(2)
+    line.setNumSegments(1)
+    line.setSegmentVertexIndices(0, 0, 1)
+    const positions = line.getVertexAttribute('positions')
+    positions.getValueRef(0).set(0.0, 0.0, 0.0)
+    positions.getValueRef(1).set(0.0, 0.0, -1.0)
+    line.setBoundingBoxDirty()
+
+    const pointermat = new Material('pointermat', 'LinesShader')
+    pointermat.setSelectable(false)
+    pointermat.getParameter('BaseColor').value = new Color(0.2, 1.0, 0.2)
+
+    xrvp.on('controllerAdded', (event) => {
+      const controller = event.controller
+
+      controller.raycastDist = 20.0
+
+      // Remove the green ball added by the VRViewManipulator.
+      controller.tipItem.removeAllChildren()
+
+      const pointerItem = new GeomItem('PointerRay', line, pointermat)
+      pointerItem.setSelectable(false)
+      const pointerXfo = new Xfo()
+      pointerXfo.sc.set(1, 1, controller.raycastDist)
+      pointerItem.localXfoParam.value = pointerXfo
+      controller.tipItem.addChild(pointerItem, false)
+
+      // The tip items needs to be rotated down a little to make it
+      // point in the right direction.
+      const tipItemXfo = controller.tipItem.localXfoParam.value
+      tipItemXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), -0.8)
+      controller.tipItem.localXfoParam.value = tipItemXfo
     })
   })
 
@@ -153,7 +202,7 @@ export default function init() {
 
   // //////////////////////////
   // Load the Asset
-  loadAsset('./data/data.skp.zcad').then((data) => {
+  loadAsset('./data/Projet construcTAU-4-10-21-2020.skp/Projet construcTAU-4-10-21-2020.skp.zcad').then((data) => {
     scene.getRoot().addChild(data.asset)
     scene.getRoot().addChild(data.layersRoot)
     renderer.frameAll()
