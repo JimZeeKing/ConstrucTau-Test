@@ -34,7 +34,7 @@
           &lt;
         </template>
       </button>
-      <tree-list :children='tree.children' :item='tree.item' :name='tree.name' level='0'></tree-list>
+      <tree-list :children='tree.children' :item='tree.item' :name='tree.name' level='0' :visible='true'></tree-list>
     </aside>
   </div>
   <main>
@@ -54,12 +54,9 @@
       <p class="infos">Ceci est un exemple de quiz intégré au VR</p>
 
       <section>
-        <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
-          data-active-group="g1" data-label="Radio 1"></div>
-        <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
-          data-active-group="g1" data-label="Radio 2"></div>
-        <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
-          data-active-group="g1" data-label="Radio 3"></div>
+        <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
+        <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
+        <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
       </section>
     </section>
 
@@ -80,12 +77,9 @@
     </section>
 
     <nav>
-      <button class="menu-active" data-mapping data-down-class="btn-click" data-hover-class="btn-hover"
-        data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page1')">Quiz</button>
-      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active"
-        data-active-group="menu" onclick="goToPage('page2')">Éléments</button>
-      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active"
-        data-active-group="menu" onclick="goToPage('page3')">Scène</button>
+      <button class="menu-active" data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page1')">Quiz</button>
+      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page2')">Éléments</button>
+      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page3')">Scène</button>
     </nav>
   </div>
 
@@ -177,23 +171,23 @@
       function digChildren(children, output) {
         for (var i = 0; i < children.length; i++) {
           if (children[i].getChildren().length > 0) {
-            output.push({ name: children[i].__name, item: children[i], children: [] })
+            children[i].shouldBeVisible = children[i].isVisible();
+            output.push({ name: children[i].__name, item: children[i], children: [], shouldBeVisible: children[i].isVisible() })
             digChildren(children[i].getChildren(), output[output.length - 1].children)
           } else {
-            output.push({ name: children[i].__name, item: children[i] })
+            children[i].shouldBeVisible = children[i].isVisible();
+            output.push({ name: children[i].__name, item: children[i], shouldBeVisible: children[i].isVisible() })
           }
         }
       }
 
       function CADReady(data) {
         const visibilityTogglesContainer = handUI.querySelector('#page2 div')
-        //  window.CADAsset = asset
-
-        console.log(data.layersRoot)
 
         const layers = data.layersRoot
         const rootLayer = data.layersRoot.__name
-        const layerData = { name: rootLayer, item: layers, children: [] }
+        layers.shouldBeVisible = true;
+        const layerData = { name: rootLayer, item: layers, children: [], shouldBeVisible: true }
 
         let children = layers.getChildren()
 
