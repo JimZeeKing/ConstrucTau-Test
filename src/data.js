@@ -156,7 +156,7 @@ function main() {
         let controllers = []
 
         xrvp.on('pointerUp', (event) => {
-            console.log("pointerup - VR");
+            console.log("pointerup - VR", event.intersectionData);
             if (event.intersectionData) {
                 if (event.intersectionData.geomItem.hasParameter('LayerName')) {
                     window.newContentRequest(event.intersectionData.geomItem.getParameter('LayerName').getValue())
@@ -499,8 +499,8 @@ function getIntersectionPosition(intersectionData, isInHand) {
 
         //   if (vr) setPointerLength(res)
 
-        //if in hand we must update the scale according to headScale (working in v3, but not v4)
-        planeXfo.sc.set(isInHand ? headScale : 1, isInHand ? headScale : 1, isInHand ? 1 : 1)
+        //if in hand we must update the scale according to headScale
+        planeXfo.sc.set(isInHand ? headScale : 1, isInHand ? headScale : 1, isInHand ? headScale : 1)
 
         const invPlaneXfo = planeXfo.inverse()
         const hitOffset = invPlaneXfo.transformVec3(ray.pointAtDist(res))
