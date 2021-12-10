@@ -1,4 +1,5 @@
 export const pos1 = {
+  "name": "Position 1",
   "id": 2,
   "tr": {
     "x": 13.182031631469727,
@@ -19,6 +20,7 @@ export const pos1 = {
 }
 
 export const pos2 = {
+  "name": "Position 2",
   "id": 3,
   "tr": {
     "x": 5.154091835021973,

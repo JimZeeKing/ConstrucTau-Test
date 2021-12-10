@@ -93,4 +93,23 @@ leftControls.component('tree-list', {
   `,
 })
 
+leftControls.component('positions-list', {
+  props: ['positions'],
+  data() {
+    return {}
+  },
+  methods: {
+    gotoPosition(positionIndex) {
+      window.gotoPosition(positionIndex);
+    }
+  },
+  template: `
+  <ul class='positions-list'>
+    <li @click='gotoPosition(index)' v-for='(position, index) in positions'>
+    {{position.name}}
+    </li>
+  </ul>
+  `,
+})
+
 const leftControlsApp = leftControls.mount('#left-controls')

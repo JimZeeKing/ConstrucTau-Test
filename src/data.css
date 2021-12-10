@@ -1,6 +1,7 @@
 * {
   box-sizing: border-box;
 }
+
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -259,15 +260,23 @@ main {
   border-right: 2px solid #ff0;
   left: 0;
   transition: all 0.5s ease-out;
+  padding: 1em;
 }
 
 .controls.closed {
   left: -250px;
 }
 
+.controls h2 {
+  text-align: center;
+  margin-bottom: 1em;
+  font-weight: bold;
+}
+
 .controls nav {
   position: absolute;
   bottom: 0;
+  left: 0;
   display: flex;
   height: 2em;
   width: 100%;
@@ -278,6 +287,11 @@ main {
   width: 100%;
   border: none;
   border: 2px solid #111;
+}
+
+.controls nav button.active {
+  background-color: #666;
+  color: #fff;
 }
 
 .controls .trigger {
@@ -302,12 +316,23 @@ main {
   color: #fff;
 }
 
+.positions-list li {
+  padding: .25em;
+  cursor: pointer;
+  transition: all .2s ease-out;
+}
+
+.positions-list li:hover {
+  margin-left: 1em;
+}
+
 .tree-list {
   cursor: pointer;
   list-style-type: none;
   padding-left: 1.5em;
   position: relative;
   font-family: Arial, Helvetica, sans-serif;
+  margin: .25em 0;
 }
 
 .tree-list div {
@@ -317,21 +342,26 @@ main {
   height: 10px;
 
   padding: 0;
-  margin-right: 0.2em;
+  margin-right: 0.5em;
+
 }
 
 .tree-list .chevron {
+  display: inline-block;
   transform: rotateZ(-90deg) translateY(-4px);
   background-size: contain;
   transition: all 0.1s ease-out;
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAAA8ElEQVRoge3YOw7CMBBF0bcJLNj/VuiSihQsBwoyTQTE9vxs6V0pEg0zOgRFYIAxxhhjbMoKgDuAZX8duXe12nsB8ADw2q8ngJt2aPTe47AojOneX8O8MaZ7z4Z5YUz31g6zxpjvXRuGybVB91Qp+4zWvYs1RIPpRZxCWm+x5mum3XX1XlCDcUdEYMIQnphwhAcmDWGJSUdImsfkpnyv+S9uzaeafieyMK6IKEwIwhsTipCsMSkIyQqTipC0mCEQUi9mKITU8y9vOITU8r97WIRUcxIyPEL6dzY1DUL6dlo4HUIq+BwSRJ8bM8YYY2zq3kHIKCH7FRG+AAAAAElFTkSuQmCC');
 }
+
 .tree-list .chevron:hover {
   transform: scale(1.5) rotateZ(-90deg) translateY(-3px);
 }
+
 .tree-list .chevron.open:hover {
   transform: scale(1.5) translateX(-3px);
 }
+
 .tree-list .chevron.open {
   transform: rotateZ(0) translateX(-4px);
 }
@@ -356,6 +386,7 @@ main {
 .tree-list span:hover {
   color: #666;
 }
+
 .tree-list span.parentHidden:hover {
   color: #333;
 }
