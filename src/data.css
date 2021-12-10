@@ -1,6 +1,9 @@
 * {
   box-sizing: border-box;
 }
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
 
 .table {
   border: 5px solid #000;
@@ -9,6 +12,7 @@
   width: 80%;
   min-width: 960px;
   font-size: 1em;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .table img {
@@ -109,6 +113,7 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 #test nav {
@@ -247,20 +252,35 @@ main {
 .controls {
   position: fixed;
   z-index: 1000;
-  width: 20%;
+  width: 250px;
+
   height: 100vh;
   background-color: #ccc;
   border-right: 2px solid #ff0;
   left: 0;
-  transition: all .5s ease-out;
+  transition: all 0.5s ease-out;
 }
 
 .controls.closed {
-  left: -20%
+  left: -250px;
 }
 
+.controls nav {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  height: 2em;
+  width: 100%;
+}
 
-.controls button {
+.controls nav button {
+  height: 100%;
+  width: 100%;
+  border: none;
+  border: 2px solid #111;
+}
+
+.controls .trigger {
   font-size: 1em;
   content: 'X';
   position: absolute;
@@ -275,11 +295,11 @@ main {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   cursor: pointer;
-  transition: all .5s ease-out;
+  transition: all 0.5s ease-out;
 }
 
-.controls button:hover {
-  color: #fff
+.controls .trigger:hover {
+  color: #fff;
 }
 
 .tree-list {
@@ -291,7 +311,6 @@ main {
 }
 
 .tree-list div {
-
   display: inline-block;
   top: 0;
   width: 10px;
@@ -299,36 +318,51 @@ main {
 
   padding: 0;
   margin-right: 0.2em;
-
 }
 
 .tree-list .chevron {
-
-  transform: rotateZ(-90deg);
+  transform: rotateZ(-90deg) translateY(-4px);
   background-size: contain;
-  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAAA8ElEQVRoge3YOw7CMBBF0bcJLNj/VuiSihQsBwoyTQTE9vxs6V0pEg0zOgRFYIAxxhhjbMoKgDuAZX8duXe12nsB8ADw2q8ngJt2aPTe47AojOneX8O8MaZ7z4Z5YUz31g6zxpjvXRuGybVB91Qp+4zWvYs1RIPpRZxCWm+x5mum3XX1XlCDcUdEYMIQnphwhAcmDWGJSUdImsfkpnyv+S9uzaeafieyMK6IKEwIwhsTipCsMSkIyQqTipC0mCEQUi9mKITU8y9vOITU8r97WIRUcxIyPEL6dzY1DUL6dlo4HUIq+BwSRJ8bM8YYY2zq3kHIKCH7FRG+AAAAAElFTkSuQmCC");
+  transition: all 0.1s ease-out;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAAA8ElEQVRoge3YOw7CMBBF0bcJLNj/VuiSihQsBwoyTQTE9vxs6V0pEg0zOgRFYIAxxhhjbMoKgDuAZX8duXe12nsB8ADw2q8ngJt2aPTe47AojOneX8O8MaZ7z4Z5YUz31g6zxpjvXRuGybVB91Qp+4zWvYs1RIPpRZxCWm+x5mum3XX1XlCDcUdEYMIQnphwhAcmDWGJSUdImsfkpnyv+S9uzaeafieyMK6IKEwIwhsTipCsMSkIyQqTipC0mCEQUi9mKITU8y9vOITU8r97WIRUcxIyPEL6dzY1DUL6dlo4HUIq+BwSRJ8bM8YYY2zq3kHIKCH7FRG+AAAAAElFTkSuQmCC');
 }
-
+.tree-list .chevron:hover {
+  transform: scale(1.5) rotateZ(-90deg) translateY(-3px);
+}
+.tree-list .chevron.open:hover {
+  transform: scale(1.5) translateX(-3px);
+}
 .tree-list .chevron.open {
-  transform: rotateZ(0);
+  transform: rotateZ(0) translateX(-4px);
 }
 
 .tree-list span.visible {
   text-decoration: none;
+  color: #000;
 }
 
 .tree-list span.parentHidden {
-  opacity: 0.5;
+  font-style: italic;
+  color: #999;
 }
 
 .tree-list span {
   user-select: none;
   text-decoration: line-through;
+  color: #444;
+  transition: all 0.2s ease-out;
+}
+
+.tree-list span:hover {
+  color: #666;
+}
+.tree-list span.parentHidden:hover {
+  color: #333;
 }
 
 .tree-list .tree-list {
   padding-left: 0.5em;
-  border-left: 1px dashed #666;
+  border-left: 1px dashed #999;
 }
 
 .tree-list .hidden {
