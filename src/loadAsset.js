@@ -55,8 +55,14 @@ const loadAsset = (url) => {
       const materials = asset.getMaterialLibrary().getMaterials()
       materials.forEach((material) => {
         material.setShaderName('ConstrucTAOSurfaceShader')
-        const baseColor = material.getParameter('baseColor')
-        // if (baseColor) baseColor.setValue(baseColor.getValue().toGamma());
+        const baseColorParam = material.getParameter('BaseColor')
+        if (baseColorParam) {
+          baseColorParam.setValue(baseColorParam.getValue().toGamma())
+          // const image = baseColorParam.getImage()
+          // if (image) {
+          //   console.log(image)
+          // }
+        }
         // console.log(material.getName(), material.getShaderName());
 
         switch (material.getName()) {
