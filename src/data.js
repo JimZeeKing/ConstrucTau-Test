@@ -229,7 +229,7 @@ function main() {
                 rightController.getTipItem().addChild(pointerUILine, false)
 
 
-
+                rightController.treeItem.setSelectable(false);
 
 
 
@@ -317,11 +317,11 @@ export function goto(posIndex) {
             xfo.sc = new Vec3(pos.sc.x, pos.sc.y, pos.sc.z)
             xrview.setXfo(xfo)
         } else {
-            const xfo = camera.getParameter('LocalXfo').getValue()
+            const xfo = camera.getParameter('GlobalXfo').getValue()
             xfo.ori = new Quat(pos.ori.x, pos.ori.y, pos.ori.z, pos.ori.w)
             xfo.tr = new Vec3(pos.tr.x, pos.tr.y, pos.tr.z)
             xfo.sc = new Vec3(pos.sc.x, pos.sc.y, pos.sc.z)
-            camera.getParameter('LocalXfo').setValue(xfo)
+            camera.getParameter('GlobalXfo').setValue(xfo)
         }
     }
 }
