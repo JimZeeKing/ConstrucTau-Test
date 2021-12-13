@@ -10,10 +10,12 @@ body {
   border: 5px solid #000;
   display: flex;
   flex-direction: column;
-  width: 80%;
-  min-width: 960px;
+
+  width: 800px;
   font-size: 1em;
   font-family: Arial, Helvetica, sans-serif;
+  box-shadow: 0 0 5px #888;
+  transition: opacity 0.2s ease-out;
 }
 
 .table img {
@@ -31,9 +33,23 @@ body {
   color: #fff;
   text-align: center;
   font-size: 2em;
-  padding: 1em;
+  padding: 0.5em;
+  user-select: none;
+  position: relative;
 }
 
+.head button {
+  position: absolute;
+  right: 0.5em;
+  top: 0.5em;
+}
+.head:hover {
+  background-color: #666;
+  cursor: move;
+}
+.table.dragging {
+  opacity: 0.25;
+}
 .row {
   display: flex;
   border-top: 2px solid #fff;
@@ -58,6 +74,16 @@ body {
   min-width: 400px;
 }
 
+.row .cell:hover:first-of-type:not(.cell:last-of-type) {
+  background-color: #111 !important;
+  cursor: pointer;
+}
+
+.row .cell :active {
+  background-color: #fff !important;
+  color: #000 !important;
+}
+
 .cell-hover {
   background-color: #111 !important;
 }
@@ -72,7 +98,6 @@ body {
 }
 
 .table .button {
-  padding: 1em;
   background-color: #666;
 }
 
@@ -317,9 +342,9 @@ main {
 }
 
 .positions-list li {
-  padding: .25em;
+  padding: 0.25em;
   cursor: pointer;
-  transition: all .2s ease-out;
+  transition: all 0.2s ease-out;
 }
 
 .positions-list li:hover {
@@ -327,60 +352,64 @@ main {
 }
 
 .tree-list {
-  cursor: pointer;
   list-style-type: none;
-  padding-left: 1em;
   position: relative;
   font-family: Arial, Helvetica, sans-serif;
-  margin: .25em 0;
+  margin: 0.25em 0;
 }
 
 .tree-list div {
   display: inline-block;
   top: 0;
-  width: 10px;
-  height: 10px;
-
-  padding: 0;
-  margin-right: 0.5em;
-
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
 }
 
 .tree-list .chevron {
   display: inline-block;
-  transform: rotateZ(-90deg) translateY(-4px);
+  transform: rotateZ(-90deg) translateY(1px) translateX(-3px);
   background-size: contain;
   transition: all 0.1s ease-out;
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAAA8ElEQVRoge3YOw7CMBBF0bcJLNj/VuiSihQsBwoyTQTE9vxs6V0pEg0zOgRFYIAxxhhjbMoKgDuAZX8duXe12nsB8ADw2q8ngJt2aPTe47AojOneX8O8MaZ7z4Z5YUz31g6zxpjvXRuGybVB91Qp+4zWvYs1RIPpRZxCWm+x5mum3XX1XlCDcUdEYMIQnphwhAcmDWGJSUdImsfkpnyv+S9uzaeafieyMK6IKEwIwhsTipCsMSkIyQqTipC0mCEQUi9mKITU8y9vOITU8r97WIRUcxIyPEL6dzY1DUL6dlo4HUIq+BwSRJ8bM8YYY2zq3kHIKCH7FRG+AAAAAElFTkSuQmCC');
 }
 
 .tree-list .chevron:hover {
-  transform: scale(1.5) rotateZ(-90deg) translateY(-3px);
+  transform: scale(0.9) rotateZ(-90deg) translateY(1px) translateX(-3px);
 }
 
 .tree-list .chevron.open:hover {
-  transform: scale(1.5) translateX(-3px);
+  transform: scale(0.9) translateX(1px) translateY(3px);
 }
 
 .tree-list .chevron.open {
-  transform: rotateZ(0) translateX(-4px);
+  transform: scale(1) rotateZ(0) translateX(1px) translateY(3px);
 }
 
-.tree-list span.visible {
+.tree-list.visible span {
   text-decoration: none;
   color: #000;
 }
 
-.tree-list span.parentHidden {
+.tree-list.invisible span {
   font-style: italic;
   color: #999;
 }
 
+.tree-list span.item-visible {
+  text-decoration: initial;
+  font-weight: bold;
+}
+.tree-list span.item-invisible {
+  text-decoration: line-through;
+  font-weight: normal;
+}
+
 .tree-list span {
   user-select: none;
-  text-decoration: line-through;
-  color: #444;
+  cursor: pointer;
   transition: all 0.2s ease-out;
+  padding-left: 0.2em;
 }
 
 .tree-list span:hover {
@@ -392,7 +421,7 @@ main {
 }
 
 .tree-list .tree-list {
-  padding-left: 0.5em;
+  margin-left: 0.5em;
   border-left: 1px dashed #999;
 }
 

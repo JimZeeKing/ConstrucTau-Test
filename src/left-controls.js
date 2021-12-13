@@ -22,6 +22,7 @@ leftControls.component('tree-list', {
   },
   methods: {
     toggle(container, event) {
+      console.log(container)
       const chevron = event.currentTarget
       const containerItem = document.querySelector(`.${container}`)
       const itemsToToggle = containerItem.querySelectorAll('ul')
@@ -29,21 +30,33 @@ leftControls.component('tree-list', {
         itemToToggle.classList.toggle('hidden')
       })
 
-      if (chevron.classList.toggle('open')) {
-      }
+      containerItem.classList.toggle('hidden')
+      chevron.classList.toggle('open')
     },
     getParentList(startingNode) {
       let parentList = startingNode.parentNode
-      while (!(parentList instanceof HTMLUListElement)) {
+
+      if (parentList == null) {
+        return parentList
+      }
+      while (parentList && !(parentList instanceof HTMLUListElement)) {
         parentList = parentList.parentNode
       }
       return parentList
     },
-    toggleVisibility(item, children, event) {
+
+    toggleVisibility(item, children, listName, event) {
       item.shouldBeVisible = !item.shouldBeVisible
       const element = event.currentTarget
-      element.classList.toggle('visible')
-      element.classList.toggle('invisible')
+
+      let parentList = document.querySelector(`.list_${listName}`)
+
+      element.classList.toggle('item-visible')
+      element.classList.toggle('item-invisible')
+      if (parentList) {
+        parentList.classList.toggle('visible')
+        parentList.classList.toggle('invisible')
+      }
 
       const childrenToKeepHidden = []
       if (item.shouldBeVisible && children) {
@@ -59,35 +72,16 @@ leftControls.component('tree-list', {
       childrenToKeepHidden.forEach((child) => {
         child.item.setVisible(false)
       })
-
-      let parentList = this.getParentList(element)
-      const allChildElements = parentList.querySelectorAll('span')
-      allChildElements.forEach((span, index) => {
-        if (index > 0) {
-          if (!item.isVisible()) {
-            span.classList.add('parentHidden')
-          } else {
-            span.classList.remove('parentHidden')
-          }
-        }
-      })
-      const allInvisible = parentList.querySelectorAll('span.invisible')
-      allInvisible.forEach((span) => {
-        const spanParent = this.getParentList(span)
-        spanParent.querySelectorAll('span').forEach((spanTohide, index) => {
-          if (index > 0) {
-            spanTohide.classList.add('parentHidden')
-          }
-        })
-      })
     },
   },
   template: `
-  <ul :class='"list_"+level' class='tree-list'>
-    <li>
-    <div :class='[{chevron:children},"open"]' @click='toggle("list_"+level, $event)'></div>
-      <span @click='toggleVisibility(item, children, $event)' class='visible' >{{name}}</span>
-      <tree-list :level='parseInt(level) + 1 + "i" + index' v-for='(child, index) in children' :children='child.children' :item='child.item' :name='child.name' :key='index'></tree-list>
+  <ul :class='"list_"+level' class='tree-list visible'>
+    <li v-for='(child, index) in children'>
+    <div  :class='[{chevron:child.children},"open"]' @click='toggle("list_"+(parseInt(level) + 1) + "i" + index, $event)'></div>
+      <span @click='toggleVisibility(child.item, child.children,parseInt(level) + 1 + "i" + index, $event)' class='item-visible' >{{child.name}}</span>
+      <template v-if="child.children">
+        <tree-list :level='parseInt(level) + 1 + "i" + index'  :children='child.children' :item='child.item' :name='child.name' :key='child.name'></tree-list>
+      </template>    
     </li>
   </ul>
   `,
@@ -100,8 +94,8 @@ leftControls.component('positions-list', {
   },
   methods: {
     gotoPosition(positionIndex) {
-      window.gotoPosition(positionIndex);
-    }
+      window.gotoPosition(positionIndex)
+    },
   },
   template: `
   <ul class='positions-list'>
