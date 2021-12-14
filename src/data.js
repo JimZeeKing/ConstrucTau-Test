@@ -4,8 +4,8 @@ import loadAsset from './loadAsset.js'
 import { positions } from './positions.js'
 
 // Zea Engine dependencies stored in new const variables. View the API to see what you can include and use.
-const { Scene, GLRenderer, Vec3, Color, Xfo, Ray, Label, DataImage, EnvMap, TreeItem, GeomItem, Plane, Material, VRViewManipulator, Lines, Quat } = window.zeaEngine
-
+const { Scene, GLRenderer, Vec3, Color, Xfo, Ray, Label, DataImage, EnvMap, TreeItem, GeomItem, Plane, Material, Lines, Quat } = window.zeaEngine
+const { CADBody } = zeaCad
 class DomTree extends GeomItem {
     /**
      * The onVRPoseChanged method.
@@ -53,7 +53,7 @@ export function prepare(readyCb) {
     main()
 }
 
-let billboardTree, camera, renderer, headScale, sceneScale, pointerUILine, pointerUIXfo, vr, leftController, xrview
+let billboardTree, camera, renderer, headScale, sceneScale, pointerUILine, pointerUIXfo, vr, leftController, xrview, contentHighlitedItem;
 const initState = new Map()
 
 function main() {
@@ -108,21 +108,44 @@ function main() {
     // Setup TreeView Display
     //const treeElement = document.getElementById('tree')
     //treeElement.setTreeItem(scene.getRoot(), selectionManager)
+    const highlightColor = new Color('#2a9d8f')
+    highlightColor.a = 0.1
+    const highlightColorContent = new Color('#ff0000')
+    highlightColorContent.a = 0.1
+    const filterItem = (item) => {
+        while (item && !(item instanceof CADBody)) item = item.getOwner()
+        return item
+    }
+
+    let highlightedItem
+    scene.getRoot().on('pointerEnter', (event) => {
+        highlightedItem = filterItem(event.intersectionData.geomItem)
+        event.intersectionData.geomItem.addHighlight('pointerOverGeom', highlightColor, true)
+    })
+    scene.getRoot().on('pointerLeave', (event) => {
+        event.leftGeometry.removeHighlight('pointerOverGeom', true)
+        highlightedItem = null
+    })
+
 
     //new content from geom click
     renderer.getViewport().on('pointerUp', (event) => {
         if (event.intersectionData) {
             if (event.intersectionData.geomItem.hasParameter('LayerName')) {
+                unhighlightContentItem();
+                contentHighlitedItem = event.intersectionData.geomItem;
+                event.intersectionData.geomItem.addHighlight('selection', highlightColorContent, true)
+                console.log(event.intersectionData.geomItem.getParameter('LayerName').getValue());
                 window.newContentRequest(event.intersectionData.geomItem.getParameter('LayerName').getValue(), event)
             }
         }
     })
 
-    let highlightedItem
+    /*let highlightedItem
     const highlightColor = new Color('#F9CE03')
     highlightColor.a = 0.1
 
-    /*  renderer.getViewport().on('pointerOverGeom', (event) => {
+      renderer.getViewport().on('pointerOverGeom', (event) => {
               // highlightedItem = filterItem(event.intersectionData.geomItem);
               event.intersectionData.geomItem.addHighlight('pointerOverGeom', highlightColor, true)
           })
@@ -284,7 +307,7 @@ function main() {
            }*/
 
     //loading the file
-    loadAsset('./data/data.skp.zcad').then((data) => {
+    loadAsset('./data/maison.skp.zcad').then((data) => {
         scene.getRoot().addChild(data.asset)
         const geomItems = [];
         data.layersRoot.traverse((geomItem) => {
@@ -316,6 +339,12 @@ export function saveCamLocal() {
     const pos = { id: id, tr: xfo.tr, ori: xfo.ori, sc: xfo.sc }
     console.log(pos, JSON.stringify(pos))
     scenePositions.push(JSON.stringify(pos))
+}
+
+export function unhighlightContentItem() {
+    if (contentHighlitedItem) {
+        contentHighlitedItem = contentHighlitedItem.removeHighlight('selection', true)
+    };
 }
 
 export function goto(posIndex) {
