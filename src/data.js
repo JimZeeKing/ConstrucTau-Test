@@ -120,10 +120,10 @@ function main() {
     let highlightedItem
     scene.getRoot().on('pointerEnter', (event) => {
         highlightedItem = filterItem(event.intersectionData.geomItem)
-        event.intersectionData.geomItem.addHighlight('pointerOverGeom', highlightColor, true)
+        highlightedItem.addHighlight('pointerOverGeom', highlightColor, true)
     })
     scene.getRoot().on('pointerLeave', (event) => {
-        event.leftGeometry.removeHighlight('pointerOverGeom', true)
+        highlightedItem.removeHighlight('pointerOverGeom', true)
         highlightedItem = null
     })
 
@@ -133,8 +133,8 @@ function main() {
         if (event.intersectionData) {
             if (event.intersectionData.geomItem.hasParameter('LayerName')) {
                 unhighlightContentItem();
-                contentHighlitedItem = event.intersectionData.geomItem;
-                event.intersectionData.geomItem.addHighlight('selection', highlightColorContent, true)
+                contentHighlitedItem = filterItem(event.intersectionData.geomItem);
+                contentHighlitedItem.addHighlight('selection', highlightColorContent, true)
                 console.log(event.intersectionData.geomItem.getParameter('LayerName').getValue());
                 window.newContentRequest(event.intersectionData.geomItem.getParameter('LayerName').getValue(), event)
             }

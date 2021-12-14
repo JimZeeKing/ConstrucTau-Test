@@ -11,6 +11,7 @@
 
   <link rel="stylesheet" href="./src/styles.css" />
   <link rel="stylesheet" href="./src/data.css" />
+  <link rel="stylesheet" href="./src/quiz.css" />
   <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/src/dom-to-image-more.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
 
@@ -32,15 +33,21 @@
 
       <h2>{{pages[currentPage].title}}</h2>
 
-      <tree-list v-show="currentPage == 0" :children="tree" :item="tree.item" :name="tree.name" level="0i0" :visible="true"></tree-list>
+      <tree-list v-show="currentPage == 0" :children="tree" :item="tree.item" :name="tree.name" level="0i0"
+        :visible="true"></tree-list>
 
       <positions-list :positions="positions" v-show="currentPage == 1"> </positions-list>
 
       <nav>
-        <button :class="{active:currentPage==index}" @click="currentPage = index" v-for="(page,index) in pages" :key="index">{{page.title}}</button>
+        <button :class="{active:currentPage==index}" @click="currentPage = index" v-for="(page,index) in pages"
+          :key="index">{{page.title}}</button>
       </nav>
       <div class="controls-options"><button onclick="window.resetScene()">Réinitialiser la scène</button></div>
     </aside>
+
+
+    <quiz></quiz>
+
   </div>
 
   <main>
@@ -60,9 +67,12 @@
       <p class="infos">Ceci est un exemple de quiz intégré au VR</p>
 
       <section>
-        <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
-        <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
-        <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
+        <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+          data-active-group="g1" data-label="Radio 1"></div>
+        <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+          data-active-group="g1" data-label="Radio 2"></div>
+        <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio"
+          data-active-group="g1" data-label="Radio 3"></div>
       </section>
     </section>
 
@@ -83,9 +93,12 @@
     </section>
 
     <nav>
-      <button class="menu-active" data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page1')">Quiz</button>
-      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page2')">Éléments</button>
-      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page3')">Scène</button>
+      <button class="menu-active" data-mapping data-down-class="btn-click" data-hover-class="btn-hover"
+        data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page1')">Quiz</button>
+      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active"
+        data-active-group="menu" onclick="goToPage('page2')">Éléments</button>
+      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active"
+        data-active-group="menu" onclick="goToPage('page3')">Scène</button>
     </nav>
   </div>
 
