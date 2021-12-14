@@ -131,7 +131,7 @@ export default function init() {
     //   console.log('VR Rendering', event.viewXfo.toString())
     // })
 
-    xrvp.on('pointerUp', (event) => {
+    xrvp.on('pointerDown', (event) => {
       const { intersectionData } = event
       if (intersectionData && intersectionData.geomItem.hasParameter('LayerName')) {
         displayBillboardOnClick(intersectionData, labelsData, billboards)
@@ -202,7 +202,7 @@ export default function init() {
 
   // //////////////////////////
   // Load the Asset
-  loadAsset('./data/Projet construcTAU-4-10-21-2020.skp/Projet construcTAU-4-10-21-2020.skp.zcad').then((data) => {
+  loadAsset('./data/data.skp.zcad').then((data) => {
     scene.getRoot().addChild(data.asset)
     scene.getRoot().addChild(data.layersRoot)
     renderer.frameAll()
