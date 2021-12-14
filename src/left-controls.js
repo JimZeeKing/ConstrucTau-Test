@@ -62,7 +62,6 @@ leftControls.component('tree-list', {
   },
   methods: {
     toggle(container, event) {
-      console.log(container)
       const chevron = event.currentTarget
       const containerItem = document.querySelector(`.${container}`)
       const itemsToToggle = containerItem.querySelectorAll('ul')
