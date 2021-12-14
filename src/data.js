@@ -141,6 +141,8 @@ function main() {
         }
     })
 
+
+
     /*let highlightedItem
     const highlightColor = new Color('#F9CE03')
     highlightColor.a = 0.1
@@ -155,6 +157,23 @@ function main() {
           })*/
     renderer.getViewport().on('viewChanged', (event) => {
         //making sure render state are reseted
+
+
+        if (contentHighlitedItem) {
+            const viewMatrix = renderer.getViewport().__viewMat
+            const projMatrix = renderer.getViewport().__projectionMatrix
+
+            const worldSpacePos = new Vec3(0, 0, 0);
+            const viewProjMatrix = projMatrix.multiply(viewMatrix)
+            //const ndc = viewProjMatrix.xyz / viewProjMatrix.w;
+            const posScreenSpace = viewProjMatrix.transformVec3(worldSpacePos);
+            console.log(posScreenSpace.x / 11.22, posScreenSpace.y / 11.22);
+            const pos2D = [((posScreenSpace.x * 0.5 + 0.5) / 7.5) * renderer.getViewport().getWidth(), (posScreenSpace.y * 0.5 + 0.5) * renderer.getViewport().getHeight()]
+            console.log(pos2D);
+        };
+
+
+
         activeBillboard.forEach((billboard, key, map) => {
             billboard.mapper.resetLastElement()
         })
@@ -180,7 +199,8 @@ function main() {
         let controllers = []
 
         xrvp.on('pointerUp', (event) => {
-            console.log('pointerup - VR', event.intersectionData)
+            console.log('pointerup - VR', event.intersectionData)//here !
+
             if (event.intersectionData) {
                 if (event.intersectionData.geomItem.hasParameter('LayerName')) {
                     window.newContentRequest(event.intersectionData.geomItem.getParameter('LayerName').getValue(), event)
