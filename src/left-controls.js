@@ -9,6 +9,46 @@ const LeftControls = {
         name: '',
         geomitems: [],
       },
+      fetching: false,
+      quizAPI: {
+        get: 'http://localhost:3000/quiz/nocred/',
+        save: 'http://localhost:3000/quiz/save/',
+        /*save: "https://tim.cgmatane.qc.ca:3000/quiz/save",
+        get: "https://tim.cgmatane.qc.ca:3000/quiz/nocred/"*/
+      },
+      quiz: {},
+    }
+  },
+  methods: {
+    fetchQuizData(quizID) {
+      console.log(this.quizAPI.get + quizID)
+      this.fetching = true
+      fetch(this.quizAPI.get + quizID, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((response) => {
+          return response.json()
+        })
+        .then((json) => {
+          if (json.error) {
+            alert(123)
+          } else {
+            json.currentQuestionIndex = 0
+            this.quiz = json
+          }
+          this.fetching = false
+        })
+    },
+  },
+  created() {
+    const params = new URLSearchParams(window.location.search)
+    if (params.has('quiz')) {
+      const quizID = params.get('quiz')
+      this.fetchQuizData(quizID)
     }
   },
 }
