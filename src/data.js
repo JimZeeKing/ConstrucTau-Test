@@ -162,13 +162,11 @@ function main() {
         if (contentHighlitedItem) {
             const viewMatrix = renderer.getViewport().__viewMat
             const projMatrix = renderer.getViewport().__projectionMatrix
-
-            const worldSpacePos = new Vec3(0, 0, 0);
-            const viewProjMatrix = projMatrix.multiply(viewMatrix)
-            //const ndc = viewProjMatrix.xyz / viewProjMatrix.w;
+            const worldSpacePos = new Vec3(0, 0, 0);//center of scene
+            const viewProjMatrix = viewMatrix.multiply(projMatrix)
             const posScreenSpace = viewProjMatrix.transformVec3(worldSpacePos);
-            console.log(posScreenSpace.x / 11.22, posScreenSpace.y / 11.22);
-            const pos2D = [((posScreenSpace.x * 0.5 + 0.5) / 7.5) * renderer.getViewport().getWidth(), (posScreenSpace.y * 0.5 + 0.5) * renderer.getViewport().getHeight()]
+            console.log(posScreenSpace.x, posScreenSpace.y);
+            const pos2D = [((posScreenSpace.x * 0.5 + 0.5)) * renderer.getViewport().getWidth(), (posScreenSpace.y * 0.5 + 0.5) * renderer.getViewport().getHeight()]
             console.log(pos2D);
         };
 
