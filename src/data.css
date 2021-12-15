@@ -57,7 +57,7 @@ body {
   border: none;
   background-color: transparent;
 
-  background-image: url("data:image/png; base64, iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAABv0lEQVRoge2YPU7DQBBGZ6gRLeIERBGX4KeDiLPAGQBRUQXOgQSUBA5AGSFxARRT4vSPIo4U1kuw9y8G7auilWfzvWy8O7ZIJpNxAjgGnoEpq2cKPAGDthKXKw6+jHNbZrWthIjcuq1jMgaqer84sGa56CRRGB9OzQHbipQisp4kjjulqm4sDthESJfHHVX9lt321/qTZJGukUW6RgiRGxEpPOqLao6wtGwXhlVNH5g4tBsToF/NMWxTGFqkAHaqum3g3bG217I2uIgZqKmMlwTEETGD/SbjLQHxRMyAP8kEkYC4ImZQUyaYBMQXMQPPZYJKQF0kVvdbiMieqr5Sba8Ln0cisun7BWb3G7ON/xCRfVUdV/P2ZCaxFWLyVbbxUZ9zYokUIrKrqmNmp35fVd9E5ED82pnm+N6E2G9snw7ASmyRZbtTUJmYIk222GAysUTanBNBZGKIuBx23jKhRXxObC+Z0CL/5sEK4Bo3iTmTao5WmLnzm8aukUW6RhbpGjaRafIU7fk0B2wiLwmC+FLLaBO5ShDEl1rGmoiq3onIRZI4bpyp6kPjq4EjYASUHu1HKErgETiM+ANlMv+aL1wTNja2EnlpAAAAAElFTkSuQmCC");
+  background-image: url('data:image/png; base64, iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAABmJLR0QA/wD/AP+gvaeTAAABv0lEQVRoge2YPU7DQBBGZ6gRLeIERBGX4KeDiLPAGQBRUQXOgQSUBA5AGSFxARRT4vSPIo4U1kuw9y8G7auilWfzvWy8O7ZIJpNxAjgGnoEpq2cKPAGDthKXKw6+jHNbZrWthIjcuq1jMgaqer84sGa56CRRGB9OzQHbipQisp4kjjulqm4sDthESJfHHVX9lt321/qTZJGukUW6RgiRGxEpPOqLao6wtGwXhlVNH5g4tBsToF/NMWxTGFqkAHaqum3g3bG217I2uIgZqKmMlwTEETGD/SbjLQHxRMyAP8kEkYC4ImZQUyaYBMQXMQPPZYJKQF0kVvdbiMieqr5Sba8Ln0cisun7BWb3G7ON/xCRfVUdV/P2ZCaxFWLyVbbxUZ9zYokUIrKrqmNmp35fVd9E5ED82pnm+N6E2G9snw7ASmyRZbtTUJmYIk222GAysUTanBNBZGKIuBx23jKhRXxObC+Z0CL/5sEK4Bo3iTmTao5WmLnzm8aukUW6RhbpGjaRafIU7fk0B2wiLwmC+FLLaBO5ShDEl1rGmoiq3onIRZI4bpyp6kPjq4EjYASUHu1HKErgETiM+ANlMv+aL1wTNja2EnlpAAAAAElFTkSuQmCC');
 }
 
 .head .button:hover {
@@ -67,11 +67,10 @@ body {
 .head:hover {
   background-color: var(--sec-color);
   cursor: move;
-
 }
 
 .table.dragging {
-  opacity: .9;
+  opacity: 0.9;
   border: 5px solid var(--sec-color);
 }
 
@@ -122,8 +121,6 @@ body {
   border: none;
 }
 
-
-
 .table .button-down {
   background-color: #fff;
 }
@@ -143,21 +140,17 @@ body {
   left: 0;
   top: 0;
   pointer-events: none;
-
 }
 
 .content-window-line-container.hidden {
   display: none;
-
 }
 
 .content-window-line-container .content-window-line {
   stroke-width: 5;
   stroke-linecap: round;
   stroke: #000;
-  ;
 }
-
 
 .container {
   display: block;
@@ -328,7 +321,7 @@ main {
   color: #fff;
   height: 100vh;
   background-color: var(--main-color);
-  border-right: 2px solid var(--sec-color);
+  border-right: 3px solid var(--sec-color);
   left: 0;
   transition: all 0.5s ease-out;
   padding: 1em;
@@ -353,7 +346,6 @@ main {
   width: 100%;
   display: flex;
 }
-
 
 .controls .controls-options button {
   width: 100%;
@@ -402,11 +394,11 @@ main {
   border-color: var(--sec-color);
   border-style: solid;
   border-left: none;
+  border-width: 3px;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   cursor: pointer;
   transition: all 0.5s ease-out;
-
 }
 
 .controls .trigger .icon {
@@ -448,9 +440,8 @@ main {
   max-height: calc(100% - 10em);
 }
 
-
 .tree-list.list_0i0::-webkit-scrollbar {
-  width: .7em;
+  width: 0.7em;
 }
 
 .tree-list.list_0i0::-webkit-scrollbar-track {
@@ -460,8 +451,6 @@ main {
 
 .tree-list.list_0i0::-webkit-scrollbar-thumb {
   background-color: var(--sec-color);
-
-
 }
 
 .tree-list {
@@ -469,7 +458,7 @@ main {
   position: relative;
   font-family: Arial, Helvetica, sans-serif;
   margin: 0.25em 0;
-  font-size: .9em;
+  font-size: 0.9em;
 }
 
 .tree-list div {
@@ -478,9 +467,7 @@ main {
   width: 15px;
   height: 15px;
   cursor: pointer;
-
 }
-
 
 .tree-list .chevron {
   display: inline-block;

@@ -2,21 +2,17 @@ const LeftControls = {
   data() {
     return {
       closed: true,
+      quizReady: false,
       currentPage: 0,
       pages: [{ title: 'Éléments' }, { title: 'Positions' }],
       positions: [],
       tree: {
         name: '',
         geomitems: [],
-      }
-
+      },
     }
   },
-  methods: {
-
-  },
-
-
+  methods: {},
 }
 
 const leftControls = Vue.createApp(LeftControls)
@@ -95,9 +91,7 @@ leftControls.component('tree-list', {
 leftControls.component('positions-list', {
   props: ['positions'],
   data() {
-    return {
-
-    }
+    return {}
   },
   methods: {
     gotoPosition(positionIndex) {
@@ -113,221 +107,212 @@ leftControls.component('positions-list', {
   `,
 })
 
-
 leftControls.component('quiz', {
   data() {
     return {
       fetching: false,
+
       quizAPI: {
         /*  get: 'http://localhost:3000/quiz/nocred/',
           save: 'http://localhost:3000/quiz/save/',*/
-        save: "https://tim.cgmatane.qc.ca:3000/quiz/save",
-        get: "https://tim.cgmatane.qc.ca:3000/quiz/nocred/"
+        save: 'https://tim.cgmatane.qc.ca:3000/quiz/save',
+        get: 'https://tim.cgmatane.qc.ca:3000/quiz/nocred/',
       },
       quiz: null,
       saved: false,
       shouldEnterInfos: false,
       shouldSeeAnswers: false,
+      shouldAppear: false,
       user: {
-        firstname: "",
-        lastname: ""
+        firstname: '',
+        lastname: '',
       },
-      savedAnswers: []
+      savedAnswers: [],
     }
   },
   methods: {
     saveLocalData(key, data) {
-      localStorage.setItem(key, JSON.stringify(data));
+      localStorage.setItem(key, JSON.stringify(data))
     },
     loadLocalData(key) {
-      return JSON.parse(localStorage.getItem(key));
+      return JSON.parse(localStorage.getItem(key))
     },
     clearLocalData() {
-      localStorage.clear();
+      localStorage.clear()
     },
     setAnswer: function (question, answer) {
-      question.userans = answer;
-      question.dirty = true;
-      this.saveLocalData("quiz", this.quiz);
+      question.userans = answer
+      question.dirty = true
+      this.saveLocalData('quiz', this.quiz)
     },
     setAnswerMultiple: function (question, answer) {
-      const foundChoiceIndex = question.userans.indexOf ? question.userans.indexOf(answer) : -1;
+      const foundChoiceIndex = question.userans.indexOf ? question.userans.indexOf(answer) : -1
 
       if (question.userans == -1) {
-        question.userans = [answer];
-      }
-      else if (foundChoiceIndex == -1) {
-        question.userans.push(answer);
+        question.userans = [answer]
+      } else if (foundChoiceIndex == -1) {
+        question.userans.push(answer)
       } else {
-        question.userans.splice(foundChoiceIndex, 1);
+        question.userans.splice(foundChoiceIndex, 1)
       }
-      question.dirty = question.userans.length > 0;
+      question.dirty = question.userans.length > 0
 
-      this.saveLocalData("quiz", this.quiz);
-
+      this.saveLocalData('quiz', this.quiz)
     },
     checkMultipleExist(question, answer) {
-      return question.userans.includes ? question.userans.includes(answer) : false;
+      return question.userans.includes ? question.userans.includes(answer) : false
     },
     grabOpenAnswer(question, event) {
-      const value = event.target.value;
-      if (value != "") {
+      const value = event.target.value
+      if (value != '') {
         this.setAnswer(question, value)
-      } else question.dirty = false;
+      } else question.dirty = false
     },
     radioButtonName(index, prefix) {
-      return prefix + index;
+      return prefix + index
     },
     saveQuizData() {
       if (this.quiz.isSom) {
         this.quiz.questions.map((question, index) => {
-          this.savedAnswers.push({ index: index, good: question.ans == question.userans, ans: question.userans });
+          this.savedAnswers.push({ index: index, good: question.ans == question.userans, ans: question.userans })
         })
-        this.shouldEnterInfos = true;
-      } else this.showQuizData();
-
+        this.shouldEnterInfos = true
+      } else this.showQuizData()
     },
     getPreviousQuestion() {
-      this.quiz.currentQuestionIndex--;
+      this.quiz.currentQuestionIndex--
     },
     getNextQuestion() {
-      this.quiz.currentQuestionIndex++;
+      this.quiz.currentQuestionIndex++
     },
     fullImagePath(src) {
-      return this.quizAPI.images + src;
+      return this.quizAPI.images + src
     },
     currentImageAnswer(question, src) {
-      return question.userans == src;
+      return question.userans == src
     },
     sendQuizData() {
-
       const data = { user: this.user, answers: this.savedAnswers, quizID: this.quiz.id }
       fetch(this.quizAPI.save, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify(data),
         headers: {
-          "Content-Type": "application/json"
-        }
-      }).then((response) => {
-        if (response.status == 200) {
-          return response.json();
-        } else return null;
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((response) => {
+          if (response.status == 200) {
+            return response.json()
+          } else return null
+        })
+        .then((json) => {
+          if (json != null) {
+            this.user.firstname = ''
+            this.user.lastname = ''
+            this.saved = true
+            this.savedAnswers = []
 
-      }).then((json) => {
-        if (json != null) {
-
-          this.user.firstname = "";
-          this.user.lastname = "";
-          this.saved = true;
-          this.savedAnswers = [];
-
-          this.clearLocalData();
-
-        }
-      });
+            this.clearLocalData()
+          }
+        })
     },
 
     showQuizData() {
-      this.savedAnswers = [];
+      this.savedAnswers = []
       this.quiz.questions.map((question, index) => {
         switch (question.type) {
           case 'choicesm':
-            let good = question.userans.length == question.ans.length;
+            let good = question.userans.length == question.ans.length
             if (good)
               for (var i = 0; i < question.ans.length; i++) {
                 if (!question.userans.includes(question.ans[i])) {
-                  good = false;
+                  good = false
                   break
-                };
-              };
+                }
+              }
 
-            this.savedAnswers.push({ index: index, good: good, ans: question.userans, type: question.type });
-            break;
+            this.savedAnswers.push({ index: index, good: good, ans: question.userans, type: question.type })
+            break
 
           case 'open':
-
-            this.savedAnswers.push({ index: index, good: question.choices.indexOf(question.userans) != -1, ans: question.userans, type: question.type, goodAnswers: question.choices });
-            break;
+            this.savedAnswers.push({ index: index, good: question.choices.indexOf(question.userans) != -1, ans: question.userans, type: question.type, goodAnswers: question.choices })
+            break
 
           default:
-            this.savedAnswers.push({ index: index, good: question.ans == question.userans, ans: question.userans, type: question.type });
-            break;
+            this.savedAnswers.push({ index: index, good: question.ans == question.userans, ans: question.userans, type: question.type })
+            break
         }
-
       })
-      this.shouldSeeAnswers = true;
+      this.shouldSeeAnswers = true
     },
     fetchQuizData(quizID) {
-
-      console.log(this.quizAPI.get + quizID);
+      console.log(this.quizAPI.get + quizID)
 
       fetch(this.quizAPI.get + quizID, {
-        method: "GET",
+        method: 'GET',
         mode: 'cors',
         headers: {
-          "Content-Type": "application/json"
-        }
-      }).then((response) => {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((response) => {
+          return response.json()
+        })
+        .then((json) => {
+          if (json.error) {
+            alert('ERROR')
+          } else {
+            json.currentQuestionIndex = 0
 
-        return response.json();
+            this.quiz = json
 
-
-      }).then((json) => {
-        if (json.error) {
-          alert('ERROR');
-        } else {
-          json.currentQuestionIndex = 0;
-          console.log(json);
-
-          this.quiz = json;
-
-          console.log(json);
-          const localData = this.loadLocalData("quiz");
-          if (localData && localData.id == this.quiz.id) {
-            this.quiz.questions = localData.questions;
-          };
-        }
-        this.isFetching = false;
-      });
+            console.log(this.quiz)
+            /* const localData = this.loadLocalData('quiz')
+            if (localData && localData.id == this.quiz.id) {
+              this.quiz.questions = localData.questions
+            }*/
+          }
+          this.isFetching = false
+        })
     },
     gotToQuestion(index, closeAnswers) {
-
       if (closeAnswers) {
-        this.shouldSeeAnswers = false;
-      };
-      this.quiz.currentQuestionIndex = index;
-
-
-    }
+        this.shouldSeeAnswers = false
+        this.shouldAppear = true
+      }
+      this.quiz.currentQuestionIndex = index
+    },
   },
   computed: {
     allDirty() {
-      return this.quiz.questions.filter((question) => {
-        return question.dirty == true;
-      }).length == this.quiz.questions.length;
+      return (
+        this.quiz.questions.filter((question) => {
+          return question.dirty == true
+        }).length == this.quiz.questions.length
+      )
     },
     getCurrentQuestion() {
       return this.quiz.questions.filter((question, index) => {
-        return index == this.quiz.currentQuestionIndex;
-      });
+        return index == this.quiz.currentQuestionIndex
+      })
     },
     hasPreviousQuestion() {
       return this.quiz.currentQuestionIndex > 0
     },
     hasNextQuestion() {
-      return this.quiz.currentQuestionIndex < this.quiz.questions.length - 1;
+      return this.quiz.currentQuestionIndex < this.quiz.questions.length - 1
     },
     submitLabel() {
-      return this.allDirty ? this.quiz.isSom ? "Soumettre le quiz" : "Voir les résultats" : "Quiz non complété"
+      return this.allDirty ? (this.quiz.isSom ? 'Soumettre le quiz' : 'Voir les résultats') : 'Quiz non complété'
     },
     APIMessage() {
-      return false;
+      return false
     },
     goodAnswersCount() {
       return this.savedAnswers.filter((savedAnswer) => {
-        return savedAnswer.good;
-      }).length;
-    }
+        return savedAnswer.good
+      }).length
+    },
   },
   created() {
     const params = new URLSearchParams(window.location.search)
@@ -337,8 +322,10 @@ leftControls.component('quiz', {
     }
   },
   template: `
-  <div class="quiz" v-if="quiz != null" :class="{active:!shouldEnterInfos && !shouldSeeAnswers}">
-
+  <div class="quiz" v-if="quiz != null" :class="{active:(shouldAppear && !shouldEnterInfos && !shouldSeeAnswers)}">
+  <div class="trigger" @click="shouldEnterInfos || shouldSeeAnswers ? null : shouldAppear = !shouldAppear" :title="!shouldAppear ? 'Afficher le quiz':'Cacher le quiz'">
+  <div class="icon"></div>
+</div>
       <h2>{{quiz.title}}</h2>
       <div class="quiz-infos" :class="{hidden:!shouldEnterInfos}">
         <h3>Transmission des réponses<button title="fermer la fenêtre" class="close-button" v-if="!saved"

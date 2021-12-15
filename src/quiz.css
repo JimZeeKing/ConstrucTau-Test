@@ -1,17 +1,56 @@
-
-
 * {
   box-sizing: border-box;
 }
 
+.quiz .trigger {
+  font-size: 1em;
+  content: 'X';
+  position: absolute;
+  left: -3em;
+  top: 1em;
+  width: 3em;
+  height: 3em;
+  background-color: var(--main-color);
+  border-color: var(--sec-color);
+  border-style: solid;
+  border-right: none;
+  border-width: 3px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  cursor: pointer;
+  transition: all 0.5s ease-out;
+}
 
+.quiz .trigger .icon {
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAYAAACpSkzOAAAABmJLR0QA/wD/AP+gvaeTAAAAgElEQVRIie3RTQqAIBCGYe+Txylc1GFadueCt02ChH+D2qb5doIfDzNjjEbzvwDT8A6wAxewCToLcAKHBPGpwgLEJ48B9lXgebtMxyU6toTNkWJ0ssgk/u9a2kI11ozUYN2QAEvtX3THlsn6TCLA+iEZrD8SwcYhAeaaD6/RfJIb4/y0+CfpwpYAAAAASUVORK5CYII=');
+  transition: all 0.2s ease-out;
+
+  background-repeat: no-repeat;
+  background-position: center center;
+  transform: rotateZ(-90deg);
+  margin: 0;
+}
+
+.quiz:not(.active) .trigger .icon {
+  transform: rotateZ(90deg) translateY(5px);
+}
+
+.quiz .trigger:hover .icon {
+  transform: rotateZ(-90deg) translateY(5px);
+}
+
+.quiz:not(.active) .trigger:hover .icon {
+  transform: rotateZ(90deg) translateY(10px);
+}
 
 .quiz-infos {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border: 3px solid #2A9D8F;
+  border: 3px solid #2a9d8f;
   z-index: 99999;
   min-height: 200px;
   width: 600px;
@@ -22,12 +61,12 @@
 
 .quiz-infos .message {
   text-align: center;
-  color: #E9C46A;
+  color: #e9c46a;
 }
 
 .quiz-infos.error h3 {
   color: #fcfcfc;
-  background-color: #E76F51;
+  background-color: #e76f51;
   margin: 0 0 1em;
 }
 
@@ -36,7 +75,7 @@
   flex-direction: column;
   justify-content: center;
   border: none;
-  border-left: 3px solid #E76F51;
+  border-left: 3px solid #e76f51;
   background-color: #fcfcfc;
   color: #264653;
   padding: 1em;
@@ -54,7 +93,7 @@
 
 .quiz-infos h3 {
   border: none;
-  border-left: 3px solid #2A9D8F;
+  border-left: 3px solid #2a9d8f;
   background-color: #fcfcfc;
   padding: 0.5em;
   font-size: 1.5em;
@@ -102,7 +141,7 @@
 }
 
 .quiz-infos .form input {
-  border: 2px solid #2A9D8F;
+  border: 2px solid #2a9d8f;
   outline: none;
   flex: 6;
   cursor: text;
@@ -111,14 +150,14 @@
 }
 
 .quiz-infos .form input:focus {
-  border: 2px solid #E9C46A;
+  border: 2px solid #e9c46a;
 }
 
 .quiz-infos .close-button {
   padding: 0.2em;
   font-size: 1em;
   border: none;
-  border-left: 3px solid #2A9D8F;
+  border-left: 3px solid #2a9d8f;
 }
 
 .quiz-infos.answers ul {
@@ -136,32 +175,33 @@
   background-color: #fcfcfc;
   color: #264653;
   border: none;
-  border-left: 3px solid #2A9D8F;
-  padding: 0 1em;
+  border-left: 3px solid #2a9d8f;
+  padding: 0.25em 0.5em;
+  line-height: 2em;
   position: relative;
   cursor: pointer;
   transition: background-color 0.2s ease-out, color 0.2s ease-out;
 }
 
 .quiz-infos.answers ul li article:hover {
-  background-color: #2A9D8F;
+  background-color: #2a9d8f;
   color: #fcfcfc;
 }
 
 .quiz-infos.answers ul li article.wrong {
   border: none;
-  border-left: 3px solid #E76F51;
-  background-color: #F4A261;
+  border-left: 3px solid #e76f51;
+  background-color: #f4a261;
   color: #fcfcfc;
   transition: background-color 0.2s ease-out;
 }
 
 .quiz-infos.answers ul li article.wrong:hover {
-  background-color: #E76F51;
+  background-color: #e76f51;
 }
 
 .quiz {
-  border-left: 3px solid #2A9D8F;
+  border-left: 3px solid #2a9d8f;
   padding: 1em;
   box-sizing: border-box;
   background-color: #264653;
@@ -179,9 +219,9 @@
   transition: right 0.5s ease-out;
 }
 
-.quiz h2{
-    font-size: 1.5em;
-    color: #fff;
+.quiz h2 {
+  font-size: 1.5em;
+  color: #fff;
 }
 
 .quiz.active {
@@ -199,7 +239,7 @@
 }
 
 .quiz label:hover .label-string {
-  background-color: #E9C46A;
+  background-color: #e9c46a;
 }
 
 .quiz label .label-string {
@@ -207,7 +247,7 @@
   flex: 2;
   text-align: left;
   border: none;
-  border-left: 3px solid #2A9D8F;
+  border-left: 3px solid #2a9d8f;
   padding-left: 0.2em;
   transition: background-color 0.2s ease-out;
 }
@@ -232,7 +272,7 @@
 }
 
 .quiz label.open input:focus {
-  border: 2px solid #E9C46A;
+  border: 2px solid #e9c46a;
 }
 
 .quiz label input {
@@ -245,7 +285,7 @@
   margin: 0.25em;
   text-align: center;
   flex: 1;
-  border-left: 3px solid #2A9D8F;
+  border-left: 3px solid #2a9d8f;
   color: #264653;
   background-color: #fcfcfc;
   /* &:nth-child(odd) {
@@ -261,7 +301,7 @@
   background-color: #264653;
   color: #fcfcfc;
   padding: 0.4em;
-  border-left: 3px solid #2A9D8F;
+  border-left: 3px solid #2a9d8f;
 }
 
 .quiz .question-container h4 {
@@ -295,7 +335,7 @@
   -o-appearance: none;
   appearance: none;
   border-radius: 50%;
-  border: 2px solid #2A9D8F;
+  border: 2px solid #2a9d8f;
   box-shadow: none;
   line-height: 15px;
   position: relative;
@@ -313,8 +353,6 @@
   outline: none;
   box-sizing: border-box;
   padding: 0;
-
-
 }
 
 .quiz .question-container .question .answers input[type='radio']:checked:after {
@@ -329,8 +367,6 @@
   box-sizing: border-box;
   display: flex;
   justify-content: center;
-
-
 }
 
 .quiz .question-container .question .answers input[type='checkbox'] {
@@ -341,7 +377,7 @@
   -moz-appearance: none;
   -o-appearance: none;
   appearance: none;
-  outline: 2px solid #2A9D8F;
+  outline: 2px solid #2a9d8f;
   box-shadow: none;
   font-size: 2em;
   position: relative;
@@ -359,7 +395,6 @@
   top: 50%;
   font-size: 50%;
   transform: translate(-50%, -55%);
-
 }
 
 .quiz .question-container .question .answers.col {
@@ -391,11 +426,11 @@
 }
 
 .quiz .question-container .question .answers ul li img:hover {
-  border: 3px solid #E9C46A;
+  border: 3px solid #e9c46a;
 }
 
 .quiz .question-container .question .answers ul li.selected img {
-  border: 5px solid #2A9D8F;
+  border: 5px solid #2a9d8f;
   opacity: 1;
 }
 
@@ -410,16 +445,16 @@
 
 .quiz button {
   border: none;
-  border-left: 3px solid #2A9D8F;
+  border-left: 3px solid #2a9d8f;
   cursor: pointer;
   padding: 0.7em;
   font-size: 1.5em;
-  font-family: "Oxygen", sans-serif;
+  font-family: 'Oxygen', sans-serif;
   transition: background-color 0.5s;
 }
 
 .quiz button:hover {
-  background-color: #E9C46A;
+  background-color: #e9c46a;
 }
 
 .quiz button:disabled {
