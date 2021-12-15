@@ -69,9 +69,10 @@ body {
   cursor: move;
 }
 
-.table.dragging {
-  opacity: 0.9;
-  border: 5px solid var(--sec-color);
+.table.dragging .head {
+  opacity: 1;
+  background-color: #fff;
+  color: var(--main-color);
 }
 
 .row {
@@ -149,7 +150,13 @@ body {
 .content-window-line-container .content-window-line {
   stroke-width: 5;
   stroke-linecap: round;
-  stroke: #000;
+  stroke: var(--main-color);
+}
+
+.content-window-line-container .content-window-line-end {
+  stroke: var(--main-color);
+  stroke-width: 3px;
+  fill: var(--sec-color);
 }
 
 .container {
@@ -398,7 +405,7 @@ main {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   cursor: pointer;
-  transition: all 0.5s ease-out;
+  transition: all 0.2s ease-out;
 }
 
 .controls .trigger .icon {
@@ -414,6 +421,11 @@ main {
 
 .controls.closed .trigger .icon {
   transform: rotateZ(-90deg) translateY(5px);
+}
+
+.controls .trigger:hover {
+  background-color: var(--sec-color);
+
 }
 
 .controls .trigger:hover .icon {
@@ -467,6 +479,8 @@ main {
   width: 15px;
   height: 15px;
   cursor: pointer;
+  margin-left: .2em;
+  margin-right: .5em;
 }
 
 .tree-list .chevron {
@@ -502,23 +516,26 @@ main {
 
 .tree-list span.item-visible {
   text-decoration: initial;
-  font-weight: 600;
+
 }
 
 .tree-list span.item-invisible {
   text-decoration: line-through;
-  font-weight: normal;
+
+  color: #ccc;
 }
 
 .tree-list span {
   user-select: none;
   cursor: pointer;
   transition: all 0.2s ease-out;
-  padding-left: 0.2em;
+  padding: 0.2em;
 }
 
 .tree-list span:hover {
-  color: #999;
+  color: var(--sec-color);
+  font-weight: bold;
+  background-color: #fff;
 }
 
 .tree-list span.parentHidden:hover {
@@ -526,7 +543,7 @@ main {
 }
 
 .tree-list .tree-list {
-  margin-left: 0.5em;
+  margin-left: 0.8em;
   border-left: 1px dashed #999;
 }
 

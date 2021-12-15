@@ -74,12 +74,21 @@ leftControls.component('tree-list', {
         child.item.setVisible(false)
       })
     },
+    toggleAllSiblingsExceptMe(listName, event) {
+      const element = event.currentTarget;
+      const siblingElements = document.querySelectorAll(`.${listName} > li > span`);
+      siblingElements.forEach(siblingElement => {
+        if (siblingElement != element) {
+          siblingElement.click();
+        };
+      });
+    }
   },
   template: `
   <ul :class='"list_"+level' class='tree-list visible'>
     <li v-for='(child, index) in children'>
     <div  :class='[{chevron:child.children},"open"]' @click='toggle("list_"+(parseInt(level) + 1) + "i" + index, $event)'></div>
-      <span @click='toggleVisibility(child.item, child.children,parseInt(level) + 1 + "i" + index, $event)' class='item-visible' >{{child.name}}</span>
+      <span @click='toggleVisibility(child.item, child.children,parseInt(level) + 1 + "i" + index, $event)' class='item-visible' @contextmenu="toggleAllSiblingsExceptMe('list_'+level, $event)" >{{child.name}}</span>
       <template v-if="child.children">
         <tree-list :level='parseInt(level) + 1 + "i" + index'  :children='child.children' :item='child.item' :name='child.name' :key='child.name'></tree-list>
       </template>    

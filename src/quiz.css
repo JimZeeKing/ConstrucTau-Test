@@ -21,6 +21,11 @@
   transition: all 0.5s ease-out;
 }
 
+.quiz .trigger:hover {
+  background-color: var(--sec-color);
+
+}
+
 .quiz .trigger .icon {
   width: 100%;
   height: 100%;
