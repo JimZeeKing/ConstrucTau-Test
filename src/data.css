@@ -510,6 +510,7 @@ main {
 .tree-list.invisible span {
   font-style: italic;
   color: #cfcfcf;
+  opacity: 0.5;
 }
 
 .tree-list span.item-visible {
