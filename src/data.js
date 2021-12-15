@@ -4,7 +4,7 @@ import loadAsset from './loadAsset.js'
 import { positions } from './positions.js'
 
 // Zea Engine dependencies stored in new const variables. View the API to see what you can include and use.
-const { Scene, GLRenderer, Vec3, Color, Xfo, Ray, Label, DataImage, EnvMap, TreeItem, GeomItem, Plane, Material, Lines, Quat } = window.zeaEngine
+const { Scene, GLRenderer, Vec3, Color, Xfo, Ray, Label, DataImage, EnvMap, TreeItem, GeomItem, Plane, Material, Lines, Quat, Vec4 } = window.zeaEngine
 const { CADBody } = zeaCad
 class DomTree extends GeomItem {
   /**
@@ -150,17 +150,24 @@ function main() {
               event.leftGeometry.removeHighlight('pointerOverGeom', true)
               highlightedItem = null
           })*/
+
+  //   renderer.getViewport().getCamera().setIsOrthographic(1)
   renderer.getViewport().on('viewChanged', (event) => {
     //making sure render state are reseted
 
+    const worldSpacePos = new Vec4(0, 0, 0, 1) //center of scene
+    // const worldSpacePos = event.viewXfo.tr.add(event.viewXfo.ori.getZaxis().scale(-10.0)) //center of scene
+
     if (contentHighlitedItem) {
-      const viewMatrix = renderer.getViewport().__viewMat
-      const projMatrix = renderer.getViewport().__projectionMatrix
-      const worldSpacePos = new Vec3(0, 0, 0) //center of scene
-      const viewProjMatrix = viewMatrix.multiply(projMatrix)
-      const posScreenSpace = viewProjMatrix.transformVec3(worldSpacePos)
-      console.log(posScreenSpace.x, posScreenSpace.y)
-      const pos2D = [(posScreenSpace.x * 0.5 + 0.5) * renderer.getViewport().getWidth(), (posScreenSpace.y * 0.5 + 0.5) * renderer.getViewport().getHeight()]
+      const viewport = renderer.getViewport()
+      const viewMatrix = viewport.__viewMat
+      const projMatrix = viewport.__projectionMatrix
+      const viewProjMatrix = projMatrix.multiply(viewMatrix)
+      const screenSpacePos = viewProjMatrix.transformVec4(worldSpacePos)
+      // perspective divide
+      screenSpacePos.x /= screenSpacePos.w
+      screenSpacePos.y /= screenSpacePos.w
+      const pos2D = [(screenSpacePos.x * 0.5 + 0.5) * viewport.getWidth(), (screenSpacePos.y * -0.5 + 0.5) * viewport.getHeight()]
       console.log(pos2D)
     }
 
