@@ -94,7 +94,7 @@
     <svg class="content-window-line-container hidden"></svg>
     <script type="module">
       const { Vec3 } = window.zeaEngine
-      import { prepare, updateBillboard, showActiveBillboard, addDomBillboard, resetView, saveCamLocal, goto, waitForVR, isVR, unhighlightContentItem } from './src/data.js'
+      import { prepare, updateBillboard, showActiveBillboard, addDomBillboard, resetView, saveCamLocal, goto, waitForVR, isVR, unhighlightContentItem, setPositionCallback } from './src/data.js'
       import { DataPool } from './src/DataPool.js'
       import { positions } from './src/positions.js'
 
@@ -251,6 +251,10 @@
           const line = document.querySelector('.content-window-line')
           line.setAttributeNS(null, 'x2', parseInt(x))
           line.setAttributeNS(null, 'y2', parseInt(y))
+
+          const circle = document.querySelector('.content-window-line-end')
+          circle.setAttributeNS(null, 'cx', parseInt(x))
+          circle.setAttributeNS(null, 'cy', parseInt(y))
         }
 
         window.closeBillboard = function (button) {
@@ -326,7 +330,10 @@
             leftControlsApp.tree = [layerData]
             leftControlsApp.positions = positions
             leftControlsApp.quizReady = true
-            console.log(leftControlsApp)
+
+            setPositionCallback((position) => {
+              window.updateWindowLineEnd(position[0], position[1])
+            })
           } else {
             const visibilityTogglesContainer = handUI.querySelector('#page2 div')
             data.asset.__childItems[0].__childItems.forEach((geomItem) => {

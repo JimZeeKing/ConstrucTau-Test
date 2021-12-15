@@ -127,6 +127,7 @@ function main() {
 
   //new content from geom click
   renderer.getViewport().on('pointerUp', (event) => {
+    console.log(123)
     if (event.intersectionData) {
       if (event.intersectionData.geomItem.hasParameter('LayerName')) {
         unhighlightContentItem()
@@ -155,20 +156,26 @@ function main() {
   renderer.getViewport().on('viewChanged', (event) => {
     //making sure render state are reseted
 
-    const worldSpacePos = new Vec4(0, 0, 0, 1) //center of scene
     // const worldSpacePos = event.viewXfo.tr.add(event.viewXfo.ori.getZaxis().scale(-10.0)) //center of scene
 
     if (contentHighlitedItem) {
+      const itemPosition = contentHighlitedItem.globalXfoParam.value.tr
+
+      const worldSpacePos = new Vec4(itemPosition.x, itemPosition.y, itemPosition.z, 1) //center of scene
+
       const viewport = renderer.getViewport()
       const viewMatrix = viewport.__viewMat
       const projMatrix = viewport.__projectionMatrix
       const viewProjMatrix = projMatrix.multiply(viewMatrix)
       const screenSpacePos = viewProjMatrix.transformVec4(worldSpacePos)
+
       // perspective divide
       screenSpacePos.x /= screenSpacePos.w
       screenSpacePos.y /= screenSpacePos.w
       const pos2D = [(screenSpacePos.x * 0.5 + 0.5) * viewport.getWidth(), (screenSpacePos.y * -0.5 + 0.5) * viewport.getHeight()]
-      console.log(pos2D)
+      // console.log(pos2D)
+
+      positionCallback(pos2D)
     }
 
     activeBillboard.forEach((billboard, key, map) => {
@@ -354,6 +361,10 @@ export function unhighlightContentItem() {
   if (contentHighlitedItem) {
     contentHighlitedItem = contentHighlitedItem.removeHighlight('selection', true)
   }
+}
+let positionCallback
+export function setPositionCallback(cb) {
+  positionCallback = cb
 }
 
 export function goto(posIndex) {
