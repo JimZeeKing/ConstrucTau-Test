@@ -115,15 +115,15 @@ function main() {
     return item
   }
 
-  let highlightedItem
-  scene.getRoot().on('pointerEnter', (event) => {
-    highlightedItem = filterItem(event.intersectionData.geomItem)
-    highlightedItem.addHighlight('pointerOverGeom', highlightColor, true)
-  })
-  scene.getRoot().on('pointerLeave', (event) => {
-    highlightedItem.removeHighlight('pointerOverGeom', true)
-    highlightedItem = null
-  })
+  // let highlightedItem
+  // scene.getRoot().on('pointerEnter', (event) => {
+  //   highlightedItem = filterItem(event.intersectionData.geomItem)
+  //   highlightedItem.addHighlight('pointerOverGeom', highlightColor, true)
+  // })
+  // scene.getRoot().on('pointerLeave', (event) => {
+  //   highlightedItem.removeHighlight('pointerOverGeom', true)
+  //   highlightedItem = null
+  // })
 
   //new content from geom click
   renderer.getViewport().on('pointerDown', (event) => {
