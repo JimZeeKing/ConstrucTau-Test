@@ -3,6 +3,7 @@ const LeftControls = {
     return {
       closed: true,
       quizReady: false,
+      quizReadyCallback: null,
       currentPage: 0,
       pages: [{ title: 'Éléments' }, { title: 'Positions' }],
       positions: [],
@@ -54,6 +55,8 @@ leftControls.component('tree-list', {
 
       element.classList.toggle('item-visible')
       element.classList.toggle('item-invisible')
+      console.log(element, parentList, listName)
+
       if (parentList) {
         parentList.classList.toggle('visible')
         parentList.classList.toggle('invisible')
@@ -75,22 +78,39 @@ leftControls.component('tree-list', {
       })
     },
     toggleAllSiblingsExceptMe(listName, event) {
-      const element = event.currentTarget;
-      const siblingElements = document.querySelectorAll(`.${listName} > li > span`);
-      siblingElements.forEach(siblingElement => {
+      const element = event.currentTarget
+      console.log(`.${listName} > li > span`)
+      const siblingElements = document.querySelectorAll(`.${listName} > li > span`)
+      console.log(siblingElements)
+      siblingElements.forEach((siblingElement) => {
         if (siblingElement != element) {
-          siblingElement.click();
-        };
-      });
+          siblingElement.click()
+        }
+      })
+    },
+    hideLastChildren() {
+      const allLastChildren = document.querySelectorAll('span.last')
+      allLastChildren.forEach((child) => {
+        child.textContent = '????????'
+      })
+    },
+  },
+  created() {
+    let self = this
+    this.$root.quizReadyCallback = (quiz) => {
+      if (quiz.isSom) {
+        self.hideLastChildren()
+      }
     }
   },
   template: `
   <ul :class='"list_"+level' class='tree-list visible'>
     <li v-for='(child, index) in children'>
     <div  :class='[{chevron:child.children},"open"]' @click='toggle("list_"+(parseInt(level) + 1) + "i" + index, $event)'></div>
-      <span @click='toggleVisibility(child.item, child.children,parseInt(level) + 1 + "i" + index, $event)' class='item-visible' @contextmenu="toggleAllSiblingsExceptMe('list_'+level, $event)" >{{child.name}}</span>
+      <span :class='{last:child.children == undefined}' @click='toggleVisibility(child.item, child.children,level+(parseInt(level) + 1), $event)' class='item-visible' @contextmenu="toggleAllSiblingsExceptMe('list_'+level, $event)" >{{child.name}}  {{level+(parseInt(level) + 1) + "i" + index}}</span>
       <template v-if="child.children">
-        <tree-list :level='parseInt(level) + 1 + "i" + index'  :children='child.children' :item='child.item' :name='child.name' :key='child.name'></tree-list>
+     
+        <tree-list :level='level+(parseInt(level) + 1) + "i" + index'  :children='child.children' :item='child.item' :name='child.name' :key='child.name'></tree-list>
       </template>    
     </li>
   </ul>
@@ -272,8 +292,11 @@ leftControls.component('quiz', {
             alert('ERROR')
           } else {
             json.currentQuestionIndex = 0
-
             this.quiz = json
+
+            if (this.$root.quizReadyCallback) {
+              this.$root.quizReadyCallback(this.quiz)
+            }
 
             console.log(this.quiz)
             /* const localData = this.loadLocalData('quiz')

@@ -126,11 +126,10 @@ function main() {
   })
 
   //new content from geom click
-  renderer.getViewport().on('pointerUp', (event) => {
-    if (event.intersectionData) {
+  renderer.getViewport().on('pointerDown', (event) => {
+    if (event.intersectionData && event.button == 0) {
       if (event.intersectionData.geomItem.hasParameter('LayerName')) {
         contentActivePosition = event.intersectionData.intersectionPos
-        console.log(contentActivePosition)
         unhighlightContentItem()
         contentHighlitedItem = filterItem(event.intersectionData.geomItem)
         contentHighlitedItem.addHighlight('selection', highlightColorContent, true)
@@ -159,7 +158,6 @@ function main() {
       screenSpacePos.x /= screenSpacePos.w
       screenSpacePos.y /= screenSpacePos.w
       const pos2D = [(screenSpacePos.x * 0.5 + 0.5) * viewport.getWidth(), (screenSpacePos.y * -0.5 + 0.5) * viewport.getHeight()]
-      // console.log(pos2D)
 
       positionCallback(pos2D)
     }

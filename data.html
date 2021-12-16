@@ -355,8 +355,9 @@
 
             leftControlsApp.tree = [layerData]
             leftControlsApp.positions = positions
-            leftControlsApp.quizReady = true
-            leftControlsApp.ColorConstructor = Color
+            setTimeout(() => {
+              leftControlsApp.quizReady = true
+            }, 1500)
 
             setPositionCallback((position) => {
               window.updateWindowLineEnd(position[0], position[1])

@@ -23,7 +23,6 @@
 
 .quiz .trigger:hover {
   background-color: var(--sec-color);
-
 }
 
 .quiz .trigger .icon {
@@ -211,14 +210,14 @@
   box-sizing: border-box;
   background-color: #264653;
   box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.25);
-  width: 450px;
+  width: 400px;
   height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   position: fixed;
-  right: -450px;
+  right: -400px;
   top: 0;
   z-index: 999999;
   transition: right 0.5s ease-out;
