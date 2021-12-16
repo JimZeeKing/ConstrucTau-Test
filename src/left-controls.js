@@ -80,9 +80,9 @@ leftControls.component('tree-list', {
     },
     toggleAllSiblingsExceptMe(listName, event) {
       const element = event.currentTarget
-      console.log(`.${listName} > li > span`)
+
       const siblingElements = document.querySelectorAll(`.${listName} > li > span`)
-      console.log(siblingElements)
+
       siblingElements.forEach((siblingElement) => {
         if (siblingElement != element) {
           siblingElement.click()
@@ -108,13 +108,9 @@ leftControls.component('tree-list', {
         if (span.innerText == itemName) {
           const parentList = this.getParentList(span);
 
-
           if (parentList && parentList.classList.contains("hidden")) {
-
             const listIndex = parentList.dataset.index;
-
             const chevronParent = this.getParentList(parentList);
-            console.log(chevronParent);
             document.querySelector(`#${chevronParent.id} li:nth-child(${parseInt(listIndex) + 1}) > .chevron`).click();
           };
 
@@ -331,7 +327,7 @@ leftControls.component('quiz', {
               this.$root.quizReadyCallback(this.quiz)
             }
 
-            console.log(this.quiz)
+
             /* const localData = this.loadLocalData('quiz')
             if (localData && localData.id == this.quiz.id) {
               this.quiz.questions = localData.questions

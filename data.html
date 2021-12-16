@@ -1,457 +1,460 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
 
-    <!-- download Zea Engine -- this downloads the latest build from version 3 of the engine -->
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@4.0.1-68fce05/dist/index.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@4.0.1/dist/index.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-ux@4.0.1/dist/index.umd.js"></script>
-    <!-- download our stylesheet -->
-    <link rel="stylesheet" href="./src/normalize.css" />
+<head>
+  <meta charset="UTF-8" />
 
-    <link rel="stylesheet" href="./src/styles.css" />
-    <link rel="stylesheet" href="./src/data.css" />
-    <link rel="stylesheet" href="./src/quiz.css" />
-    <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/src/dom-to-image-more.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
 
-    <script src="./libs/CanvasRenderer.js"></script>
-    <script src="./libs/DomMapper.js"></script>
-    <script src="./src/zea-fps-display.js" type="module"></script>
-    <script src="https://unpkg.com/vue@next"></script>
-    <script defer src="./src/left-controls.js"></script>
+  <!-- download Zea Engine -- this downloads the latest build from version 3 of the engine -->
+  <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@4.0.1-68fce05/dist/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@4.0.1/dist/index.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-ux@4.0.1/dist/index.umd.js"></script>
+  <!-- download our stylesheet -->
+  <link rel="stylesheet" href="./src/normalize.css" />
 
-    <title>Application ConstrucTAU</title>
-  </head>
+  <link rel="stylesheet" href="./src/styles.css" />
+  <link rel="stylesheet" href="./src/data.css" />
+  <link rel="stylesheet" href="./src/quiz.css" />
+  <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/src/dom-to-image-more.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
 
-  <body class="overflow-hidden">
-    <div id="left-controls">
-      <aside :class="['controls', {'closed':closed}]">
-        <button class="trigger" @click="closed = !closed" :title="closed ? 'Ouvrir les contrôles':'Fermer les contrôles'">
-          <div class="icon"></div>
-        </button>
+  <script src="./libs/CanvasRenderer.js"></script>
+  <script src="./libs/DomMapper.js"></script>
+  <script src="./src/zea-fps-display.js" type="module"></script>
+  <script src="https://unpkg.com/vue@next"></script>
+  <script defer src="./src/left-controls.js"></script>
 
-        <h2>{{pages[currentPage].title}}</h2>
+  <title>Application ConstrucTAU</title>
+</head>
 
-        <tree-list v-show="currentPage == 0" :children="tree" :item="tree.item" :name="tree.name" level="0i0" :visible="true"></tree-list>
+<body class="overflow-hidden">
+  <div id="left-controls">
+    <aside :class="['controls', {'closed':closed}]">
+      <button class="trigger" @click="closed = !closed" :title="closed ? 'Ouvrir les contrôles':'Fermer les contrôles'">
+        <div class="icon"></div>
+      </button>
 
-        <positions-list :positions="positions" v-show="currentPage == 1"> </positions-list>
+      <h2>{{pages[currentPage].title}}</h2>
 
-        <nav>
-          <button :class="{active:currentPage==index}" @click="currentPage = index" v-for="(page,index) in pages" :key="index">{{page.title}}</button>
-        </nav>
-        <div class="controls-options"><button onclick="window.resetScene()">Réinitialiser la scène</button></div>
-      </aside>
+      <tree-list v-show="currentPage == 0" :children="tree" :item="tree.item" :name="tree.name" level="0i0" :visible="true"></tree-list>
 
-      <quiz v-if="quizReady"></quiz>
-    </div>
-
-    <main>
-      <div id="canvas-holder">
-        <canvas id="canvas" style="position: absolute; width: 100%; height: 100%;"> </canvas>
-      </div>
-      <div class="xr-button hidden" id="xr-button"></div>
-      <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
-      <progress class="progress-display" id="progress" value="0" max="100">0%</progress>
-    </main>
-
-    <div id="infoTable" class="table"></div>
-
-    <div id="test">
-      <section id="page1" class="page active">
-        <h2>Quiz</h2>
-        <p class="infos">Ceci est un exemple de quiz intégré au VR</p>
-
-        <section>
-          <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
-          <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
-          <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
-        </section>
-      </section>
-
-      <section id="page2" class="page">
-        <h2>Éléments</h2>
-        <p class="infos">Options des éléments</p>
-        <div></div>
-      </section>
-
-      <section id="page3" class="page">
-        <h2>Scène</h2>
-        <p class="infos">Options de la scène</p>
-        <div>
-          <button onclick="gotoPosition(0)" data-mapping data-hover-class="btn-hover">Position 1</button>
-          <button onclick="gotoPosition(1)" data-mapping data-hover-class="btn-hover">Position 2</button>
-          <button onclick="resetScene()" data-mapping data-hover-class="btn-hover">Réinitialiser la scène</button>
-        </div>
-      </section>
+      <positions-list :positions="positions" v-show="currentPage == 1"> </positions-list>
 
       <nav>
-        <button class="menu-active" data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page1')">Quiz</button>
-        <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page2')">Éléments</button>
-        <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page3')">Scène</button>
+        <button :class="{active:currentPage==index}" @click="currentPage = index" v-for="(page,index) in pages" :key="index">{{page.title}}</button>
       </nav>
+      <div class="controls-options"><button onclick="window.resetScene()">Réinitialiser la scène</button></div>
+    </aside>
+
+    <quiz v-if="quizReady"></quiz>
+  </div>
+
+  <main>
+    <div id="canvas-holder">
+      <canvas id="canvas" style="position: absolute; width: 100%; height: 100%;"> </canvas>
     </div>
+    <div class="xr-button hidden" id="xr-button"></div>
+    <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
+    <progress class="progress-display" id="progress" value="0" max="100">0%</progress>
+  </main>
 
-    <svg class="content-window-line-container hidden"></svg>
-    <script type="module">
-      const { Vec3, Color } = window.zeaEngine
-      import { prepare, updateBillboard, showActiveBillboard, addDomBillboard, resetView, saveCamLocal, goto, waitForVR, isVR, unhighlightContentItem, setPositionCallback } from './src/data.js'
-      import { DataPool } from './src/DataPool.js'
-      import { positions } from './src/positions.js'
+  <div id="infoTable" class="table"></div>
 
-      let templateContainer, handUI, mapper1, mapper2, currentContent
-      let json = DataPool.create()
-      // let url = 'http://127.0.0.1:3000/content/all/nocred'
-      let url = 'https://tim.cgmatane.qc.ca:3000/content/all/nocred'
-      let domrenderer = CanvasRenderer.setup()
+  <div id="test">
+    <section id="page1" class="page active">
+      <h2>Quiz</h2>
+      <p class="infos">Ceci est un exemple de quiz intégré au VR</p>
 
-      Promise.all([json.loadData(url), fetch('./data/templates/infos.mustache').then((resp) => resp.text())]).then((data) => {
-        templateContainer = document.querySelector('#infoTable')
-        handUI = document.querySelector('#test')
-        mapper2 = DomMapper.setup(handUI)
+      <section>
+        <div id="r1" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 1"></div>
+        <div id="r2" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 2"></div>
+        <div id="r3" data-mapping data-hover-class="radio-hover" data-active-class="radio-active" class="radio" data-active-group="g1" data-label="Radio 3"></div>
+      </section>
+    </section>
 
-        const template = Handlebars.compile(data[1])
-        prepareInfos('Semelle Flottante', template)
+    <section id="page2" class="page">
+      <h2>Éléments</h2>
+      <p class="infos">Options des éléments</p>
+      <div></div>
+    </section>
 
-        prepare(CADReady)
+    <section id="page3" class="page">
+      <h2>Scène</h2>
+      <p class="infos">Options de la scène</p>
+      <div>
+        <button onclick="gotoPosition(0)" data-mapping data-hover-class="btn-hover">Position 1</button>
+        <button onclick="gotoPosition(1)" data-mapping data-hover-class="btn-hover">Position 2</button>
+        <button onclick="resetScene()" data-mapping data-hover-class="btn-hover">Réinitialiser la scène</button>
+      </div>
+    </section>
 
-        waitForVR(() => {
-          templateContainer.addEventListener('domevent', function (event) {
-            domrenderer.renderElement(templateContainer, event.detail.element, event.detail.type, false, true)
-          })
+    <nav>
+      <button class="menu-active" data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page1')">Quiz</button>
+      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page2')">Éléments</button>
+      <button data-mapping data-down-class="btn-click" data-hover-class="btn-hover" data-active-class="menu-active" data-active-group="menu" onclick="goToPage('page3')">Scène</button>
+    </nav>
+  </div>
 
-          templateContainer.addEventListener('render', (event) => {
-            if (event.detail.renderData.bytes) {
-              updateBillboard(templateContainer, event.detail.renderData.bytes, true)
-            }
-          })
+  <svg class="content-window-line-container hidden"></svg>
+  <script type="module">
+    const { Vec3, Color } = window.zeaEngine
+    import { prepare, updateBillboard, showActiveBillboard, addDomBillboard, resetView, saveCamLocal, goto, waitForVR, isVR, unhighlightContentItem, setPositionCallback } from './src/data.js'
+    import { DataPool } from './src/DataPool.js'
+    import { positions } from './src/positions.js'
 
-          domrenderer.addRenderContainer(handUI, '#fff', (renderData) => {
-            addDomBillboard(renderData, 'handUI', mapper2, undefined, undefined, 0.001, true, true)
-          })
+    let templateContainer, handUI, mapper1, mapper2, currentContent
+    let json = DataPool.create()
+    // let url = 'http://127.0.0.1:3000/content/all/nocred'
+    let url = 'https://tim.cgmatane.qc.ca:3000/content/all/nocred'
+    let domrenderer = CanvasRenderer.setup()
 
-          handUI.addEventListener('domevent', function (event) {
-            domrenderer.renderElement(handUI, event.detail.element, event.detail.type, false, true)
-          })
+    Promise.all([json.loadData(url), fetch('./data/templates/infos.mustache').then((resp) => resp.text())]).then((data) => {
+      templateContainer = document.querySelector('#infoTable')
+      handUI = document.querySelector('#test')
+      mapper2 = DomMapper.setup(handUI)
 
-          handUI.addEventListener('render', (event) => {
-            if (event.detail.renderData.bytes) {
-              updateBillboard('handUI', event.detail.renderData.bytes, false)
-            }
-          })
+      const template = Handlebars.compile(data[1])
+      prepareInfos('Semelle Flottante', template)
 
-          window.goToPage = function (pageID) {
-            const currentPage = handUI.querySelector('.active')
-            if (currentPage) {
-              currentPage.classList.remove('active')
-            }
+      prepare(CADReady)
 
-            const newCurrentPage = handUI.querySelector(`#${pageID}`)
-
-            if (newCurrentPage) {
-              newCurrentPage.classList.add('active')
-            }
-
-            domrenderer.resetStates(handUI)
-            domrenderer.renderMainContainer(handUI, (argument) => {
-              mapper2.updateMapping()
-            })
-          }
-          //vr version
-          window.closeBillboard = function (button) {
-            let mainContainer = button
-            var els = []
-            while (mainContainer) {
-              els.unshift(mainContainer)
-              if (mainContainer.parentNode == document.body) break
-              mainContainer = mainContainer.parentNode
-            }
-            showActiveBillboard(mainContainer, false)
-          }
-          window.newContentRequest = function (contentTitle, event) {
-            updateInfos(contentTitle, template)
-          }
-        }) //end vr setup
-
-        window.addEventListener('resize', (event) => {
-          const svg = document.querySelector('.content-window-line-container')
-          svg.setAttributeNS(null, 'viewBox', '0 0 ' + window.innerWidth + ' ' + window.innerHeight)
-          svg.setAttributeNS(null, 'width', window.innerWidth)
-          svg.setAttributeNS(null, 'height', window.innerHeight)
+      waitForVR(() => {
+        templateContainer.addEventListener('domevent', function (event) {
+          domrenderer.renderElement(templateContainer, event.detail.element, event.detail.type, false, true)
         })
 
-        window.newContentRequest = function (contentTitle, event) {
-          const data = json.getObjectFromListWithProp(url, 'title', contentTitle) || { title: contentTitle }
+        templateContainer.addEventListener('render', (event) => {
+          if (event.detail.renderData.bytes) {
+            updateBillboard(templateContainer, event.detail.renderData.bytes, true)
+          }
+        })
 
-          leftControlsApp.treeListSearchCallback(contentTitle)
+        domrenderer.addRenderContainer(handUI, '#fff', (renderData) => {
+          addDomBillboard(renderData, 'handUI', mapper2, undefined, undefined, 0.001, true, true)
+        })
 
-          templateContainer.innerHTML = template(data)
+        handUI.addEventListener('domevent', function (event) {
+          domrenderer.renderElement(handUI, event.detail.element, event.detail.type, false, true)
+        })
 
-          //dargging of templatecotnainer
-          templateContainer.querySelector('.head').addEventListener('mousedown', (e) => {
-            var rect = templateContainer.getBoundingClientRect()
-            var style = window.getComputedStyle(templateContainer)
+        handUI.addEventListener('render', (event) => {
+          if (event.detail.renderData.bytes) {
+            updateBillboard('handUI', event.detail.renderData.bytes, false)
+          }
+        })
 
-            templateContainer.clickOffsetX = e.clientX - rect.left + parseInt(style.marginLeft)
-            templateContainer.clickOffsetY = e.clientY - rect.top + parseInt(style.marginTop)
-
-            function mmove(e) {
-              templateContainer.style.left = e.clientX - templateContainer.clickOffsetX + 'px'
-              templateContainer.style.top = e.clientY - templateContainer.clickOffsetY + 'px'
-
-              window.updateWindowLineStart()
-            }
-
-            function mup(e) {
-              window.removeEventListener('mousemove', mmove)
-              templateContainer.classList.remove('dragging')
-            }
-
-            templateContainer.classList.add('dragging')
-
-            window.addEventListener('mousemove', mmove)
-            window.addEventListener('mouseup', mup)
-          })
-
-          //buttons interaction to reaveal content
-          const allButtons = templateContainer.querySelectorAll('.row .cell:first-of-type:not(.cell:last-of-type)')
-          allButtons.forEach((button) => {
-            button.addEventListener('click', (event) => {
-              const nextInvisibleCell = button.parentNode.querySelector('.invisible-data')
-              if (nextInvisibleCell) {
-                nextInvisibleCell.classList.remove('invisible-data')
-              }
-            })
-          })
-
-          if (templateContainer.style.position != 'absolute') {
-            templateContainer.style.position = 'absolute'
-            templateContainer.style.zIndex = 100000
-            templateContainer.style.right = '1em'
-            templateContainer.style.top = '1em'
+        window.goToPage = function (pageID) {
+          const currentPage = handUI.querySelector('.active')
+          if (currentPage) {
+            currentPage.classList.remove('active')
           }
 
-          //setup line for content window
-          const line = document.querySelector('.content-window-line')
-          console.log(templateContainer.style.left, templateContainer.style.top, event.clientX, event.clientY)
-          line.setAttributeNS(null, 'x1', parseInt(templateContainer.offsetLeft + templateContainer.offsetWidth * 0.5))
-          line.setAttributeNS(null, 'y1', parseInt(templateContainer.offsetTop + templateContainer.offsetHeight * 0.5))
-          line.setAttributeNS(null, 'x2', event.clientX)
-          line.setAttributeNS(null, 'y2', event.clientY)
-          const circle = document.querySelector('.content-window-line-end')
+          const newCurrentPage = handUI.querySelector(`#${pageID}`)
 
-          circle.setAttributeNS(null, 'cx', event.clientX)
-          circle.setAttributeNS(null, 'cy', event.clientY)
+          if (newCurrentPage) {
+            newCurrentPage.classList.add('active')
+          }
 
-          const svg = document.querySelector('.content-window-line-container')
-          svg.classList.remove('hidden')
+          domrenderer.resetStates(handUI)
+          domrenderer.renderMainContainer(handUI, (argument) => {
+            mapper2.updateMapping()
+          })
         }
-
-        //window center
-        window.updateWindowLineStart = function () {
-          const line = document.querySelector('.content-window-line')
-          line.setAttributeNS(null, 'x1', parseInt(templateContainer.offsetLeft + templateContainer.offsetWidth * 0.5))
-          line.setAttributeNS(null, 'y1', parseInt(templateContainer.offsetTop + templateContainer.offsetHeight * 0.5))
-        }
-
-        //item center
-        window.updateWindowLineEnd = function (x, y) {
-          const line = document.querySelector('.content-window-line')
-          line.setAttributeNS(null, 'x2', parseInt(x))
-          line.setAttributeNS(null, 'y2', parseInt(y))
-
-          const circle = document.querySelector('.content-window-line-end')
-          circle.setAttributeNS(null, 'cx', parseInt(x))
-          circle.setAttributeNS(null, 'cy', parseInt(y))
-        }
-
+        //vr version
         window.closeBillboard = function (button) {
-          templateContainer.style.position = 'initial'
-          templateContainer.style.zIndex = 'initial'
-          templateContainer.style.top = 'initial'
-          templateContainer.style.left = 'initial'
-          unhighlightContentItem()
-          leftControlsApp.unselectAll()
-
-          const svg = document.querySelector('.content-window-line-container')
-          svg.classList.add('hidden')
-        }
-
-        window.resetScene = function () {
-          resetView(true)
-          resetTree()
-          unhighlightContentItem()
-          window.closeBillboard()
-          leftControlsApp.currentPage = 0
-        }
-
-        window.gotoPosition = function (positionIndex) {
-          goto(positionIndex)
-        }
-
-        window.saveCam = function (positionName) {
-          saveCamLocal()
-        }
-
-        function resetTree() {
-          //geom
-          const masterTree = document.querySelectorAll('.tree-list')
-          masterTree.forEach((tree) => {
-            tree.querySelectorAll('span').forEach((span) => {
-              span.classList.add('item-visible')
-              span.classList.remove('item-invisible')
-            })
-
-            tree.classList.add('visible')
-            tree.classList.remove('invisible')
-          })
-        }
-
-        function digChildren(children, output) {
-          for (var i = 0; i < children.length; i++) {
-            if (children[i].getChildren().length > 0) {
-              children[i].shouldBeVisible = children[i].isVisible()
-              children[i].highlightColor2 = new Color('#2a9d8f')
-              output.push({ name: children[i].__name, item: children[i], children: [], shouldBeVisible: children[i].isVisible() })
-              sortChildren(children[i].getChildren())
-              digChildren(children[i].getChildren(), output[output.length - 1].children)
-            } else {
-              children[i].highlightColor2 = new Color('#2a9d8f')
-              children[i].shouldBeVisible = children[i].isVisible()
-              output.push({ name: children[i].__name, item: children[i], shouldBeVisible: children[i].isVisible() })
-            }
+          let mainContainer = button
+          var els = []
+          while (mainContainer) {
+            els.unshift(mainContainer)
+            if (mainContainer.parentNode == document.body) break
+            mainContainer = mainContainer.parentNode
           }
+          showActiveBillboard(mainContainer, false)
         }
-
-        function applyToAllChildren(children, functionToCall) {
-          for (var i = 0; i < children.length; i++) {
-            functionToCall(children[i])
-            if (children[i].getChildren().length > 0) applyToAllChildren(children[i].getChildren(), functionToCall)
-          }
+        window.newContentRequest = function (contentTitle, event) {
+          updateInfos(contentTitle, template)
         }
+      }) //end vr setup
 
-        function sortChildren(children) {
-          children.sort(function (a, b) {
-            var nameA = a.__name.toLowerCase(),
-              nameB = b.__name.toLowerCase()
-            nameA = nameA.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-            nameB = nameB.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-
-            if (nameA < nameB)
-              //sort string ascending
-              return -1
-            if (nameA > nameB) return 1
-            return 0 //default return value (no sorting)
-          })
-        }
-
-        function CADReady(data) {
-          if (!isVR()) {
-            const layers = data.layersRoot
-            const rootLayer = data.layersRoot.__name
-            layers.shouldBeVisible = true
-            const layerData = { name: rootLayer, item: layers, children: [], shouldBeVisible: true }
-
-            let children = layers.getChildren()
-
-            sortChildren(children)
-
-            digChildren(children, layerData.children)
-
-            leftControlsApp.tree = [layerData]
-
-            leftControlsApp.positions = positions
-            setTimeout(() => {
-              leftControlsApp.quizReady = true
-            }, 1500)
-
-            setPositionCallback((position) => {
-              window.updateWindowLineEnd(position[0], position[1])
-            })
-          } else {
-            const visibilityTogglesContainer = handUI.querySelector('#page2 div')
-            data.asset.__childItems[0].__childItems.forEach((geomItem) => {
-              const itemName = geomItem.getParameter('LayerName').getValue()
-              const itemContainer = document.createElement('div')
-              const title = document.createElement('h3')
-              title.innerText = itemName
-              itemContainer.appendChild(title)
-
-              const btn = document.createElement('button')
-              btn.classList.add('btn-init')
-              btn.dataset.mapping = true
-              btn.dataset.activeClass = 'btn-active'
-              btn.geomitem = geomItem
-              btn.addEventListener('click', (event) => {
-                btn.innerText = btn.innerText == 'Afficher' ? 'Cacher' : 'Afficher'
-                const visible = btn.geomitem.isVisible()
-                btn.geomitem.setVisible(!visible)
-              })
-
-              btn.innerText = 'Cacher'
-
-              itemContainer.appendChild(btn)
-              visibilityTogglesContainer.appendChild(itemContainer)
-            })
-          }
-        }
+      window.addEventListener('resize', (event) => {
+        const svg = document.querySelector('.content-window-line-container')
+        svg.setAttributeNS(null, 'viewBox', '0 0 ' + window.innerWidth + ' ' + window.innerHeight)
+        svg.setAttributeNS(null, 'width', window.innerWidth)
+        svg.setAttributeNS(null, 'height', window.innerHeight)
       })
 
-      function prepareInfos(title, template) {
-        const data = json.getObjectFromListWithProp(url, 'title', title)
+      window.newContentRequest = function (contentTitle, event) {
+        const data = json.getObjectFromListWithProp(url, 'title', contentTitle) || { title: contentTitle }
+
+        leftControlsApp.treeListSearchCallback(contentTitle)
+
         templateContainer.innerHTML = template(data)
 
-        if (!isVR()) {
-          //prepare svg for content window line
-          const xmlns = 'http://www.w3.org/2000/svg'
-          const bW = window.innerWidth
-          const bH = window.innerHeight
+        //dargging of templatecotnainer
+        templateContainer.querySelector('.head').addEventListener('mousedown', (e) => {
+          var rect = templateContainer.getBoundingClientRect()
+          var style = window.getComputedStyle(templateContainer)
 
-          const svg = document.querySelector('.content-window-line-container')
-          svg.setAttributeNS(null, 'viewBox', '0 0 ' + bW + ' ' + bH)
-          svg.setAttributeNS(null, 'width', bW)
-          svg.setAttributeNS(null, 'height', bH)
+          templateContainer.clickOffsetX = e.clientX - rect.left + parseInt(style.marginLeft)
+          templateContainer.clickOffsetY = e.clientY - rect.top + parseInt(style.marginTop)
 
-          const line = document.createElementNS(xmlns, 'line')
-          line.classList.add('content-window-line')
+          function mmove(e) {
+            templateContainer.style.left = e.clientX - templateContainer.clickOffsetX + 'px'
+            templateContainer.style.top = e.clientY - templateContainer.clickOffsetY + 'px'
 
-          svg.appendChild(line)
+            window.updateWindowLineStart()
+          }
 
-          const circle = document.createElementNS(xmlns, 'circle')
-          circle.classList.add('content-window-line-end')
-          circle.setAttributeNS(null, 'cx', 0)
-          circle.setAttributeNS(null, 'cy', 0)
-          circle.setAttributeNS(null, 'r', 10)
+          function mup(e) {
+            window.removeEventListener('mousemove', mmove)
+            templateContainer.classList.remove('dragging')
+          }
 
-          svg.appendChild(circle)
+          templateContainer.classList.add('dragging')
 
-          document.body.appendChild(svg)
+          window.addEventListener('mousemove', mmove)
+          window.addEventListener('mouseup', mup)
+        })
+
+        //buttons interaction to reaveal content
+        const allButtons = templateContainer.querySelectorAll('.row .cell:first-of-type:not(.cell:last-of-type)')
+        allButtons.forEach((button) => {
+          button.addEventListener('click', (event) => {
+            const nextInvisibleCell = button.parentNode.querySelector('.invisible-data')
+            if (nextInvisibleCell) {
+              nextInvisibleCell.classList.remove('invisible-data')
+            }
+          })
+        })
+
+        if (templateContainer.style.position != 'absolute') {
+          templateContainer.style.position = 'absolute'
+          templateContainer.style.zIndex = 100000
+          templateContainer.style.right = '1em'
+          templateContainer.style.top = '1em'
         }
 
-        if (!isVR()) return
-        mapper1 = DomMapper.setup(templateContainer)
-        setTimeout(() => {
-          domrenderer.addRenderContainer(templateContainer, '#666', (renderData) => {
-            mapper1.updatePositions()
-            addDomBillboard(renderData, templateContainer, mapper1, new Vec3(5, 1, 1), undefined, 0.0025)
-          })
-        }, 100)
+        //setup line for content window
+        const line = document.querySelector('.content-window-line')
+        console.log(templateContainer.style.left, templateContainer.style.top, event.clientX, event.clientY)
+        line.setAttributeNS(null, 'x1', parseInt(templateContainer.offsetLeft + templateContainer.offsetWidth * 0.5))
+        line.setAttributeNS(null, 'y1', parseInt(templateContainer.offsetTop + templateContainer.offsetHeight * 0.5))
+        line.setAttributeNS(null, 'x2', event.clientX)
+        line.setAttributeNS(null, 'y2', event.clientY)
+        const circle = document.querySelector('.content-window-line-end')
+
+        circle.setAttributeNS(null, 'cx', event.clientX)
+        circle.setAttributeNS(null, 'cy', event.clientY)
+
+        const svg = document.querySelector('.content-window-line-container')
+        svg.classList.remove('hidden')
       }
 
-      function updateInfos(title, template) {
-        if (currentContent == title) return
-        const data = json.getObjectFromListWithProp(url, 'title', title)
-        templateContainer.innerHTML = template(data)
-        domrenderer.resetStates(templateContainer)
-        currentContent = title
-        setTimeout(() => {
-          domrenderer.renderMainContainer(templateContainer, (argument) => {
-            mapper1.updateMapping()
-            showActiveBillboard(templateContainer, true, true)
-          })
-        }, 100)
+      //window center
+      window.updateWindowLineStart = function () {
+        const line = document.querySelector('.content-window-line')
+        line.setAttributeNS(null, 'x1', parseInt(templateContainer.offsetLeft + templateContainer.offsetWidth * 0.5))
+        line.setAttributeNS(null, 'y1', parseInt(templateContainer.offsetTop + templateContainer.offsetHeight * 0.5))
       }
-    </script>
-  </body>
+
+      //item center
+      window.updateWindowLineEnd = function (x, y) {
+        const line = document.querySelector('.content-window-line')
+        line.setAttributeNS(null, 'x2', parseInt(x))
+        line.setAttributeNS(null, 'y2', parseInt(y))
+
+        const circle = document.querySelector('.content-window-line-end')
+        circle.setAttributeNS(null, 'cx', parseInt(x))
+        circle.setAttributeNS(null, 'cy', parseInt(y))
+      }
+
+      window.closeBillboard = function (button) {
+        templateContainer.style.position = 'initial'
+        templateContainer.style.zIndex = 'initial'
+        templateContainer.style.top = 'initial'
+        templateContainer.style.left = 'initial'
+        unhighlightContentItem()
+        leftControlsApp.unselectAll()
+
+        const svg = document.querySelector('.content-window-line-container')
+        svg.classList.add('hidden')
+      }
+
+      window.resetScene = function () {
+        resetView(true)
+        resetTree()
+        unhighlightContentItem()
+        window.closeBillboard()
+        leftControlsApp.currentPage = 0
+      }
+
+      window.gotoPosition = function (positionIndex) {
+        goto(positionIndex)
+      }
+
+      window.saveCam = function (positionName) {
+        saveCamLocal()
+      }
+
+      function resetTree() {
+        //geom
+        const masterTree = document.querySelectorAll('.tree-list')
+        masterTree.forEach((tree) => {
+          tree.querySelectorAll('span').forEach((span) => {
+            span.classList.add('item-visible')
+            span.classList.remove('item-invisible')
+          })
+
+          tree.classList.add('visible')
+          tree.classList.remove('invisible')
+        })
+      }
+
+      function digChildren(children, output) {
+        for (var i = 0; i < children.length; i++) {
+          if (children[i].getChildren().length > 0) {
+            children[i].shouldBeVisible = children[i].isVisible()
+            children[i].highlightColor2 = new Color('#2a9d8f')
+            output.push({ name: children[i].__name, item: children[i], children: [], shouldBeVisible: children[i].isVisible() })
+            sortChildren(children[i].getChildren())
+            digChildren(children[i].getChildren(), output[output.length - 1].children)
+          } else {
+            children[i].highlightColor2 = new Color('#2a9d8f')
+            children[i].shouldBeVisible = children[i].isVisible()
+            output.push({ name: children[i].__name, item: children[i], shouldBeVisible: children[i].isVisible() })
+          }
+        }
+      }
+
+      function applyToAllChildren(children, functionToCall) {
+        for (var i = 0; i < children.length; i++) {
+          functionToCall(children[i])
+          if (children[i].getChildren().length > 0) applyToAllChildren(children[i].getChildren(), functionToCall)
+        }
+      }
+
+      function sortChildren(children) {
+        children.sort(function (a, b) {
+          var nameA = a.__name.toLowerCase(),
+            nameB = b.__name.toLowerCase()
+          nameA = nameA.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          nameB = nameB.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
+          if (nameA < nameB)
+            //sort string ascending
+            return -1
+          if (nameA > nameB) return 1
+          return 0 //default return value (no sorting)
+        })
+      }
+
+      function CADReady(data) {
+        if (!isVR()) {
+          const layers = data.layersRoot
+          const rootLayer = data.layersRoot.__name
+          layers.shouldBeVisible = true
+          const layerData = { name: rootLayer, item: layers, children: [], shouldBeVisible: true }
+
+          let children = layers.getChildren()
+
+          sortChildren(children)
+
+          digChildren(children, layerData.children)
+
+          leftControlsApp.tree = [layerData]
+
+          leftControlsApp.positions = positions
+          setTimeout(() => {
+            leftControlsApp.quizReady = true
+          }, 1500)
+
+          setPositionCallback((position) => {
+            window.updateWindowLineEnd(position[0], position[1])
+          })
+        } else {
+          const visibilityTogglesContainer = handUI.querySelector('#page2 div')
+          data.asset.__childItems[0].__childItems.forEach((geomItem) => {
+            const itemName = geomItem.getParameter('LayerName').getValue()
+            const itemContainer = document.createElement('div')
+            const title = document.createElement('h3')
+            title.innerText = itemName
+            itemContainer.appendChild(title)
+
+            const btn = document.createElement('button')
+            btn.classList.add('btn-init')
+            btn.dataset.mapping = true
+            btn.dataset.activeClass = 'btn-active'
+            btn.geomitem = geomItem
+            btn.addEventListener('click', (event) => {
+              btn.innerText = btn.innerText == 'Afficher' ? 'Cacher' : 'Afficher'
+              const visible = btn.geomitem.isVisible()
+              btn.geomitem.setVisible(!visible)
+            })
+
+            btn.innerText = 'Cacher'
+
+            itemContainer.appendChild(btn)
+            visibilityTogglesContainer.appendChild(itemContainer)
+          })
+        }
+      }
+    })
+
+    function prepareInfos(title, template) {
+      const data = json.getObjectFromListWithProp(url, 'title', title)
+      templateContainer.innerHTML = template(data)
+
+      if (!isVR()) {
+        //prepare svg for content window line
+        const xmlns = 'http://www.w3.org/2000/svg'
+        const bW = window.innerWidth
+        const bH = window.innerHeight
+
+        const svg = document.querySelector('.content-window-line-container')
+        svg.setAttributeNS(null, 'viewBox', '0 0 ' + bW + ' ' + bH)
+        svg.setAttributeNS(null, 'width', bW)
+        svg.setAttributeNS(null, 'height', bH)
+
+        const line = document.createElementNS(xmlns, 'line')
+        line.classList.add('content-window-line')
+
+        svg.appendChild(line)
+
+        const circle = document.createElementNS(xmlns, 'circle')
+        circle.classList.add('content-window-line-end')
+        circle.setAttributeNS(null, 'cx', 0)
+        circle.setAttributeNS(null, 'cy', 0)
+        circle.setAttributeNS(null, 'r', 10)
+
+        svg.appendChild(circle)
+
+        document.body.appendChild(svg)
+      }
+
+      if (!isVR()) return
+      mapper1 = DomMapper.setup(templateContainer)
+      setTimeout(() => {
+        domrenderer.addRenderContainer(templateContainer, '#666', (renderData) => {
+          mapper1.updatePositions()
+          addDomBillboard(renderData, templateContainer, mapper1, new Vec3(5, 1, 1), undefined, 0.0025)
+        })
+      }, 100)
+    }
+
+    function updateInfos(title, template) {
+      if (currentContent == title) return
+      const data = json.getObjectFromListWithProp(url, 'title', title)
+      templateContainer.innerHTML = template(data)
+      domrenderer.resetStates(templateContainer)
+      currentContent = title
+      setTimeout(() => {
+        domrenderer.renderMainContainer(templateContainer, (argument) => {
+          mapper1.updateMapping()
+          showActiveBillboard(templateContainer, true, true)
+        })
+      }, 100)
+    }
+  </script>
+</body>
+
 </html>

@@ -532,6 +532,7 @@ main {
   cursor: pointer;
   transition: all 0.2s ease-out;
   padding: 0.2em;
+  display: inline-block;
 }
 
 .tree-list span:hover {
