@@ -105,7 +105,8 @@ leftControls.component('tree-list', {
 
       const allSpans = rootList.querySelectorAll('span');
       allSpans.forEach(span => {
-        if (span.innerText == itemName) {
+        console.log(span.innerText, itemName);
+        if (span.innerText.toLocaleLowerCase() == itemName.toLocaleLowerCase()) {
           const parentList = this.getParentList(span);
 
           if (parentList && parentList.classList.contains("hidden")) {
