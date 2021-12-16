@@ -300,7 +300,7 @@ function main() {
   })
 
   //loading the file
-  loadAsset('./data/maison.skp.zcad').then((data) => {
+  loadAsset('./data/Maison.skp.zcad').then((data) => {
     scene.getRoot().addChild(data.asset)
     const geomItems = []
     data.layersRoot.traverse((geomItem) => {

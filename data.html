@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8" />
+
     <!-- download Zea Engine -- this downloads the latest build from version 3 of the engine -->
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@4.0.1-68fce05/dist/index.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@4.0.1/dist/index.umd.js"></script>
@@ -20,7 +22,7 @@
     <script src="https://unpkg.com/vue@next"></script>
     <script defer src="./src/left-controls.js"></script>
 
-    <title>ConstrucTAU - Data</title>
+    <title>Application ConstrucTAU</title>
   </head>
 
   <body class="overflow-hidden">
@@ -47,7 +49,7 @@
 
     <main>
       <div id="canvas-holder">
-        <canvas id="canvas" style="position: absolute; width: 100%; height: 100%"> </canvas>
+        <canvas id="canvas" style="position: absolute; width: 100%; height: 100%;"> </canvas>
       </div>
       <div class="xr-button hidden" id="xr-button"></div>
       <zea-fps-display class="fps-display" id="fps"></zea-fps-display>
@@ -182,6 +184,8 @@
         window.newContentRequest = function (contentTitle, event) {
           const data = json.getObjectFromListWithProp(url, 'title', contentTitle) || { title: contentTitle }
 
+          leftControlsApp.treeListSearchCallback(contentTitle)
+
           templateContainer.innerHTML = template(data)
 
           //dargging of templatecotnainer
@@ -268,6 +272,7 @@
           templateContainer.style.top = 'initial'
           templateContainer.style.left = 'initial'
           unhighlightContentItem()
+          leftControlsApp.unselectAll()
 
           const svg = document.querySelector('.content-window-line-container')
           svg.classList.add('hidden')
@@ -332,6 +337,7 @@
               nameB = b.__name.toLowerCase()
             nameA = nameA.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
             nameB = nameB.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
             if (nameA < nameB)
               //sort string ascending
               return -1
@@ -354,6 +360,7 @@
             digChildren(children, layerData.children)
 
             leftControlsApp.tree = [layerData]
+
             leftControlsApp.positions = positions
             setTimeout(() => {
               leftControlsApp.quizReady = true
