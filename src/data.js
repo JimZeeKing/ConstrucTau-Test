@@ -94,18 +94,11 @@ function main() {
         renderer,
         scene,
     }
-    const selectionManager = new SelectionManager(appData, {
-        selectionOutlineColor: new Color(1, 1, 0.2, 0.1),
-        branchSelectionOutlineColor: new Color(1, 1, 0.2, 0.1),
-    })
-
     // Setup FPS Display
     const fpsElement = document.getElementById('fps')
     fpsElement.renderer = renderer
 
-    // Setup TreeView Display
-    //const treeElement = document.getElementById('tree')
-    //treeElement.setTreeItem(scene.getRoot(), selectionManager)
+
     const highlightColor = new Color('#2a9d8f')
     highlightColor.a = 0.1
     const highlightColorContent = new Color('#2a9d8f')
@@ -117,6 +110,7 @@ function main() {
 
     //new content from geom click
     renderer.getViewport().on('pointerDown', (event) => {
+        if (window.currentQuizIsSom) return
         if (event.intersectionData && event.button == 0) {
             if (event.intersectionData.geomItem.hasParameter('LayerName')) {
                 contentActivePosition = event.intersectionData.intersectionPos

@@ -129,6 +129,7 @@ leftControls.component('tree-list', {
 
     this.$root.quizReadyCallback = (quiz) => {
       if (quiz.isSom) {
+        window.currentQuizIsSom = true;
         self.hideLastChildren()
       }
     }

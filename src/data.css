@@ -420,7 +420,7 @@ main {
 }
 
 .controls.closed .trigger .icon {
-  transform: rotateZ(-90deg) translateY(5px);
+  transform: rotateZ(-90deg) translateY(7px);
 }
 
 .controls .trigger:hover {
