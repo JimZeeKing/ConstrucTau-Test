@@ -103,7 +103,7 @@ function main() {
   }
 
   //new content from geom click
-  renderer.getViewport().on('pointerDown', (event) => {
+  renderer.getViewport().on('pointerUp', (event) => {
     if (window.currentQuizIsSom) return
     if (event.intersectionData && event.button == 0) {
       if (event.intersectionData.geomItem.hasParameter('LayerName')) {
@@ -118,9 +118,34 @@ function main() {
     }
   })
 
+  scene.getRoot().on('pointerMove', (event) => {
+    if (event.intersectionData && event.pointerType == 'xr') {
+      const controller = event.controller
+      const pointerItem = controller.tipItem.getChild(0)
+      const pointerXfo = pointerItem.localXfoParam.value
+      pointerXfo.sc.z = event.intersectionData.dist / controller.xrvp.stageScale
+      pointerItem.localXfoParam.value = pointerXfo
+      console.log('pointerMove - VR', event.intersectionData) //here !
+    }
+
+    event.intersectionData.geomItem.addHighlight('selection', highlightColorContent, true)
+  })
+  scene.getRoot().on('pointerLeave', (event) => {
+    if (!event.intersectionData && event.pointerType == 'xr') {
+      const controller = event.controller
+      const pointerItem = controller.tipItem.getChild(0)
+      const pointerXfo = pointerItem.localXfoParam.value
+      pointerXfo.sc.z = controller.raycastDist
+      pointerItem.localXfoParam.value = pointerXfo
+      console.log('pointerLeave - VR', event.intersectionData) //here !
+    }
+
+    event.leftGeometry.removeHighlight('selection', highlightColorContent, true)
+  })
+
   renderer.getViewport().on('viewChanged', (event) => {
     //making sure render state are reseted
-    console.log(contentActivePosition)
+
     // const worldSpacePos = event.viewXfo.tr.add(event.viewXfo.ori.getZaxis().scale(-10.0)) //center of scene
 
     if (contentHighlitedItem && !vr) {
@@ -263,6 +288,8 @@ function main() {
           },
         ])
 
+        leftController.getTipItem().removeAllChildren()
+
         leftController.getTipItem().addChild(activeBillboard.get('handUI').billboard, false)
         const uiLocalXfo = activeBillboard.get('handUI').billboard.getParameter('LocalXfo').getValue()
         uiLocalXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.4)
@@ -370,6 +397,7 @@ export function addDomBillboard(imageData, targetElement, mapper, pos, lookAt, p
   activeBillboard.set(targetElement, bData)
 
   bData.billboard.getParameter('Visible').setValue(showOnCreation ? showOnCreation : false)
+  // bData.billboard.setSelectable(false)
 }
 
 export function resetView(resetScene) {
@@ -515,11 +543,6 @@ function createBillboard(label, pos, image, targetPos, targetPPM) {
   return geomItem
 }
 
-function setPointerLength(length) {
-  pointerUIXfo.sc.set(1, 1, length)
-  pointerUILine.getParameter('LocalXfo').setValue(pointerUIXfo)
-}
-
 function getIntersectionPosition(intersectionData, isInHand) {
   if (intersectionData) {
     const ray = intersectionData.ray ? intersectionData.ray : intersectionData.pointerRay
@@ -527,6 +550,7 @@ function getIntersectionPosition(intersectionData, isInHand) {
 
     //bug:pointerevent stil firing after maing it invisible
     if (!geomItem.isVisible()) {
+      console.log('not good')
       return
     }
 
@@ -537,7 +561,13 @@ function getIntersectionPosition(intersectionData, isInHand) {
       return -1
     }
 
-    // if (vr) setPointerLength(res)
+    if (vr) {
+      const controller = leftController
+      const pointerItem = controller.tipItem.getChild(0)
+      const pointerXfo = pointerItem.localXfoParam.value
+      pointerXfo.sc.z = intersectionData.dist / controller.xrvp.stageScale
+      pointerItem.localXfoParam.value = pointerXfo
+    }
 
     //if in hand we must update the scale according to headScale
     planeXfo.sc.set(isInHand ? headScale : 1, isInHand ? headScale : 1, isInHand ? headScale : 1)
