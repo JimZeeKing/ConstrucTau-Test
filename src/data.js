@@ -75,29 +75,29 @@ function main() {
   // set camera's target and position.
   camera.setPositionAndTarget(new Vec3(11.372241020202637, -7.3188862800598145, 5.77191162109375), new Vec3(0, 0, 1.7))
 
-  const envMap = new EnvMap()
-  envMap.load('./data/StudioG.zenv')
-  scene.setEnvMap(envMap)
+  // const envMap = new EnvMap()
+  // envMap.load('./data/StudioG.zenv')
+  // scene.setEnvMap(envMap)
 
-  // These variables can be used later in our program
-  const grid_size = 10
-  const grid_div = 10
+  // // These variables can be used later in our program
+  // const grid_size = 10
+  // const grid_div = 10
 
-  scene.setupGrid(grid_size, grid_div)
+  // scene.setupGrid(grid_size, grid_div)
 
   // create an empty TreeItem can be added to the scene tree to then add billboards to.
   billboardTree = new TreeItem('billboards')
   scene.getRoot().addChild(billboardTree)
 
-  const { SelectionManager } = zeaUx
-  const appData = {
-    renderer,
-    scene,
-  }
-  const selectionManager = new SelectionManager(appData, {
-    selectionOutlineColor: new Color(1, 1, 0.2, 0.1),
-    branchSelectionOutlineColor: new Color(1, 1, 0.2, 0.1),
-  })
+  // const { SelectionManager } = zeaUx
+  // const appData = {
+  //   renderer,
+  //   scene,
+  // }
+  // const selectionManager = new SelectionManager(appData, {
+  //   selectionOutlineColor: new Color(1, 1, 0.2, 0.1),
+  //   branchSelectionOutlineColor: new Color(1, 1, 0.2, 0.1),
+  // })
 
   // Setup FPS Display
   const fpsElement = document.getElementById('fps')
