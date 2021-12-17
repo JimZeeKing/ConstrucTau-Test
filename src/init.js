@@ -83,6 +83,24 @@ export default function init() {
     event.leftGeometry.removeHighlight('pointerOverGeom', true)
     highlightedItem = null
   })
+  scene.getRoot().on('pointerMove', (event) => {
+    if (event.intersectionData && event.pointerType == 'xr') {
+      const controller = event.controller
+      const pointerItem = controller.tipItem.getChild(0)
+      const pointerXfo = pointerItem.localXfoParam.value
+      pointerXfo.sc.z = event.intersectionData.dist / controller.xrvp.stageScale
+      pointerItem.localXfoParam.value = pointerXfo
+    }
+  })
+  scene.getRoot().on('pointerLeave', (event) => {
+    if (!event.intersectionData && event.pointerType == 'xr') {
+      const controller = event.controller
+      const pointerItem = controller.tipItem.getChild(0)
+      const pointerXfo = pointerItem.localXfoParam.value
+      pointerXfo.sc.z = controller.raycastDist
+      pointerItem.localXfoParam.value = pointerXfo
+    }
+  })
 
   let pointerDownPos
   renderer.getViewport().on('pointerDown', (event) => {
@@ -135,7 +153,11 @@ export default function init() {
       const { intersectionData } = event
       if (intersectionData && intersectionData.geomItem.hasParameter('LayerName')) {
         displayBillboardOnClick(intersectionData, labelsData, billboards)
-        event.stopPropagation()
+
+        // We can't stop propagation here, else the VRViewManipulator doesn't work.
+        // (e.g. we have to avoid clicking on things do move, which means we
+        // can't go inside the building.)
+        // event.stopPropagation()
       }
     })
 
@@ -202,7 +224,9 @@ export default function init() {
 
   // //////////////////////////
   // Load the Asset
-  loadAsset('./data/data.skp.zcad').then((data) => {
+  // const url = './data/data.skp.zcad'
+  const url = './data/maison.skp.zcad'
+  loadAsset(url).then((data) => {
     scene.getRoot().addChild(data.asset)
     scene.getRoot().addChild(data.layersRoot)
     renderer.frameAll()
