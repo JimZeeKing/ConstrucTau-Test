@@ -119,7 +119,7 @@ progress {
 .fps-display {
   position: absolute;
   bottom: 15px;
-  right: 10px;
+  left: 10px;
 }
 
 .hidden {
