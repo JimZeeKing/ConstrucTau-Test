@@ -4,6 +4,7 @@ const LeftControls = {
       closed: true,
       quizReady: false,
       quizReadyCallback: null,
+      treeListSearchCallback: null,
       currentPage: 0,
       pages: [{ title: 'Éléments' }, { title: 'Positions' }],
       positions: [],
@@ -28,9 +29,10 @@ leftControls.component('tree-list', {
       const chevron = event.currentTarget
       const containerItem = document.querySelector(`.${container}`)
       const itemsToToggle = containerItem.querySelectorAll('ul')
-      itemsToToggle.forEach((itemToToggle) => {
-        itemToToggle.classList.toggle('hidden')
-      })
+
+      /* itemsToToggle.forEach((itemToToggle) => {
+         itemToToggle.classList.toggle('hidden')
+       })*/
 
       containerItem.classList.toggle('hidden')
       chevron.classList.toggle('open')
@@ -55,7 +57,6 @@ leftControls.component('tree-list', {
 
       element.classList.toggle('item-visible')
       element.classList.toggle('item-invisible')
-      console.log(element, parentList, listName)
 
       if (parentList) {
         parentList.classList.toggle('visible')
@@ -79,9 +80,9 @@ leftControls.component('tree-list', {
     },
     toggleAllSiblingsExceptMe(listName, event) {
       const element = event.currentTarget
-      console.log(`.${listName} > li > span`)
+
       const siblingElements = document.querySelectorAll(`.${listName} > li > span`)
-      console.log(siblingElements)
+
       siblingElements.forEach((siblingElement) => {
         if (siblingElement != element) {
           siblingElement.click()
@@ -97,20 +98,52 @@ leftControls.component('tree-list', {
   },
   created() {
     let self = this
+
+    this.$root.treeListSearchCallback = (itemName, foundCallback) => {
+      const rootList = document.querySelector('.list_0i0')
+
+      const allSpans = rootList.querySelectorAll('span')
+      allSpans.forEach((span) => {
+        if (span.innerText.toLocaleLowerCase() == itemName.toLocaleLowerCase()) {
+          if (foundCallback) {
+            foundCallback(span)
+            return
+          }
+
+          const parentList = this.getParentList(span)
+
+          if (parentList && parentList.classList.contains('hidden')) {
+            const listIndex = parentList.dataset.index
+            const chevronParent = this.getParentList(parentList)
+            document.querySelector(`#${chevronParent.id} li:nth-child(${parseInt(listIndex) + 1}) > .chevron`).click()
+          }
+
+          span.classList.add('selected')
+
+          // if (parentList) parentList.scrollIntoView(true)
+          span.scrollIntoView(true)
+        } else span.classList.remove('selected')
+      })
+    }
+
+    this.$root.unselectAll = function () {
+      document.querySelectorAll('span.selected').forEach((span) => span.classList.remove('selected'))
+    }
+
     this.$root.quizReadyCallback = (quiz) => {
       if (quiz.isSom) {
+        window.currentQuizIsSom = true
         self.hideLastChildren()
       }
     }
   },
   template: `
-  <ul :class='"list_"+level' class='tree-list visible'>
+  <ul :id='"list_"+level' :class='"list_"+level' class='tree-list visible'>
     <li v-for='(child, index) in children'>
-    <div  :class='[{chevron:child.children},"open"]' @click='toggle("list_"+(parseInt(level) + 1) + "i" + index, $event)'></div>
-      <span :class='{last:child.children == undefined}' @click='toggleVisibility(child.item, child.children,level+(parseInt(level) + 1), $event)' class='item-visible' @contextmenu="toggleAllSiblingsExceptMe('list_'+level, $event)" >{{child.name}}  {{level+(parseInt(level) + 1) + "i" + index}}</span>
+    <div  :class='[{chevron:child.children},"open"]' @click='toggle("list_"+level+(parseInt(level) + 1) + "i" + index, $event)'></div>
+      <span :class='{last:child.children == undefined}' @click='toggleVisibility(child.item, child.children,level+(parseInt(level) + 1)+ "i" + index, $event)' class='item-visible' @contextmenu="toggleAllSiblingsExceptMe('list_'+level, $event)" >{{child.name}}</span>
       <template v-if="child.children">
-     
-        <tree-list :level='level+(parseInt(level) + 1) + "i" + index'  :children='child.children' :item='child.item' :name='child.name' :key='child.name'></tree-list>
+        <tree-list :data-index='index' :level='level+(parseInt(level) + 1) + "i" + index'  :children='child.children' :item='child.item' :name='child.name' :key='child.name'></tree-list>
       </template>    
     </li>
   </ul>
@@ -298,7 +331,6 @@ leftControls.component('quiz', {
               this.$root.quizReadyCallback(this.quiz)
             }
 
-            console.log(this.quiz)
             /* const localData = this.loadLocalData('quiz')
             if (localData && localData.id == this.quiz.id) {
               this.quiz.questions = localData.questions

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8" />
+
     <!-- download Zea Engine -- this downloads the latest build from version 3 of the engine -->
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@4.0.1-dc98d7c/dist/index.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@4.0.1/dist/index.umd.js"></script>
@@ -20,7 +22,7 @@
     <script src="https://unpkg.com/vue@next"></script>
     <script defer src="./src/left-controls.js"></script>
 
-    <title>ConstrucTAU - Data</title>
+    <title>Application ConstrucTAU</title>
   </head>
 
   <body class="overflow-hidden">
@@ -94,7 +96,7 @@
     <svg class="content-window-line-container hidden"></svg>
     <script type="module">
       const { Vec3, Color } = window.zeaEngine
-      import { prepare, updateBillboard, showActiveBillboard, addDomBillboard, resetView, saveCamLocal, goto, waitForVR, isVR, unhighlightContentItem, setPositionCallback } from './src/data.js'
+      import { prepare, frameView, updateBillboard, showActiveBillboard, addDomBillboard, resetView, saveCamLocal, goto, waitForVR, isVR, unhighlightContentItem, setPositionCallback } from './src/data.js'
       import { DataPool } from './src/DataPool.js'
       import { positions } from './src/positions.js'
 
@@ -115,6 +117,13 @@
         prepare(CADReady)
 
         waitForVR(() => {
+          mapper1 = DomMapper.setup(templateContainer)
+          setTimeout(() => {
+            domrenderer.addRenderContainer(templateContainer, '#666', (renderData) => {
+              mapper1.updatePositions()
+              addDomBillboard(renderData, templateContainer, mapper1, new Vec3(5, 1, 1), undefined, 0.0025)
+            })
+          }, 100)
           templateContainer.addEventListener('domevent', function (event) {
             domrenderer.renderElement(templateContainer, event.detail.element, event.detail.type, false, true)
           })
@@ -182,10 +191,24 @@
         window.newContentRequest = function (contentTitle, event) {
           const data = json.getObjectFromListWithProp(url, 'title', contentTitle) || { title: contentTitle }
 
+          leftControlsApp.treeListSearchCallback(contentTitle)
+
           templateContainer.innerHTML = template(data)
+
+          if (templateContainer.classList.contains('minimized')) {
+            const minimizeBtn = templateContainer.querySelector('.head .minimize')
+            if (minimizeBtn) {
+              minimizeBtn.classList.toggle('minimize')
+              minimizeBtn.classList.toggle('maximize')
+            }
+          }
 
           //dargging of templatecotnainer
           templateContainer.querySelector('.head').addEventListener('mousedown', (e) => {
+            if (e.target instanceof HTMLButtonElement) {
+              return
+            }
+
             var rect = templateContainer.getBoundingClientRect()
             var style = window.getComputedStyle(templateContainer)
 
@@ -268,9 +291,29 @@
           templateContainer.style.top = 'initial'
           templateContainer.style.left = 'initial'
           unhighlightContentItem()
+          leftControlsApp.unselectAll()
 
           const svg = document.querySelector('.content-window-line-container')
           svg.classList.add('hidden')
+        }
+
+        window.minimizeBillboard = function (button) {
+          templateContainer.classList.toggle('minimized')
+          button.classList.toggle('minimize')
+          button.classList.toggle('maximize')
+          updateWindowLineStart()
+        }
+
+        window.hideItem = function (button) {
+          button.classList.toggle('hide')
+          button.classList.toggle('show')
+          leftControlsApp.treeListSearchCallback(templateContainer.querySelector('.head').innerText, (span) => {
+            span.click()
+          })
+        }
+
+        window.frameItem = function (argument) {
+          frameView()
         }
 
         window.resetScene = function () {
@@ -332,6 +375,7 @@
               nameB = b.__name.toLowerCase()
             nameA = nameA.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
             nameB = nameB.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
             if (nameA < nameB)
               //sort string ascending
               return -1
@@ -354,6 +398,7 @@
             digChildren(children, layerData.children)
 
             leftControlsApp.tree = [layerData]
+
             leftControlsApp.positions = positions
             setTimeout(() => {
               leftControlsApp.quizReady = true
@@ -423,13 +468,15 @@
         }
 
         if (!isVR()) return
-        mapper1 = DomMapper.setup(templateContainer)
+
+        console.log('VR')
+        /*mapper1 = DomMapper.setup(templateContainer)
         setTimeout(() => {
           domrenderer.addRenderContainer(templateContainer, '#666', (renderData) => {
             mapper1.updatePositions()
             addDomBillboard(renderData, templateContainer, mapper1, new Vec3(5, 1, 1), undefined, 0.0025)
           })
-        }, 100)
+        }, 100)*/
       }
 
       function updateInfos(title, template) {

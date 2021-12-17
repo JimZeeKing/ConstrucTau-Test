@@ -1,5 +1,12 @@
 
-<div class="head">{{title}} <button data-mapping class='button' data-hover-class='button-hover' data-down-class='button-down'  onclick="closeBillboard(this)"></button></div>
+<div class="head">
+<span>{{title}}</span>
+ <button data-mapping class='button close' data-hover-class='button-hover' data-down-class='button-down'  onclick="closeBillboard(this)"></button>
+<button data-mapping class='button minimize' data-hover-class='button-hover' data-down-class='button-down'  onclick="minimizeBillboard(this)"></button>
+<button data-mapping class='button hide' data-hover-class='button-hover' data-down-class='button-down'  onclick="hideItem(this)"></button>
+<button data-mapping class='button frame' data-hover-class='button-hover' data-down-class='button-down'  onclick="frameItem(this)"></button>
+
+</div>
   <div class="row">
     <div class="cell" data-mapping data-hover-class='cell-hover' data-down-class='cell-down' data-target-id='vocableFR'>Vocabulaire (nom français de la composante):</div>
     <div class="cell invisible-data" id='vocableFR' data-remove-class='invisible-data'>{{titleFR}}</div>

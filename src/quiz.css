@@ -38,7 +38,7 @@
 }
 
 .quiz:not(.active) .trigger .icon {
-  transform: rotateZ(90deg) translateY(5px);
+  transform: rotateZ(90deg) translateY(3px);
 }
 
 .quiz .trigger:hover .icon {
@@ -46,7 +46,7 @@
 }
 
 .quiz:not(.active) .trigger:hover .icon {
-  transform: rotateZ(90deg) translateY(10px);
+  transform: rotateZ(90deg) translateY(6px);
 }
 
 .quiz-infos {
@@ -61,6 +61,8 @@
   background-color: #264653;
   padding: 1em;
   transition: left 0.5s ease-out;
+  color: #fff;
+
 }
 
 .quiz-infos .message {
@@ -111,6 +113,7 @@
 
 .quiz-infos h4 {
   text-align: center;
+  padding: 1em .5em;
 }
 
 .quiz-infos .form .footer {
@@ -137,7 +140,7 @@
 }
 
 .quiz-infos .form label:hover .label-string {
-  background-color: inherit;
+  background-color: var(--sec-color);
 }
 
 .quiz-infos .form label .label-string {

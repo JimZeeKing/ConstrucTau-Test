@@ -89,51 +89,30 @@ function main() {
   billboardTree = new TreeItem('billboards')
   scene.getRoot().addChild(billboardTree)
 
-  // const { SelectionManager } = zeaUx
-  // const appData = {
-  //   renderer,
-  //   scene,
-  // }
-  // const selectionManager = new SelectionManager(appData, {
-  //   selectionOutlineColor: new Color(1, 1, 0.2, 0.1),
-  //   branchSelectionOutlineColor: new Color(1, 1, 0.2, 0.1),
-  // })
-
   // Setup FPS Display
   const fpsElement = document.getElementById('fps')
   fpsElement.renderer = renderer
 
-  // Setup TreeView Display
-  //const treeElement = document.getElementById('tree')
-  //treeElement.setTreeItem(scene.getRoot(), selectionManager)
   const highlightColor = new Color('#2a9d8f')
   highlightColor.a = 0.1
-  const highlightColorContent = new Color('#e9c46a')
+  const highlightColorContent = new Color('#2a9d8f')
   highlightColorContent.a = 0.1
   const filterItem = (item) => {
     while (item && !(item instanceof CADBody)) item = item.getOwner()
     return item
   }
 
-  // let highlightedItem
-  // scene.getRoot().on('pointerEnter', (event) => {
-  //   highlightedItem = filterItem(event.intersectionData.geomItem)
-  //   highlightedItem.addHighlight('pointerOverGeom', highlightColor, true)
-  // })
-  // scene.getRoot().on('pointerLeave', (event) => {
-  //   highlightedItem.removeHighlight('pointerOverGeom', true)
-  //   highlightedItem = null
-  // })
-
   //new content from geom click
   renderer.getViewport().on('pointerDown', (event) => {
+    if (window.currentQuizIsSom) return
     if (event.intersectionData && event.button == 0) {
       if (event.intersectionData.geomItem.hasParameter('LayerName')) {
         contentActivePosition = event.intersectionData.intersectionPos
         unhighlightContentItem()
-        contentHighlitedItem = filterItem(event.intersectionData.geomItem)
+        contentHighlitedItem = event.intersectionData.geomItem //filterItem(event.intersectionData.geomItem)
         contentHighlitedItem.addHighlight('selection', highlightColorContent, true)
         console.log(event.intersectionData.geomItem.getParameter('LayerName').getValue())
+
         window.newContentRequest(event.intersectionData.geomItem.getParameter('LayerName').getValue(), event)
       }
     }
@@ -141,12 +120,12 @@ function main() {
 
   renderer.getViewport().on('viewChanged', (event) => {
     //making sure render state are reseted
-
+    console.log(contentActivePosition)
     // const worldSpacePos = event.viewXfo.tr.add(event.viewXfo.ori.getZaxis().scale(-10.0)) //center of scene
 
     if (contentHighlitedItem && !vr) {
       const itemPosition = contentActivePosition
-      const worldSpacePos = new Vec4(itemPosition.x, itemPosition.y, itemPosition.z, 1) //center of scene
+      const worldSpacePos = new Vec4(itemPosition.x, itemPosition.y, itemPosition.z, 1)
 
       const viewport = renderer.getViewport()
       const viewMatrix = viewport.__viewMat
@@ -297,10 +276,12 @@ function main() {
     xrButton.addEventListener('click', function (event) {
       xrvp.togglePresenting()
     })
+
+    initState.set(xrview, xrview.getXfo().toJSON())
   })
 
   //loading the file
-  loadAsset('./data/maison.skp.zcad').then((data) => {
+  loadAsset('./data/Maison.skp.zcad').then((data) => {
     scene.getRoot().addChild(data.asset)
     const geomItems = []
     data.layersRoot.traverse((geomItem) => {
@@ -339,7 +320,9 @@ let positionCallback
 export function setPositionCallback(cb) {
   positionCallback = cb
 }
-
+export function frameView() {
+  camera.frameView(renderer.getViewport(), [contentHighlitedItem])
+}
 export function goto(posIndex) {
   const pos = typeof scenePositions[posIndex] == 'string' ? JSON.parse(scenePositions[posIndex]) : scenePositions[posIndex]
   if (pos) {
@@ -539,26 +522,22 @@ function setPointerLength(length) {
 
 function getIntersectionPosition(intersectionData, isInHand) {
   if (intersectionData) {
-    //   console.log(intersectionData);
     const ray = intersectionData.ray ? intersectionData.ray : intersectionData.pointerRay
-
     const geomItem = intersectionData.geomItem
 
     //bug:pointerevent stil firing after maing it invisible
-    /*  if (geomItem.getParameter('Visible').getValue() == false) {
-                      return
-                  }
-          */
+    if (!geomItem.isVisible()) {
+      return
+    }
+
     const planeXfo = geomItem.getParameter('GlobalXfo').getValue().clone()
     const plane = new Ray(planeXfo.tr, planeXfo.ori.getZaxis())
-
     const res = ray.intersectRayPlane(plane)
     if (res <= 0) {
-      console.log('tooshort', res)
       return -1
     }
 
-    //   if (vr) setPointerLength(res)
+    // if (vr) setPointerLength(res)
 
     //if in hand we must update the scale according to headScale
     planeXfo.sc.set(isInHand ? headScale : 1, isInHand ? headScale : 1, isInHand ? headScale : 1)
