@@ -117,6 +117,7 @@ function main() {
         contentHighlitedItem = event.intersectionData.geomItem //filterItem(event.intersectionData.geomItem)
         contentHighlitedItem.addHighlight('selection', highlightColorContent, true)
         console.log(event.intersectionData.geomItem.getParameter('LayerName').getValue())
+
         window.newContentRequest(event.intersectionData.geomItem.getParameter('LayerName').getValue(), event)
       }
     }
@@ -124,7 +125,7 @@ function main() {
 
   renderer.getViewport().on('viewChanged', (event) => {
     //making sure render state are reseted
-
+    console.log(contentActivePosition)
     // const worldSpacePos = event.viewXfo.tr.add(event.viewXfo.ori.getZaxis().scale(-10.0)) //center of scene
 
     if (contentHighlitedItem && !vr) {
@@ -324,7 +325,9 @@ let positionCallback
 export function setPositionCallback(cb) {
   positionCallback = cb
 }
-
+export function frameView() {
+  camera.frameView(renderer.getViewport(), [contentHighlitedItem])
+}
 export function goto(posIndex) {
   const pos = typeof scenePositions[posIndex] == 'string' ? JSON.parse(scenePositions[posIndex]) : scenePositions[posIndex]
   if (pos) {

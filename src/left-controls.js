@@ -99,38 +99,40 @@ leftControls.component('tree-list', {
   created() {
     let self = this
 
+    this.$root.treeListSearchCallback = (itemName, foundCallback) => {
+      const rootList = document.querySelector('.list_0i0')
 
-    this.$root.treeListSearchCallback = (itemName) => {
-      const rootList = document.querySelector(".list_0i0");
-
-      const allSpans = rootList.querySelectorAll('span');
-      allSpans.forEach(span => {
-        console.log(span.innerText, itemName);
+      const allSpans = rootList.querySelectorAll('span')
+      allSpans.forEach((span) => {
         if (span.innerText.toLocaleLowerCase() == itemName.toLocaleLowerCase()) {
-          const parentList = this.getParentList(span);
+          if (foundCallback) {
+            foundCallback(span)
+            return
+          }
 
-          if (parentList && parentList.classList.contains("hidden")) {
-            const listIndex = parentList.dataset.index;
-            const chevronParent = this.getParentList(parentList);
-            document.querySelector(`#${chevronParent.id} li:nth-child(${parseInt(listIndex) + 1}) > .chevron`).click();
-          };
+          const parentList = this.getParentList(span)
 
-          span.classList.add("selected");
+          if (parentList && parentList.classList.contains('hidden')) {
+            const listIndex = parentList.dataset.index
+            const chevronParent = this.getParentList(parentList)
+            document.querySelector(`#${chevronParent.id} li:nth-child(${parseInt(listIndex) + 1}) > .chevron`).click()
+          }
 
-          if (parentList) parentList.scrollIntoView(false);
-          else span.scrollIntoView(false);
+          span.classList.add('selected')
 
-        } else span.classList.remove("selected");
-      });
+          // if (parentList) parentList.scrollIntoView(true)
+          span.scrollIntoView(true)
+        } else span.classList.remove('selected')
+      })
     }
 
     this.$root.unselectAll = function () {
-      document.querySelectorAll("span.selected").forEach(span => span.classList.remove("selected"))
+      document.querySelectorAll('span.selected').forEach((span) => span.classList.remove('selected'))
     }
 
     this.$root.quizReadyCallback = (quiz) => {
       if (quiz.isSom) {
-        window.currentQuizIsSom = true;
+        window.currentQuizIsSom = true
         self.hideLastChildren()
       }
     }
@@ -328,7 +330,6 @@ leftControls.component('quiz', {
             if (this.$root.quizReadyCallback) {
               this.$root.quizReadyCallback(this.quiz)
             }
-
 
             /* const localData = this.loadLocalData('quiz')
             if (localData && localData.id == this.quiz.id) {
