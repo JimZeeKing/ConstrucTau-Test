@@ -6,7 +6,7 @@ import displayBillboardOnClick from './displayBillboardOnClick.js'
 import './dom-ui.js'
 
 export default function init() {
-  const { Color, Vec3, Xfo, Scene, GLRenderer, EnvMap, resourceLoader, TreeItem, Lines, Material, GeomItem } = zeaEngine
+  const { Color, Vec3, Xfo, Scene, GLRenderer, EnvMap, resourceLoader, TreeItem, Lines, Material, GeomItem, Plane, FlatSurfaceMaterial } = zeaEngine
   const { CADBody } = zeaCad
 
   const urlParams = new URLSearchParams(window.location.search)
@@ -83,7 +83,7 @@ export default function init() {
     event.leftGeometry.removeHighlight('pointerOverGeom', true)
     highlightedItem = null
   })
-  scene.getRoot().on('pointerMove', (event) => {
+  const pointerMove = (event) => {
     if (event.intersectionData && event.pointerType == 'xr') {
       const controller = event.controller
       const pointerItem = controller.tipItem.getChild(0)
@@ -91,8 +91,8 @@ export default function init() {
       pointerXfo.sc.z = event.intersectionData.dist / controller.xrvp.stageScale
       pointerItem.localXfoParam.value = pointerXfo
     }
-  })
-  scene.getRoot().on('pointerLeave', (event) => {
+  }
+  const pointerLeave = (event) => {
     if (!event.intersectionData && event.pointerType == 'xr') {
       const controller = event.controller
       const pointerItem = controller.tipItem.getChild(0)
@@ -100,7 +100,9 @@ export default function init() {
       pointerXfo.sc.z = controller.raycastDist
       pointerItem.localXfoParam.value = pointerXfo
     }
-  })
+  }
+  scene.getRoot().on('pointerMove', pointerMove)
+  scene.getRoot().on('pointerLeave', pointerLeave)
 
   let pointerDownPos
   renderer.getViewport().on('pointerDown', (event) => {
@@ -171,39 +173,55 @@ export default function init() {
       }
     })
 
-    const line = new Lines()
-    line.setNumVertices(2)
-    line.setNumSegments(1)
-    line.setSegmentVertexIndices(0, 0, 1)
-    const positions = line.getVertexAttribute('positions')
-    positions.getValueRef(0).set(0.0, 0.0, 0.0)
-    positions.getValueRef(1).set(0.0, 0.0, -1.0)
-    line.setBoundingBoxDirty()
-
-    const pointermat = new Material('pointermat', 'LinesShader')
-    pointermat.setSelectable(false)
-    pointermat.getParameter('BaseColor').value = new Color(0.2, 1.0, 0.2)
-
     xrvp.on('controllerAdded', (event) => {
       const controller = event.controller
-
-      controller.raycastDist = 20.0
 
       // Remove the green ball added by the VRViewManipulator.
       controller.tipItem.removeAllChildren()
 
-      const pointerItem = new GeomItem('PointerRay', line, pointermat)
-      pointerItem.setSelectable(false)
-      const pointerXfo = new Xfo()
-      pointerXfo.sc.set(1, 1, controller.raycastDist)
-      pointerItem.localXfoParam.value = pointerXfo
-      controller.tipItem.addChild(pointerItem, false)
+      if (controller.inputSource.handedness == 'right') {
+        controller.raycastArea = 0.05
+        controller.raycastDist = 5.0
+        const line = new Lines()
+        line.setNumVertices(2)
+        line.setNumSegments(1)
+        line.setSegmentVertexIndices(0, 0, 1)
+        const positions = line.getVertexAttribute('positions')
+        positions.getValueRef(0).set(0.0, 0.0, 0.0)
+        positions.getValueRef(1).set(0.0, 0.0, -1.0)
+        line.setBoundingBoxDirty()
 
-      // The tip items needs to be rotated down a little to make it
-      // point in the right direction.
-      const tipItemXfo = controller.tipItem.localXfoParam.value
-      tipItemXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), -0.8)
-      controller.tipItem.localXfoParam.value = tipItemXfo
+        const pointermat = new Material('pointermat', 'LinesShader')
+        pointermat.setSelectable(false)
+        pointermat.getParameter('BaseColor').value = new Color(0.2, 1.0, 0.2)
+
+        const pointerItem = new GeomItem('PointerRay', line, pointermat)
+        pointerItem.setSelectable(false)
+        const pointerXfo = new Xfo()
+        pointerXfo.sc.set(1, 1, controller.raycastDist)
+        pointerItem.localXfoParam.value = pointerXfo
+        controller.tipItem.addChild(pointerItem, false)
+
+        // The tip items needs to be rotated down a little to make it
+        // point in the right direction.
+        const tipItemXfo = controller.tipItem.localXfoParam.value
+        tipItemXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), -0.8)
+        controller.tipItem.localXfoParam.value = tipItemXfo
+      }
+
+      if (controller.inputSource.handedness == 'left') {
+        controller.raycastDist = 0.0
+        const planeItem = new GeomItem('Clipboard', new Plane(), new FlatSurfaceMaterial())
+        const xfo = new Xfo()
+        xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.4)
+        xfo.tr.set(0.35, -0.05, 0.08)
+        xfo.sc.set(0.4, 0.3, 1.0)
+        planeItem.localXfoParam.value = xfo
+        controller.tipItem.addChild(planeItem, false)
+
+        planeItem.on('pointerMove', pointerMove)
+        planeItem.on('pointerLeave', pointerLeave)
+      }
     })
   })
 
@@ -225,12 +243,12 @@ export default function init() {
   // //////////////////////////
   // Load the Asset
   // const url = './data/data.skp.zcad'
-  const url = './data/maison.skp.zcad'
-  loadAsset(url).then((data) => {
-    scene.getRoot().addChild(data.asset)
-    scene.getRoot().addChild(data.layersRoot)
-    renderer.frameAll()
-  })
+  // const url = './data/maison.skp.zcad'
+  // loadAsset(url).then((data) => {
+  //   scene.getRoot().addChild(data.asset)
+  //   scene.getRoot().addChild(data.layersRoot)
+  //   renderer.frameAll()
+  // })
 
   const domUI = document.createElement('dom-ui')
   document.body.appendChild(domUI)
