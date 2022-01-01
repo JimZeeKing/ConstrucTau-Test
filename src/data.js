@@ -359,13 +359,13 @@ export function goto(posIndex) {
       const xfo = xrview.getXfo()
       xfo.ori = new Quat(pos.ori.x, pos.ori.y, pos.ori.z, pos.ori.w)
       xfo.tr = new Vec3(pos.tr.x, pos.tr.y, pos.tr.z)
-      xfo.sc = new Vec3(pos.sc.x, pos.sc.y, pos.sc.z)
+      xfo.sc = new Vec3(pos.sc.x, pos.sc.x, pos.sc.x)
       xrview.setXfo(xfo)
     } else {
       const xfo = camera.getParameter('GlobalXfo').getValue()
       xfo.ori = new Quat(pos.ori.x, pos.ori.y, pos.ori.z, pos.ori.w)
       xfo.tr = new Vec3(pos.tr.x, pos.tr.y, pos.tr.z)
-      xfo.sc = new Vec3(pos.sc.x, pos.sc.y, pos.sc.z)
+      xfo.sc = new Vec3(pos.sc.x, pos.sc.x, pos.sc.x)
       camera.getParameter('GlobalXfo').setValue(xfo)
     }
   }
