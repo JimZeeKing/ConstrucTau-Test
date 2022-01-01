@@ -376,20 +376,30 @@ export function addDomBillboard(imageData, targetElement, mapper, pos, lookAt, p
   billboardData.set(targetElement, bData)
 
   domBillboardData.billboard.on('pointerDown', (event) => {
-    const pos = getIntersectionPosition(event.intersectionData, isInHand)
+    const pos = getIntersectionPosition(event, isInHand)
     if (pos) mapper.mapDownToDomElement(pos.x, pos.y)
+    event.stopPropagation()
   })
 
   domBillboardData.billboard.on('pointerUp', (event) => {
-    const pos = getIntersectionPosition(event.intersectionData, isInHand)
+    const pos = getIntersectionPosition(event, isInHand)
     if (pos) mapper.mapClickToDomElement(pos.x, pos.y)
+    event.stopPropagation()
   })
 
   domBillboardData.billboard.on('pointerMove', (event) => {
-    const pos = getIntersectionPosition(event.intersectionData, isInHand)
+    const pos = getIntersectionPosition(event, isInHand)
     if (pos) mapper.mapPosToDomElement(pos.x, pos.y)
+    event.stopPropagation()
   })
   domBillboardData.billboard.on('pointerLeave', (event) => {
+    if (!event.intersectionData && event.pointerType == 'xr') {
+      const controller = event.controller
+      const pointerItem = controller.tipItem.getChild(0)
+      const pointerXfo = pointerItem.localXfoParam.value
+      pointerXfo.sc.z = controller.raycastDist
+      pointerItem.localXfoParam.value = pointerXfo
+    }
     mapper.resetLastElement()
   })
 
@@ -543,10 +553,15 @@ function createBillboard(label, pos, image, targetPos, targetPPM) {
   return geomItem
 }
 
-function getIntersectionPosition(intersectionData, isInHand) {
-  if (intersectionData) {
-    const ray = intersectionData.ray ? intersectionData.ray : intersectionData.pointerRay
+function getIntersectionPosition(event, isInHand) {
+  event.stopPropagation()
+  if (event.intersectionData) {
+    const intersectionData = event.intersectionData
+    // The controller that fired the intersectrion.
+    const ray = intersectionData.pointerRay
     const geomItem = intersectionData.geomItem
+
+    const hitPos = ray.pointAtDist(intersectionData.dist)
 
     //bug:pointerevent stil firing after maing it invisible
     if (!geomItem.isVisible()) {
@@ -554,29 +569,40 @@ function getIntersectionPosition(intersectionData, isInHand) {
       return
     }
 
-    const planeXfo = geomItem.getParameter('GlobalXfo').getValue().clone()
-    const plane = new Ray(planeXfo.tr, planeXfo.ori.getZaxis())
-    const res = ray.intersectRayPlane(plane)
-    if (res <= 0) {
-      return -1
-    }
-
-    if (vr) {
-      const controller = leftController
+    if (event.controller) {
+      // Adjust the pointer ray to show it hit a surface
+      const controller = event.controller
       const pointerItem = controller.tipItem.getChild(0)
       const pointerXfo = pointerItem.localXfoParam.value
       pointerXfo.sc.z = intersectionData.dist / controller.xrvp.stageScale
       pointerItem.localXfoParam.value = pointerXfo
     }
 
-    //if in hand we must update the scale according to headScale
-    planeXfo.sc.set(isInHand ? headScale : 1, isInHand ? headScale : 1, isInHand ? headScale : 1)
-
+    const planeXfo = geomItem.globalXfoParam.value.clone()
+    planeXfo.sc.set(1, 1, 1)
     const invPlaneXfo = planeXfo.inverse()
-    const hitOffset = invPlaneXfo.transformVec3(ray.pointAtDist(res))
+    const hitOffset = invPlaneXfo.transformVec3(hitPos)
+    // hitOffset.scaleInPlace(1 / controller.xrvp.stageScale)
+    // console.log(hitOffset1.toString())
+
+    // const plane = new Ray(planeXfo.tr, planeXfo.ori.getZaxis())
+    // const res = ray.intersectRayPlane(plane)
+    // console.log(res, intersectionData.dist)
+    // if (res <= 0) {
+    //   return -1
+    // }
+
+    //if in hand we must update the scale according to headScale
+    // planeXfo.sc.set(isInHand ? headScale : 1, isInHand ? headScale : 1, isInHand ? headScale : 1)
+
+    // const hitOffset = invPlaneXfo.transformVec3(ray.pointAtDist(res))
+    // hitOffset.scaleInPlace(1 / controller.xrvp.stageScale)
+    // console.log(hitOffset.toString())
     const clientX = hitOffset.x / geomItem.pixelsPerMeter + geomItem.width * 0.5
     const clientY = -hitOffset.y / geomItem.pixelsPerMeter + geomItem.height * 0.5
+    // console.log(clientX, clientY)
     return { x: clientX, y: clientY }
   }
 }
+
 // <!-- prettier-ignore-end -->
