@@ -42,13 +42,13 @@ void main(void) {
   v_drawItemId = float(drawItemId);
   v_geomItemData  = getInstanceData(drawItemId);
   
-  #ifdef ENABLE_MULTI_DRAW
+#ifdef ENABLE_MULTI_DRAW
   vec2 materialCoords = v_geomItemData.zw;
   vec4 materialValue1 = getMaterialValue(materialCoords, 1);
   float overlay = materialValue1.z;
-  #else
+#else
   float overlay = Overlay;
-  #endif
+#endif
 
   mat4 modelMatrix = getModelMatrix(drawItemId);
   mat4 modelViewMatrix = viewMatrix * modelMatrix;
@@ -261,7 +261,7 @@ void main(void) {
     #endif
 
 #elif defined(DRAW_GEOMDATA)
-  fragColor = setFragColor_geomData(v_viewPos, floatGeomBuffer, passId,v_drawItemId, 0);
+  fragColor = setFragColor_geomData(v_viewPos, floatGeomBuffer, passId, v_drawItemId, 0);
 #elif defined(DRAW_HIGHLIGHT)
   fragColor = setFragColor_highlight(v_drawItemId);
 #endif // DRAW_HIGHLIGHT
