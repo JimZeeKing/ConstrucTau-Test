@@ -4,8 +4,9 @@ import loadAsset from './loadAsset.js'
 import { positions } from './positions.js'
 
 // Zea Engine dependencies stored in new const variables. View the API to see what you can include and use.
-const { Scene, GLRenderer, Vec3, Color, Xfo, Ray, resourceLoader, DataImage, EnvMap, TreeItem, GeomItem, Plane, Material, Lines, Quat, Vec4 } = window.zeaEngine
+const { Scene, GLRenderer, Vec3, Color, Xfo, Ray, resourceLoader, DataImage, EnvMap, TreeItem, GeomItem, Plane, Material, Lines, Quat, Vec4, FlatSurfaceMaterial } = window.zeaEngine
 const { CADBody } = zeaCad
+
 class DomTree extends GeomItem {
   /**
    * The onVRPoseChanged method.
@@ -46,6 +47,7 @@ class DomTree extends GeomItem {
 const plane = new Plane(1, 1)
 const billboardData = new Map()
 const activeBillboard = new Map()
+
 let readyCallback
 export function prepare(readyCb) {
   readyCallback = readyCb
@@ -53,11 +55,10 @@ export function prepare(readyCb) {
   main()
 }
 
-let billboardTree, camera, renderer, headScale, sceneScale, pointerUILine, pointerUIXfo, vr, leftController, xrview, contentHighlitedItem, contentActivePosition
+let billboardTree, camera, renderer, sceneScale, pointerUILine, pointerUIXfo, vr, leftController, rightController, xrview, contentHighlitedItem, contentActivePosition
 const initState = new Map()
 
 function main() {
-  headScale = 1
   // create a new scene
   const scene = new Scene()
 
@@ -118,14 +119,14 @@ function main() {
     }
   })
 
-  scene.getRoot().on('pointerMove', (event) => {
+  scene.getRoot().on('pointerEnter', (event) => {
     if (event.intersectionData && event.pointerType == 'xr') {
       const controller = event.controller
       const pointerItem = controller.tipItem.getChild(0)
       const pointerXfo = pointerItem.localXfoParam.value
       pointerXfo.sc.z = event.intersectionData.dist / controller.xrvp.stageScale
       pointerItem.localXfoParam.value = pointerXfo
-      console.log('pointerMove - VR', event.intersectionData) //here !
+      console.log('pointerEnter - VR', event.intersectionData) //here !
     }
 
     event.intersectionData.geomItem.addHighlight('selection', highlightColorContent, true)
@@ -203,100 +204,85 @@ function main() {
     xrvp.on('pointerDown', (event) => {
       console.log('pointerup - VR', event.intersectionData) //here !
 
-      if (event.intersectionData) {
-        if (event.intersectionData.geomItem.hasParameter('LayerName')) {
-          window.newContentRequest(event.intersectionData.geomItem.getParameter('LayerName').getValue(), event)
-        }
+      if (event.intersectionData && event.intersectionData.geomItem.hasParameter('LayerName')) {
+        window.newContentRequest(event.intersectionData.geomItem.getParameter('LayerName').getValue(), event)
       }
     })
 
-    xrvp.on('viewChanged', (event) => {
-      const headXfo = event.viewXfo
-      headScale = headXfo.sc.x
-
-      const sceneXfo = xrvp.getXfo()
-      sceneScale = sceneXfo.sc
-
-      if (leftController) {
-        callControllerButtonPress(leftController)
-      }
-    })
     xrvp.on('controllerAdded', (event) => {
       // const xfo = activeBillboard.get('handDomBillboard').get('handDomBillboard').billboard.getParameter('GlobalXfo').getValue();
-      controllers = xrvp.getControllers()
 
-      if (controllers.length == 2) {
-        //we have both controllers now
+      const controller = event.controller
+      // Remove the green ball added by the VRViewManipulator.
+      controller.tipItem.removeAllChildren()
 
-        const pointermat = new Material('pointermat', 'LinesShader')
-        pointermat.setSelectable(false)
-        pointermat.getParameter('BaseColor').setValue(new Color(0, 1, 0))
-
+      if (controller.inputSource.handedness == 'right') {
+        controller.raycastDist = 20.0
         const line = new Lines()
         line.setNumVertices(2)
         line.setNumSegments(1)
         line.setSegmentVertexIndices(0, 0, 1)
-
         const positions = line.getVertexAttribute('positions')
         positions.getValueRef(0).set(0.0, 0.0, 0.0)
         positions.getValueRef(1).set(0.0, 0.0, -1.0)
         line.setBoundingBoxDirty()
 
-        const rightController = getHandController(controllers, 'right')
-        rightController.raycastDist = 20.0
+        const pointermat = new Material('pointermat', 'LinesShader')
+        pointermat.setSelectable(false)
+        pointermat.getParameter('BaseColor').value = new Color(0.2, 1.0, 0.2)
 
-        pointerUIXfo = new Xfo()
-        pointerUIXfo.sc.set(1, 1, rightController.raycastDist)
-        pointerUIXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), -0.8)
+        const pointerItem = new GeomItem('PointerRay', line, pointermat)
+        pointerItem.setSelectable(false)
+        const pointerXfo = new Xfo()
+        pointerXfo.sc.set(1, 1, controller.raycastDist)
+        pointerItem.localXfoParam.value = pointerXfo
+        controller.tipItem.addChild(pointerItem, false)
 
-        pointerUILine = new GeomItem('VRControllerPointer', line, pointermat)
-        pointerUILine.setSelectable(false)
+        // The tip items needs to be rotated down a little to make it
+        // point in the right direction.
+        const tipItemXfo = controller.tipItem.localXfoParam.value
+        tipItemXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), -0.8)
+        controller.tipItem.localXfoParam.value = tipItemXfo
 
-        rightController.getTipItem().removeAllChildren()
-        rightController.tipItem.localXfoParam.value = pointerUIXfo
-        rightController.getTipItem().addChild(pointerUILine, false)
+        rightController = controller
+      }
 
-        rightController.treeItem.setSelectable(false)
-
-        leftController = getHandController(controllers, 'left', [
-          () => {
-            console.log(0)
-          },
-          () => {
-            console.log(1)
-          },
-          () => {
-            console.log(2)
-          },
-          () => {
-            console.log(3)
-          },
-          () => {
-            console.log(4)
-            //x button
-            activeBillboard.get('handUI').billboard.setVisible(!activeBillboard.get('handUI').billboard.isVisible())
-          },
-          () => {
-            console.log(5)
-            saveCamLocal()
-          },
-          () => {
-            console.log(6)
-          },
-          () => {
-            console.log(7)
-          },
-        ])
-
-        leftController.getTipItem().removeAllChildren()
-
-        leftController.getTipItem().addChild(activeBillboard.get('handUI').billboard, false)
-        const uiLocalXfo = activeBillboard.get('handUI').billboard.getParameter('LocalXfo').getValue()
+      if (controller.inputSource.handedness == 'left') {
+        controller.raycastDist = 0.0
+        // const billboard = new GeomItem('Clipboard', new Plane(), new FlatSurfaceMaterial())
+        const billboard = activeBillboard.get('handUI').billboard
+        const uiLocalXfo = billboard.localXfoParam.value
+        // const uiLocalXfo = new Xfo()
         uiLocalXfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * -0.4)
-
         uiLocalXfo.tr.set(0.35, -0.05, 0.08)
-        activeBillboard.get('handUI').billboard.getParameter('LocalXfo').setValue(uiLocalXfo)
-        activeBillboard.get('handUI').billboard.setVisible(false)
+        billboard.localXfoParam.value = uiLocalXfo
+        controller.getTipItem().addChild(billboard, false)
+        billboard.setVisible(false)
+        // planeItem.on('pointerMove', pointerMove)
+        // planeItem.on('pointerLeave', pointerLeave)
+
+        let handUIButton = -1
+        switch (controller.inputSource.profiles[0]) {
+          case 'htc-vive':
+            // The top thumb button.
+            handUIButton = 2
+            break
+          case 'oculus-touch':
+          case 'oculus-touch-v2':
+          case 'oculus-touch-v3':
+            //x button
+            handUIButton = 4
+            break
+          default:
+            break
+        }
+        controller.on('buttonPressed', (event) => {
+          console.log('buttonPressed', event)
+          if (event.button == handUIButton) {
+            const billboard = activeBillboard.get('handUI').billboard
+            billboard.setVisible(!billboard.isVisible())
+          }
+        })
       }
     })
 
@@ -307,7 +293,7 @@ function main() {
     initState.set(xrview, xrview.getXfo().toJSON())
   })
 
-  //loading the file
+  // loading the file
   loadAsset('./data/Maison.skp.zcad').then((data) => {
     scene.getRoot().addChild(data.asset)
     const geomItems = []
@@ -328,6 +314,7 @@ function main() {
     readyCallback(data)
   })
 }
+
 const scenePositions = positions
 export function saveCamLocal() {
   const xfo = vr ? xrview.getXfo() : camera.globalXfoParam.value
@@ -488,37 +475,6 @@ export function isVR() {
   return vr
 }
 
-function getHandController(controllers, handedness, buttonsCallback) {
-  let found = null
-  controllers.forEach((controller) => {
-    console.log(controller.inputSource)
-    if (controller.inputSource.handedness == handedness) {
-      found = controller
-      if (controller.inputSource.gamepad && buttonsCallback) {
-        controller.inputSource.gamepad.buttons.forEach((button, index) => {
-          if (buttonsCallback[index]) {
-            leftHandButtons.set(button, { callback: buttonsCallback[index], isPressed: false })
-          }
-        })
-      }
-    }
-  })
-  return found
-}
-
-function callControllerButtonPress(controller) {
-  controller.inputSource.gamepad.buttons.forEach((button, index) => {
-    const buttonData = leftHandButtons.get(button)
-    if (button.pressed && !buttonData.isPressed && buttonData.callback) {
-      buttonData.callback()
-      buttonData.isPressed = true
-    } else if (!button.pressed) {
-      buttonData.isPressed = false
-    }
-    leftHandButtons.set(button, buttonData)
-  })
-}
-
 function createDomBillboard(data, label, pos, lookAt, ppm) {
   const billboardLabel = createDataImage(data, label || 'dataimage')
   const billboard = createBillboard(label instanceof HTMLElement ? label.id : label, pos, billboardLabel, lookAt, ppm)
@@ -533,7 +489,7 @@ function createDataImage(imgData, name) {
 
 function createBillboard(label, pos, image, targetPos, targetPPM) {
   const geomItem = new DomTree(label)
-  const material = new Material('material', 'FlatSurfaceShader')
+  const material = new FlatSurfaceMaterial('material')
   material.getParameter('BaseColor').setImage(image)
   geomItem.getParameter('Geometry').setValue(plane)
   geomItem.getParameter('Material').setValue(material)
@@ -544,7 +500,9 @@ function createBillboard(label, pos, image, targetPos, targetPPM) {
   xfo.tr = pos
   if (targetPos) {
     xfo.ori.setFromDirectionAndUpvector(targetPos.subtract(pos), new Vec3(0, 0, 1))
-  } else xfo.ori.setFromDirectionAndUpvector(new Vec3(0, 0, 0), new Vec3(0, 0, 1))
+  }
+  // Note: dir must be a vector of non-zero length.
+  //else xfo.ori.setFromDirectionAndUpvector(new Vec3(0, 0, 0), new Vec3(0, 0, 1))
 
   geomItem.getParameter('GlobalXfo').setValue(xfo)
   geomItem.pixelsPerMeter = ppm
@@ -569,6 +527,13 @@ function getIntersectionPosition(event, isInHand) {
       return
     }
 
+    const planeXfo = geomItem.globalXfoParam.value.clone()
+    planeXfo.sc.set(1, 1, 1)
+    const invPlaneXfo = planeXfo.inverse()
+    const hitOffset = invPlaneXfo.transformVec3(hitPos)
+
+    let scale = 1.0
+
     if (event.controller) {
       // Adjust the pointer ray to show it hit a surface
       const controller = event.controller
@@ -576,31 +541,14 @@ function getIntersectionPosition(event, isInHand) {
       const pointerXfo = pointerItem.localXfoParam.value
       pointerXfo.sc.z = intersectionData.dist / controller.xrvp.stageScale
       pointerItem.localXfoParam.value = pointerXfo
+
+      // Note: this applies only to billboards in the hand.
+      scale = controller.xrvp.stageScale
     }
 
-    const planeXfo = geomItem.globalXfoParam.value.clone()
-    planeXfo.sc.set(1, 1, 1)
-    const invPlaneXfo = planeXfo.inverse()
-    const hitOffset = invPlaneXfo.transformVec3(hitPos)
-    // hitOffset.scaleInPlace(1 / controller.xrvp.stageScale)
-    // console.log(hitOffset1.toString())
+    let clientX = hitOffset.x / (geomItem.pixelsPerMeter * scale) + geomItem.width * 0.5
+    let clientY = -hitOffset.y / (geomItem.pixelsPerMeter * scale) + geomItem.height * 0.5
 
-    // const plane = new Ray(planeXfo.tr, planeXfo.ori.getZaxis())
-    // const res = ray.intersectRayPlane(plane)
-    // console.log(res, intersectionData.dist)
-    // if (res <= 0) {
-    //   return -1
-    // }
-
-    //if in hand we must update the scale according to headScale
-    // planeXfo.sc.set(isInHand ? headScale : 1, isInHand ? headScale : 1, isInHand ? headScale : 1)
-
-    // const hitOffset = invPlaneXfo.transformVec3(ray.pointAtDist(res))
-    // hitOffset.scaleInPlace(1 / controller.xrvp.stageScale)
-    // console.log(hitOffset.toString())
-    const clientX = hitOffset.x / geomItem.pixelsPerMeter + geomItem.width * 0.5
-    const clientY = -hitOffset.y / geomItem.pixelsPerMeter + geomItem.height * 0.5
-    // console.log(clientX, clientY)
     return { x: clientX, y: clientY }
   }
 }
